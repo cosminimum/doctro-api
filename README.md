@@ -17,3 +17,24 @@
 </table>
 
 ###### *very important: each layer have access only to the lower layer(s)
+
+### 2) User login
+**URL:** http://(awesome-api-here)/api/login
+
+**METHOD:** POST
+
+**BODY:** (Content-Type: application/json) (raw json)
+```json
+{
+    "username": "email@doctro.tld",
+    "password": "plain password here"
+}
+```
+**RESPONSE**:
+```json
+{
+    "user": "email@doctro.tld",
+    "token": "super secret token here"
+}
+```
+###### *WORK IN PROGRESS: token generator & token handler
