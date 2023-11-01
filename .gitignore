@@ -1,3 +1,6 @@
+###> CUSTOM ###
+/.idea/
+###< CUSTOM ###
 
 ###> symfony/framework-bundle ###
 /.env.local
