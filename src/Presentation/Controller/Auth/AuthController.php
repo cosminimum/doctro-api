@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presentation\Controller;
+namespace App\Presentation\Controller\Auth;
 
 use App\Application\Repository\AccessTokenRepositoryInterface;
 use App\Infrastructure\Entity\User;
@@ -18,7 +18,7 @@ class AuthController extends AbstractController
     ) {
     }
 
-    #[Route('/login', name: 'login')]
+    #[Route('/login', name: 'login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
         if ($user === null) {
@@ -49,7 +49,7 @@ class AuthController extends AbstractController
         ]);
     }
 
-    #[Route('/logout', name: 'logout')]
+    #[Route('/logout', name: 'logout', methods: ['GET'])]
     public function logout(): void
     {
         // todo: add logout subscriber --> invalidate last active token

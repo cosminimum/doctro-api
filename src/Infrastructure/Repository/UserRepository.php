@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\Application\Repository\UserRepositoryInterface;
+use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -21,15 +22,15 @@ class UserRepository extends ServiceEntityRepository implements
         parent::__construct($registry, User::class);
     }
 
-    public function addUser(array $userData): int
+    public function addUser(UserCreateRequestDto $userData): int
     {
         $user = (new User())
-            ->setEmail($userData['email'])
-            ->setRoles($userData['roles']);
+            ->setEmail($userData->getEmail())
+            ->setRoles($userData->getRoles());
 
         $newPassword = $this->passwordHasher->hashPassword(
             $user,
-            $userData['password']
+            $userData->getPassword()
         );
 
         $user->setPassword($newPassword);

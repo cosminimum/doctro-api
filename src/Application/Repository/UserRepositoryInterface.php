@@ -2,7 +2,9 @@
 
 namespace App\Application\Repository;
 
+use App\Domain\Dto\UserCreateRequestDto;
+
 interface UserRepositoryInterface
 {
-    public function addUser(array $userData): int;
+    public function addUser(UserCreateRequestDto $userData): int;
 }
