@@ -52,5 +52,6 @@ class AuthController extends AbstractController
     #[Route('/logout', name: 'logout')]
     public function logout(): void
     {
+        // todo: add logout subscriber --> invalidate last active token
     }
 }
