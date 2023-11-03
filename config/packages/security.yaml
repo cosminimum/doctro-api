@@ -17,14 +17,17 @@ security:
             provider: app_user_provider
 
             json_login:
-                check_path: api_login
+                check_path: login
+
+            logout:
+                path: logout
 
             access_token:
                 token_handler: App\Application\Security\AccessTokenHandler
 
     # Note: Only the *first* access control that matches will be used
     access_control:
-        - { path: ^/api/login$, roles: [ ] }
+        - { path: ^/login, roles: [ ] }
         - { path: ^/api/, roles: [ IS_AUTHENTICATED_FULLY ] }
 
 when@test:

@@ -2,11 +2,12 @@
 
 namespace App\Infrastructure\Repository;
 
+use App\Application\Repository\AccessTokenRepositoryInterface;
 use App\Infrastructure\Entity\AccessToken;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class AccessTokenRepository extends ServiceEntityRepository
+class AccessTokenRepository extends ServiceEntityRepository implements AccessTokenRepositoryInterface
 {
     private const TOKEN_VALIDITY_MINUTES = 5;
 
@@ -19,6 +20,11 @@ class AccessTokenRepository extends ServiceEntityRepository
     public function getAccessToken(string $accessToken): ?AccessToken
     {
         return $this->findOneBy(['token' => $accessToken]);
+    }
+
+    public function getAccessTokenByUserIdentifier(string $userIdentifier): ?AccessToken
+    {
+        return $this->findOneBy(['userIdentifier' => $userIdentifier], ['id' => 'desc']);
     }
 
     public function addAccessToken(string $email, string $tokenUuid): void

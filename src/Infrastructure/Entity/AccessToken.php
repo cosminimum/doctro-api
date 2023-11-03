@@ -7,6 +7,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: AccessTokenRepository::class)]
 #[ORM\Table(name: 'access_tokens')]
+#[ORM\HasLifecycleCallbacks]
 class AccessToken
 {
     use CreatedUpdatedTrait;
