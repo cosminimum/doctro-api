@@ -20,7 +20,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
     'doctor' => Doctor::class,
     'manager' => Manager::class
 ])]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements
+    UserInterface,
+    PasswordAuthenticatedUserInterface
 {
     use CreatedUpdatedTrait;
 
