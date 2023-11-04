@@ -7,16 +7,29 @@ use Symfony\Component\Validator\Constraints as Assert;
 class UserCreateRequestDto
 {
     public function __construct(
-        #[Assert\NotBlank(message: 'email is mandatory')]
-        #[Assert\Email(message: 'email has wrong format')]
+        #[Assert\NotBlank()]
+        #[Assert\Email()]
         private readonly string $email,
 
-        #[Assert\NotBlank(message: 'roles are mandatory')]
-        #[Assert\Count(min: 1, minMessage: 'minimum of 1 role is mandatory')]
+        #[Assert\NotBlank()]
+        private readonly string $firstName,
+
+        #[Assert\NotBlank()]
+        private readonly string $lastName,
+
+        #[Assert\NotBlank()]
+        #[Assert\Length(exactly: 13)]
+        private readonly string $cnp,
+
+        #[Assert\NotBlank()]
+        private string $phone,
+
+        #[Assert\NotBlank()]
+        #[Assert\Count(min: 1)]
         private readonly array $roles,
 
-        #[Assert\NotBlank(message: 'password is mandatory')]
-        #[Assert\Length(min: 6, max: 30, exactMessage: 'password must be between 6 and 30')]
+        #[Assert\NotBlank()]
+        #[Assert\Length(min: 6)]
         private readonly string $password
     ) {
     }
@@ -24,6 +37,26 @@ class UserCreateRequestDto
     public function getEmail(): string
     {
         return $this->email;
+    }
+
+    public function getFirstName(): string
+    {
+        return $this->firstName;
+    }
+
+    public function getLastName(): string
+    {
+        return $this->lastName;
+    }
+
+    public function getCnp(): string
+    {
+        return $this->cnp;
+    }
+
+    public function getPhone(): string
+    {
+        return $this->phone;
     }
 
     /** @return string[] */

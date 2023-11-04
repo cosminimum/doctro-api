@@ -26,6 +26,10 @@ class UserRepository extends ServiceEntityRepository implements
     {
         $user = (new User())
             ->setEmail($userData->getEmail())
+            ->setFirstName($userData->getFirstName())
+            ->setLastName($userData->getLastName())
+            ->setCnp($userData->getCnp())
+            ->setPhone($userData->getPhone())
             ->setRoles($userData->getRoles());
 
         $newPassword = $this->passwordHasher->hashPassword(
