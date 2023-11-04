@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\Application\Repository\DoctorRepositoryInterface;
+use App\Application\Repository\MedicalSpecialtyRepositoryInterface;
 use App\Domain\Dto\DoctorCreateRequestDto;
 use App\Infrastructure\Entity\Doctor;
 use App\Infrastructure\Entity\DoctorDetails;
@@ -14,7 +15,8 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
 {
     public function __construct(
         ManagerRegistry $registry,
-        private readonly UserPasswordHasherInterface $passwordHasher
+        private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly MedicalSpecialtyRepositoryInterface $medicalSpecialtyRepository
     ) {
         parent::__construct($registry, Doctor::class);
     }
@@ -34,6 +36,10 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
             ->setStamp($userData->getStamp());
 
         $doctor->setDoctorDetails($doctorDetails);
+
+        $doctor->addMedicalSpecialty(
+            $this->medicalSpecialtyRepository->findByCode($userData->getSpecialtyCode())
+        );
 
         $newPassword = $this->passwordHasher->hashPassword(
             $doctor,

@@ -16,7 +16,7 @@ class DoctorDetails
     #[ORM\Column(type: 'integer')]
     private int $id;
 
-    #[ORM\OneToOne(inversedBy: 'doctorDetails', targetEntity: Doctor::class)]
+    #[ORM\OneToOne(mappedBy: 'doctorDetails', targetEntity: Doctor::class)]
     #[ORM\JoinColumn(name: 'doctor_id', referencedColumnName: 'id', nullable: false)]
     private Doctor $doctor;
 

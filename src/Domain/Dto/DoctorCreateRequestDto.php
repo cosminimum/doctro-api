@@ -28,6 +28,9 @@ class DoctorCreateRequestDto
         private readonly string $stamp,
 
         #[Assert\NotBlank()]
+        private readonly string $specialtyCode,
+
+        #[Assert\NotBlank()]
         #[Assert\Count(min: 1)]
         private readonly array $roles,
 
@@ -65,6 +68,11 @@ class DoctorCreateRequestDto
     public function getStamp(): string
     {
         return $this->stamp;
+    }
+
+    public function getSpecialtyCode(): string
+    {
+        return $this->specialtyCode;
     }
 
     /** @return string[] */
