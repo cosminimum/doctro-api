@@ -2,8 +2,8 @@
 
 namespace App\Presentation\Controller;
 
-use App\Application\Repository\UserRepositoryInterface;
-use App\Domain\Dto\UserCreateRequestDto;
+use App\Application\Repository\PatientRepositoryInterface;
+use App\Domain\Dto\PatientCreateRequestDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -13,14 +13,14 @@ use Symfony\Component\Routing\Annotation\Route;
 class UserController extends AbstractController
 {
     public function __construct(
-        private readonly UserRepositoryInterface $userRepository
+        private readonly PatientRepositoryInterface $userRepository
     ) {
     }
 
     #[Route(
         '/api/user', name: 'api_user_create', methods: ['POST']
     )]
-    public function create(#[MapRequestPayload] UserCreateRequestDto $requestDto): JsonResponse
+    public function create(#[MapRequestPayload] PatientCreateRequestDto $requestDto): JsonResponse
     {
         $userId = $this->userRepository->addUser($requestDto);
 

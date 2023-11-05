@@ -4,7 +4,7 @@ namespace App\Domain\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class UserCreateRequestDto
+class PatientCreateRequestDto
 {
     public function __construct(
         #[Assert\NotBlank()]

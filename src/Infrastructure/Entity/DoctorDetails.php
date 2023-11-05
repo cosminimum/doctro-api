@@ -23,9 +23,6 @@ class DoctorDetails
     #[ORM\Column(type: 'string')]
     private string $stamp;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;

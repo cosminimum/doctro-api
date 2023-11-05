@@ -3,6 +3,7 @@
 namespace App\Infrastructure\Entity;
 
 use App\Infrastructure\Repository\UserRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
@@ -17,8 +18,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[DiscriminatorColumn(name: 'user_type', type: 'string')]
 #[DiscriminatorMap([
     'user' => User::class,
-    'doctor' => Doctor::class,
-    'manager' => Manager::class
+    Patient::USER_TYPE => Patient::class,
+    Doctor::USER_TYPE => Doctor::class,
+    Manager::USER_TYPE => Manager::class
 ])]
 class User implements
     UserInterface,

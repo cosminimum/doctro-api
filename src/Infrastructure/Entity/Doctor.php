@@ -10,6 +10,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: DoctorRepository::class)]
 class Doctor extends User
 {
+    public const USER_TYPE = 'doctor';
+
     #[ORM\OneToOne(mappedBy: 'doctor', targetEntity: DoctorDetails::class, cascade: ["persist"])]
     private DoctorDetails $doctorDetails;
 
@@ -17,9 +19,13 @@ class Doctor extends User
     #[ORM\JoinTable(name: 'doctor_to_specialty')]
     private Collection $medicalSpecialties;
 
+    #[ORM\OneToMany(mappedBy: 'doctor', targetEntity: Appointment::class)]
+    private Collection $appointments;
+
     public function __construct()
     {
         $this->medicalSpecialties = new ArrayCollection();
+        $this->appointments = new ArrayCollection();
     }
 
     public function getDoctorDetails(): DoctorDetails
@@ -48,5 +54,10 @@ class Doctor extends User
     {
         $this->medicalSpecialties->removeElement($medicalSpecialty);
         return $this;
+    }
+
+    public function getAppointments(): Collection
+    {
+        return $this->appointments;
     }
 }

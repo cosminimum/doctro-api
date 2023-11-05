@@ -26,9 +26,6 @@ class AccessToken
     #[ORM\Column(type: 'datetime', columnDefinition: "TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP")]
     private \DateTime $validUntil;
 
-    /**
-     * @return int
-     */
     public function getId(): int
     {
         return $this->id;
