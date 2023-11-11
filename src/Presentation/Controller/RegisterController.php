@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Presentation\Controller\Auth;
+namespace App\Presentation\Controller;
 
 use App\Application\Repository\DoctorRepositoryInterface;
 use App\Application\Repository\PatientRepositoryInterface;
-use App\Domain\Dto\DoctorCreateRequestDto;
-use App\Domain\Dto\PatientCreateRequestDto;
+use App\Domain\Dto\UserCreateRequestDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +20,7 @@ class RegisterController extends AbstractController
     }
 
     #[Route('/register/patient', name: 'register', methods: ['POST'])]
-    public function registerPatient(#[MapRequestPayload] PatientCreateRequestDto $requestDto): JsonResponse
+    public function registerPatient(#[MapRequestPayload] UserCreateRequestDto $requestDto): JsonResponse
     {
         $userId = $this->patientRepository->addPatient($requestDto);
 
@@ -29,7 +28,7 @@ class RegisterController extends AbstractController
     }
 
     #[Route('/register/doctor', name: 'register_doctor', methods: ['POST'])]
-    public function registerDoctor(#[MapRequestPayload] DoctorCreateRequestDto $requestDto): JsonResponse
+    public function registerDoctor(#[MapRequestPayload] UserCreateRequestDto $requestDto): JsonResponse
     {
         $userId = $this->doctorRepository->addDoctor($requestDto);
 

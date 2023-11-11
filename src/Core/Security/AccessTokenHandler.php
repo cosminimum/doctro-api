@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Application\Security;
+namespace App\Core\Security;
 
-use App\Application\Repository\AccessTokenRepositoryInterface;
+use App\Infrastructure\Repository\AccessTokenRepository;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Http\AccessToken\AccessTokenHandlerInterface;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -10,7 +10,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 class AccessTokenHandler implements AccessTokenHandlerInterface
 {
     public function __construct(
-        private readonly AccessTokenRepositoryInterface $repository
+        private readonly AccessTokenRepository $repository
     ) {
     }
 

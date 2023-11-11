@@ -2,12 +2,11 @@
 
 namespace App\Infrastructure\Repository;
 
-use App\Application\Repository\AccessTokenRepositoryInterface;
 use App\Infrastructure\Entity\AccessToken;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class AccessTokenRepository extends ServiceEntityRepository implements AccessTokenRepositoryInterface
+class AccessTokenRepository extends ServiceEntityRepository
 {
     private const TOKEN_VALIDITY_MINUTES = 5;
 

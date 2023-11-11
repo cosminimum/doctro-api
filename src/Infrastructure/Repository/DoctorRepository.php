@@ -3,10 +3,8 @@
 namespace App\Infrastructure\Repository;
 
 use App\Application\Repository\DoctorRepositoryInterface;
-use App\Application\Repository\MedicalSpecialtyRepositoryInterface;
-use App\Domain\Dto\DoctorCreateRequestDto;
+use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\Doctor;
-use App\Infrastructure\Entity\DoctorDetails;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -15,13 +13,12 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
 {
     public function __construct(
         ManagerRegistry $registry,
-        private readonly UserPasswordHasherInterface $passwordHasher,
-        private readonly MedicalSpecialtyRepositoryInterface $medicalSpecialtyRepository
+        private readonly UserPasswordHasherInterface $passwordHasher
     ) {
         parent::__construct($registry, Doctor::class);
     }
 
-    public function addDoctor(DoctorCreateRequestDto $userData): int
+    public function addDoctor(UserCreateRequestDto $userData): int
     {
         $doctor = (new Doctor())
             ->setEmail($userData->getEmail())
@@ -29,17 +26,7 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
             ->setLastName($userData->getLastName())
             ->setCnp($userData->getCnp())
             ->setPhone($userData->getPhone())
-            ->setRoles($userData->getRoles());
-
-        $doctorDetails = (new DoctorDetails())
-            ->setDoctor($doctor)
-            ->setStamp($userData->getStamp());
-
-        $doctor->setDoctorDetails($doctorDetails);
-
-        $doctor->addMedicalSpecialty(
-            $this->medicalSpecialtyRepository->findByCode($userData->getSpecialtyCode())
-        );
+            ->setRoles([Doctor::BASE_ROLE]);
 
         $newPassword = $this->passwordHasher->hashPassword(
             $doctor,

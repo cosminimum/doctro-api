@@ -1,4 +1,10 @@
-controllers:
+core:
+    resource:
+        path: ../src/Core/Controller/
+        namespace: App\Core\Controller
+    type: attribute
+
+app:
     resource:
         path: ../src/Presentation/Controller/
         namespace: App\Presentation\Controller

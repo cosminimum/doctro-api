@@ -4,7 +4,7 @@ namespace App\Domain\Dto;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class DoctorCreateRequestDto
+class UserCreateRequestDto
 {
     public function __construct(
         #[Assert\NotBlank()]
@@ -23,16 +23,6 @@ class DoctorCreateRequestDto
 
         #[Assert\NotBlank()]
         private readonly string $phone,
-
-        #[Assert\NotBlank()]
-        private readonly string $stamp,
-
-        #[Assert\NotBlank()]
-        private readonly string $specialtyCode,
-
-        #[Assert\NotBlank()]
-        #[Assert\Count(min: 1)]
-        private readonly array $roles,
 
         #[Assert\NotBlank()]
         #[Assert\Length(min: 6)]
@@ -63,16 +53,6 @@ class DoctorCreateRequestDto
     public function getPhone(): string
     {
         return $this->phone;
-    }
-
-    public function getStamp(): string
-    {
-        return $this->stamp;
-    }
-
-    public function getSpecialtyCode(): string
-    {
-        return $this->specialtyCode;
     }
 
     /** @return string[] */

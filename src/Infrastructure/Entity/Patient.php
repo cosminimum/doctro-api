@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Patient extends User
 {
     public const USER_TYPE = 'patient';
+    public const BASE_ROLE = 'ROLE_PATIENT';
 
     #[ORM\OneToMany(mappedBy: 'patient', targetEntity: Appointment::class)]
     private Collection $appointments;

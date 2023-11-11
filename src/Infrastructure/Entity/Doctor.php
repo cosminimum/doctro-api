@@ -11,6 +11,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Doctor extends User
 {
     public const USER_TYPE = 'doctor';
+    public const BASE_ROLE = 'ROLE_DOCTOR';
 
     #[ORM\OneToOne(mappedBy: 'doctor', targetEntity: DoctorDetails::class, cascade: ["persist"])]
     private DoctorDetails $doctorDetails;

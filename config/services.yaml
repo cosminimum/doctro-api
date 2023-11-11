@@ -21,6 +21,10 @@ services:
             - '../src/Infrastructure/Entity/'
             - '../src/Kernel.php'
 
+    App\Core\Controller\:
+        resource: '../src/Core/Controller/'
+        tags: ['controller.service_arguments']
+
     App\Presentation\Controller\:
         resource: '../src/Presentation/Controller/'
         tags: ['controller.service_arguments']

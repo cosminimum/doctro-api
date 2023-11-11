@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Presentation\Controller\Auth;
+namespace App\Core\Controller;
 
-use App\Application\Repository\AccessTokenRepositoryInterface;
 use App\Infrastructure\Entity\User;
+use App\Infrastructure\Repository\AccessTokenRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -14,7 +14,7 @@ use Symfony\Component\Uid\Uuid;
 class AuthController extends AbstractController
 {
     public function __construct(
-        private readonly AccessTokenRepositoryInterface $accessTokenRepository
+        private readonly AccessTokenRepository $accessTokenRepository
     ) {
     }
 

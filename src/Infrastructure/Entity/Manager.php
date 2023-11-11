@@ -9,4 +9,5 @@ use Doctrine\ORM\Mapping as ORM;
 class Manager extends User
 {
     public const USER_TYPE = 'manager';
+    public const BASE_ROLE = 'ROLE_MANAGER';
 }

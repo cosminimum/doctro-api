@@ -26,7 +26,7 @@ security:
                 path: logout
 
             access_token:
-                token_handler: App\Application\Security\AccessTokenHandler
+                token_handler: App\Core\Security\AccessTokenHandler
 
     # Note: Only the *first* access control that matches will be used
     access_control:

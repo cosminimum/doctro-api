@@ -3,7 +3,7 @@
 namespace App\Infrastructure\Repository;
 
 use App\Application\Repository\PatientRepositoryInterface;
-use App\Domain\Dto\PatientCreateRequestDto;
+use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\Patient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -18,7 +18,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         parent::__construct($registry, Patient::class);
     }
 
-    public function addPatient(PatientCreateRequestDto $userData): int
+    public function addPatient(UserCreateRequestDto $userData): int
     {
         $user = (new Patient())
             ->setEmail($userData->getEmail())
@@ -26,7 +26,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
             ->setLastName($userData->getLastName())
             ->setCnp($userData->getCnp())
             ->setPhone($userData->getPhone())
-            ->setRoles($userData->getRoles());
+            ->setRoles([Patient::BASE_ROLE]);
 
         $newPassword = $this->passwordHasher->hashPassword(
             $user,

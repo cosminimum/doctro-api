@@ -2,9 +2,9 @@
 
 namespace App\Application\Repository;
 
-use App\Domain\Dto\DoctorCreateRequestDto;
+use App\Domain\Dto\UserCreateRequestDto;
 
 interface DoctorRepositoryInterface
 {
-    public function addDoctor(DoctorCreateRequestDto $userData): int;
+    public function addDoctor(UserCreateRequestDto $userData): int;
 }
