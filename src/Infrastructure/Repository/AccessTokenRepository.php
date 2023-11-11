@@ -8,7 +8,7 @@ use Doctrine\Persistence\ManagerRegistry;
 
 class AccessTokenRepository extends ServiceEntityRepository
 {
-    private const TOKEN_VALIDITY_MINUTES = 5;
+    private const TOKEN_VALIDITY_DAYS = 365;
 
     public function __construct(
         ManagerRegistry $registry
@@ -30,7 +30,7 @@ class AccessTokenRepository extends ServiceEntityRepository
     {
         $tokenValidity = (new \DateTime())
             ->modify(
-                sprintf('+%s minutes', self::TOKEN_VALIDITY_MINUTES)
+                sprintf('+%s days', self::TOKEN_VALIDITY_DAYS)
             );
 
         $accessToken = (new AccessToken())
@@ -46,7 +46,7 @@ class AccessTokenRepository extends ServiceEntityRepository
     {
         $newValidity = (new \DateTime())
             ->modify(
-                sprintf('+%s minutes', self::TOKEN_VALIDITY_MINUTES)
+                sprintf('+%s days', self::TOKEN_VALIDITY_DAYS)
             );
 
         $accessToken->setValidUntil($newValidity);

@@ -3,7 +3,6 @@
 namespace App\Infrastructure\Entity;
 
 use App\Infrastructure\Repository\UserRepository;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
