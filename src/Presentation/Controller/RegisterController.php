@@ -4,6 +4,7 @@ namespace App\Presentation\Controller;
 
 use App\Application\Story\DoctorRegisterStory;
 use App\Application\Story\PatientRegisterStory;
+use App\Domain\Dto\ApiResponseDto;
 use App\Domain\Dto\UserCreateRequestDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -24,7 +25,12 @@ class RegisterController extends AbstractController
     {
         $userId = $this->patientRegisterStory->register($requestDto);
 
-        return $this->json(['user_id' => $userId], Response::HTTP_OK);
+        $response = new ApiResponseDto(code: Response::HTTP_OK, data: ['user_id' => $userId]);
+
+        return $this->json(
+            $response->toArray(),
+            $response->getCode()
+        );
     }
 
     #[Route('/register/doctor', name: 'register_doctor', methods: ['POST'])]
@@ -32,6 +38,11 @@ class RegisterController extends AbstractController
     {
         $userId = $this->doctorRegisterStory->register($requestDto);
 
-        return $this->json(['user_id' => $userId], Response::HTTP_OK);
+        $response = new ApiResponseDto(code: Response::HTTP_OK, data: ['user_id' => $userId]);
+
+        return $this->json(
+            $response->toArray(),
+            $response->getCode()
+        );
     }
 }

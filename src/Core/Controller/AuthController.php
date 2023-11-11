@@ -2,6 +2,7 @@
 
 namespace App\Core\Controller;
 
+use App\Domain\Dto\ApiResponseDto;
 use App\Infrastructure\Entity\User;
 use App\Infrastructure\Repository\AccessTokenRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,9 +22,14 @@ class AuthController extends AbstractController
     #[Route('/login', name: 'login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
+        $response = new ApiResponseDto();
+
         if ($user === null) {
+            $response->setErrors(['missing credentials'])
+                ->setCode(Response::HTTP_UNAUTHORIZED);
+
             return $this->json(
-                ['message' => 'missing credentials',],
+                $response->toArray(),
                 Response::HTTP_UNAUTHORIZED
             );
         }
@@ -43,10 +49,15 @@ class AuthController extends AbstractController
             );
         }
 
-        return $this->json([
+        $response->setData([
             'user'  => $user->getUserIdentifier(),
             'token' => $token,
         ]);
+
+        return $this->json(
+            $response->toArray(),
+            Response::HTTP_OK
+        );
     }
 
     #[Route('/logout', name: 'logout', methods: ['GET'])]
