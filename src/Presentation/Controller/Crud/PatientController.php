@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presentation\Controller;
+namespace App\Presentation\Controller\Crud;
 
 use App\Application\Repository\PatientRepositoryInterface;
 use App\Domain\Dto\UserCreateRequestDto;
@@ -9,50 +9,55 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 
-class UserController extends AbstractController
+class PatientController extends AbstractController
 {
     public function __construct(
-        private readonly PatientRepositoryInterface $userRepository
+        private readonly PatientRepositoryInterface $patientRepository,
+        private readonly AuthorizationCheckerInterface $authorizationChecker
     ) {
+        if (!$this->authorizationChecker->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException();
+        }
     }
 
     #[Route(
-        '/api/user', name: 'api_user_create', methods: ['POST']
+        '/api/crud/patient', name: 'api_crud_patient_create', methods: ['POST']
     )]
     public function create(#[MapRequestPayload] UserCreateRequestDto $requestDto): JsonResponse
     {
-        $userId = $this->userRepository->addUser($requestDto);
+        $userId = $this->patientRepository->addPatient($requestDto);
 
         return $this->json(['user_id' => $userId], Response::HTTP_OK);
     }
 
     #[Route(
-        '/api/user/{userId}', name: 'api_user_read', methods: ['GET']
+        '/api/crud/patient/{userId}', name: 'api_crud_patient_read', methods: ['GET']
     )]
     public function read(int $userId): JsonResponse
     {
-        // todo: get user
+        // todo: get patient
 
         return $this->json([], Response::HTTP_OK);
     }
 
     #[Route(
-        '/api/user/{userId}', name: 'api_user_update', methods: ['PUT']
+        '/api/crud/patient/{userId}', name: 'api_crud_patient_update', methods: ['PUT']
     )]
     public function update(int $userId, array $userData): JsonResponse
     {
-        // todo update user
+        // todo update patient
 
         return $this->json([], Response::HTTP_OK);
     }
 
     #[Route(
-        '/api/user/{userId}', name: 'api_user_delete', methods: ['DELETE']
+        '/api/crud/patient/{userId}', name: 'api_crud_patient_delete', methods: ['DELETE']
     )]
     public function delete(int $userId): JsonResponse
     {
-        // todo: delete user
+        // todo: delete patient
 
         return $this->json([], Response::HTTP_OK);
     }
