@@ -16,6 +16,8 @@ class DoctorListStory
     {
         $doctorList = $this->doctorRepository->getDoctorByFilters($requestDto);
 
+        // todo: filter by available dates? -- external call
+
         return $doctorList;
     }
 }

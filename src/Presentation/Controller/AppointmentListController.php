@@ -2,29 +2,29 @@
 
 namespace App\Presentation\Controller;
 
-use App\Application\Story\DoctorListStory;
+use App\Application\Story\AppointmentListStory;
 use App\Domain\Dto\ApiResponseDto;
-use App\Domain\Dto\DoctorListRequestDto;
+use App\Domain\Dto\AppointmentListRequestDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Annotation\Route;
 
-class DoctorListController extends AbstractController
+class AppointmentListController extends AbstractController
 {
     public function __construct(
-        private readonly DoctorListStory $doctorListStory
+        private readonly AppointmentListStory $appointmentListStory
     ) {
     }
 
-    #[Route('/api/doctors', name: 'api_doctor_list', methods: ['GET'])]
-    public function list(#[MapRequestPayload] DoctorListRequestDto $requestDto): JsonResponse
+    #[Route('/api/appointments', name: 'api_appointment_list', methods: ['GET'])]
+    public function list(#[MapRequestPayload] AppointmentListRequestDto $requestDto): JsonResponse
     {
         $response = new ApiResponseDto();
 
         try {
-            $results = $this->doctorListStory->list($requestDto);
+            $results = $this->appointmentListStory->list($requestDto);
 
             $response->setData($results);
         } catch (\Throwable $throwable) {
