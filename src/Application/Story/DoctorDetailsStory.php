@@ -3,6 +3,7 @@
 namespace App\Application\Story;
 
 use App\Application\Repository\DoctorRepositoryInterface;
+use App\Domain\Dto\DoctorDetailsDto;
 
 class DoctorDetailsStory
 {
@@ -11,11 +12,12 @@ class DoctorDetailsStory
     ) {
     }
 
-    public function details(int $doctorId): array
+    public function details(int $doctorId): ?DoctorDetailsDto
     {
-        // todo: get doctor details
-        // todo: get external calendar
+        $doctor = $this->doctorRepository->getDoctorDetails($doctorId);
 
-        return [];
+        // todo: get external calendar -- external call -- how?
+
+        return $doctor;
     }
 }

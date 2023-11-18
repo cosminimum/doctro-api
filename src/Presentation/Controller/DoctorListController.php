@@ -8,7 +8,7 @@ use App\Domain\Dto\DoctorListRequestDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DoctorListController extends AbstractController
@@ -19,17 +19,20 @@ class DoctorListController extends AbstractController
     }
 
     #[Route('/api/doctors', name: 'api_doctor_list', methods: ['GET'])]
-    public function list(#[MapRequestPayload] DoctorListRequestDto $requestDto): JsonResponse
+    public function list(#[MapQueryString] ?DoctorListRequestDto $requestDto): JsonResponse
     {
         $response = new ApiResponseDto();
 
         try {
-            $results = $this->doctorListStory->list($requestDto);
+            $doctorList = $this->doctorListStory->list($requestDto);
 
-            $response->setData($results);
+            $response->setData(
+                $doctorList->toArray()
+            );
         } catch (\Throwable $throwable) {
-            $response->setCode(Response::HTTP_INTERNAL_SERVER_ERROR)
-                ->setErrors(['general_error']);
+            $response->setIsError(true)
+                ->setCode(Response::HTTP_INTERNAL_SERVER_ERROR)
+                ->setErrors(['general_error', $throwable->getMessage(), $throwable->getTrace()]);
 
             // todo: log error
         }

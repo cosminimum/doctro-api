@@ -17,8 +17,12 @@ class Doctor extends User
     private DoctorDetails $doctorDetails;
 
     #[ORM\ManyToMany(targetEntity: MedicalSpecialty::class, inversedBy: 'doctors')]
-    #[ORM\JoinTable(name: 'doctor_to_specialty')]
+    #[ORM\JoinTable(name: 'doctor_to_medical_specialty')]
     private Collection $medicalSpecialties;
+
+    #[ORM\ManyToMany(targetEntity: HospitalService::class, inversedBy: 'doctors')]
+    #[ORM\JoinTable(name: 'doctor_to_hospital_service')]
+    private Collection $hospitalServices;
 
     #[ORM\OneToMany(mappedBy: 'doctor', targetEntity: Appointment::class)]
     private Collection $appointments;
@@ -26,6 +30,7 @@ class Doctor extends User
     public function __construct()
     {
         $this->medicalSpecialties = new ArrayCollection();
+        $this->hospitalServices = new ArrayCollection();
         $this->appointments = new ArrayCollection();
     }
 
@@ -54,6 +59,23 @@ class Doctor extends User
     public function removeMedicalSpecialty(MedicalSpecialty $medicalSpecialty): self
     {
         $this->medicalSpecialties->removeElement($medicalSpecialty);
+        return $this;
+    }
+
+    public function getHospitalServices(): Collection
+    {
+        return $this->hospitalServices;
+    }
+
+    public function addHospitalService(HospitalService $hospitalService): self
+    {
+        $this->hospitalServices->add($hospitalService);
+        return $this;
+    }
+
+    public function removeHospitalService(HospitalService $hospitalService): self
+    {
+        $this->hospitalServices->removeElement($hospitalService);
         return $this;
     }
 

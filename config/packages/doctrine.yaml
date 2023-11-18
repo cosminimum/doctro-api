@@ -21,6 +21,9 @@ doctrine:
                 dir: '%kernel.project_dir%/src/Infrastructure/Entity'
                 prefix: 'App\Infrastructure\Entity'
                 alias: App
+        dql:
+            string_functions:
+                GROUP_CONCAT: App\Infrastructure\MysqlToDoctrine\GroupConcat
 
 when@test:
     doctrine:

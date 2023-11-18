@@ -3,13 +3,18 @@
 namespace App\Infrastructure\Repository;
 
 use App\Application\Repository\DoctorRepositoryInterface;
+use App\Domain\Dto\DoctorDetailsDto;
 use App\Domain\Dto\DoctorListRequestDto;
+use App\Domain\Dto\DoctorDto;
 use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\Doctor;
+use App\Infrastructure\Factory\DoctorDetailsDtoFactory;
+use App\Infrastructure\Factory\DoctorDtoFactory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\AbstractQuery;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-use function Doctrine\ORM\QueryBuilder;
 
 class DoctorRepository extends ServiceEntityRepository implements DoctorRepositoryInterface
 {
@@ -43,51 +48,83 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
         return $doctor->getId();
     }
 
-    public function getDoctorByFilters(DoctorListRequestDto $requestDto): array
+    /** @return DoctorDto[] */
+    public function getDoctorListByFilters(?DoctorListRequestDto $requestDto): array
     {
         $qb = $this->createQueryBuilder('doctor');
 
         $qb->innerJoin('doctor.medicalSpecialties', 'specialty');
-        // todo: join hospital & hospital services
+        $qb->innerJoin('doctor.hospitalServices', 'service');
 
-        $qb->select('doctor')
-            ->where(true);
+        $qb->select('doctor');
 
-        if ($requestDto->getHospitalId() !== null) {
-            $qb->where(
-                $qb->expr()->in(':hospitalId', 'doctor.hospitals')
-            );
+        $qb->where($qb->expr()->eq(true, true));
 
-            $qb->setParameter('hospitalId', $requestDto->getHospitalId());
-        }
-
-        if ($requestDto->getSpecialtyId() !== null) {
+        if ($requestDto?->getHospitalId() !== null) {
             $qb->andWhere(
-                $qb->expr()->in(':specialtyId', 'doctor.medicalSpecialties')
+                $qb->expr()->eq('service.hospital', ':hospitalId')
             );
 
-            $qb->setParameter('specialtyId', $requestDto->getSpecialtyId());
+            $qb->setParameter('hospitalId', $requestDto?->getHospitalId());
         }
 
-        if ($requestDto->getDoctorName() !== null) {
+        if ($requestDto?->getSpecialtyId() !== null) {
+            $qb->andWhere(
+                $qb->expr()->eq('specialty.id', ':specialtyId')
+            );
+
+            $qb->setParameter('specialtyId', $requestDto?->getSpecialtyId());
+        }
+
+        if ($requestDto?->getDoctorName() !== null) {
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->eq('doctor.firstName', ':doctorName'),
-                    $qb->expr()->eq('doctor.lastName', ':doctorName')
+                    $qb->expr()->like('doctor.firstName', ':doctorName'),
+                    $qb->expr()->like('doctor.lastName', ':doctorName')
                 )
             );
 
-            $qb->setParameter('doctorName', $requestDto->getDoctorName());
+            $qb->setParameter('doctorName', '%'.$requestDto?->getDoctorName().'%');
         }
 
-        if ($requestDto->getServiceId() !== null) {
+        if ($requestDto?->getServiceId() !== null) {
             $qb->andWhere(
-                $qb->expr()->eq('hospitalService.medicalService', ':serviceId')
+                $qb->expr()->eq('service.medicalService', ':serviceId')
             );
 
-            $qb->setParameter('serviceId', $requestDto->getServiceId());
+            $qb->setParameter('serviceId', $requestDto?->getServiceId());
         }
 
-        return $qb->getQuery()->getArrayResult();
+        $qb->groupBy('doctor.id');
+
+        /** @var Doctor[] $results */
+        $results = $qb->getQuery()->getResult(AbstractQuery::HYDRATE_OBJECT);
+
+
+        return array_map(static function ($doctor) {
+            return DoctorDtoFactory::fromEntity($doctor);
+        }, $results);
+    }
+
+    public function getDoctorDetails(int $doctorId): ?DoctorDetailsDto
+    {
+        $qb = $this->createQueryBuilder('doctor');
+
+        $qb->innerJoin('doctor.medicalSpecialties', 'specialty');
+        $qb->innerJoin('doctor.hospitalServices', 'service');
+
+        $qb->select('doctor');
+
+        $qb->where(
+            $qb->expr()->eq('doctor.id', ':doctorId')
+        );
+
+        $qb->setParameter('doctorId', $doctorId);
+
+        $result = $qb->getQuery()->getOneOrNullResult(AbstractQuery::HYDRATE_OBJECT);
+
+        return $result !== null
+            ? DoctorDetailsDtoFactory::fromEntity($result)
+            : null;
     }
 }

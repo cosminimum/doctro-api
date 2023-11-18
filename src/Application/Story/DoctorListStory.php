@@ -4,6 +4,7 @@ namespace App\Application\Story;
 
 use App\Application\Repository\DoctorRepositoryInterface;
 use App\Domain\Dto\DoctorListRequestDto;
+use App\Domain\Dto\DoctorListResponseDto;
 
 class DoctorListStory
 {
@@ -12,12 +13,12 @@ class DoctorListStory
     ) {
     }
 
-    public function list(DoctorListRequestDto $requestDto): array
+    public function list(?DoctorListRequestDto $requestDto): DoctorListResponseDto
     {
-        $doctorList = $this->doctorRepository->getDoctorByFilters($requestDto);
+        $rows = $this->doctorRepository->getDoctorListByFilters($requestDto);
 
-        // todo: filter by available dates? -- external call
+        // todo: filter by available dates? -- external call -- how?
 
-        return $doctorList;
+        return new DoctorListResponseDto($rows);
     }
 }

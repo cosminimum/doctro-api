@@ -3,11 +3,13 @@
 namespace App\Infrastructure\Entity;
 
 use App\Infrastructure\Repository\HospitalServiceRepository;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: HospitalServiceRepository::class)]
 #[ORM\Table(name: 'hospital_services')]
 #[ORM\HasLifecycleCallbacks]
+#[ORM\UniqueConstraint(name: 'hospital_id_medical_service_id', columns: ['hospital_id', 'medical_service_id'])]
 class HospitalService
 {
     use CreatedUpdatedTrait;
@@ -21,9 +23,12 @@ class HospitalService
     #[ORM\JoinColumn(name: 'hospital_id', referencedColumnName: 'id', nullable: false)]
     private Hospital $hospital;
 
-    #[ORM\OneToOne(mappedBy: 'id', targetEntity: MedicalService::class)]
+    #[ORM\ManyToOne(targetEntity: MedicalService::class, inversedBy: 'hospitalServices')]
     #[ORM\JoinColumn(name: 'medical_service_id', referencedColumnName: 'id', nullable: false)]
     private MedicalService $medicalService;
+
+    #[ORM\ManyToMany(targetEntity: Doctor::class, mappedBy: 'hospitalServices')]
+    private Collection $doctors;
 
     #[ORM\Column(type: 'string')]
     private string $name;
