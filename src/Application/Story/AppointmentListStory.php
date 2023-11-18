@@ -2,6 +2,7 @@
 
 namespace App\Application\Story;
 
+use App\Application\Repository\AppointmentRepositoryInterface;
 use App\Domain\Dto\AppointmentListRequestDto;
 
 class AppointmentListStory

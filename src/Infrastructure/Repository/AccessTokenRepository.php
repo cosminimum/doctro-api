@@ -54,4 +54,18 @@ class AccessTokenRepository extends ServiceEntityRepository
         $this->getEntityManager()->persist($accessToken);
         $this->getEntityManager()->flush();
     }
+
+    public function terminateTokenValidityByUserIdentifier(string $userIdentifier): void
+    {
+        $lastAccessToken = $this->findOneBy(
+            ['userIdentifier' => $userIdentifier], ['id' => 'desc']
+        );
+
+        $lastAccessToken->setValidUntil(
+            new \DateTime('now 00:00:00')
+        );
+
+        $this->getEntityManager()->persist($lastAccessToken);
+        $this->getEntityManager()->flush();
+    }
 }

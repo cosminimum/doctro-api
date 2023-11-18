@@ -50,7 +50,8 @@ class AuthController extends AbstractController
         }
 
         $response->setData([
-            'user'  => $user->getUserIdentifier(),
+            'user_name'  => $user->getUserIdentifier(),
+            'user_id' => $user->getId(),
             'token' => $token,
         ]);
 
