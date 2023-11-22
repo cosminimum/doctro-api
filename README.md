@@ -1,6 +1,19 @@
 # Doctro API <sup>(beta)</sup>
 <hr>
 
+### Table of Contents
+**[Architecture layers](#architecture-layers)**<br>
+**[Register patient / doctor](#register-patient--doctor)**<br>
+**[User login](#user-login-suplogin-as-patient--doctorsup)**<br>
+**[User logout](#user-logout)**<br>
+**[API -- list doctors](#api----list-doctors)**<br>
+**[API -- list doctor details](#api----list-doctor-details)**<br>
+**[API -- add appointment](#api----add-appointment)**<br>
+**[API -- appointment list](#api----appointment-list)**<br>
+**[API -- appointment cancel](#api----appointment-cancel)**<br>
+**[API -- medical list](#api----medical-list)**<br>
+<hr>
+
 ## Architecture layers
 <table>
     <tbody>
@@ -20,7 +33,7 @@
 ###### *very important: each layer have access only to the lower layer(s)
 <hr>
 
-### 1) Register patient / doctor
+## Register patient / doctor
 [POST] http://(awesome-api-here)/register/patient <br>
 [POST] http://(awesome-api-here)/register/doctor
 
@@ -49,7 +62,7 @@
 ```
 <hr>
 
-### 2) User login <sup>(login as patient / doctor)</sup>
+## User login <sup>(login as patient / doctor)</sup>
 [POST] http://(awesome-api-here)/login
 
 **Request BODY:** (Content-Type: application/json) (raw json)
@@ -75,7 +88,7 @@
 ###### *the token validity is 1 year! -- use logout if need to force token expiration earlier
 <hr>
 
-### 3) User logout
+## User logout
 [GET] http://(awesome-api-here)/logout
 
 **Request Header:**
@@ -98,7 +111,7 @@
 ```
 <hr>
 
-### 4) API -- list doctors
+## API -- list doctors
 [GET] http://(awesome-api-here)/api/doctors
 
 **Request Header:**
@@ -154,7 +167,7 @@
 ```
 <hr>
 
-### 5) API -- list doctor details
+## API -- list doctor details
 [GET] http://(awesome-api-here)/api/doctor/1
 
 **Request Header:**
@@ -213,17 +226,45 @@
 ```
 <hr>
 
-### 6) API -- add appointment
+## API -- add appointment
+[POST] http://(awesome-api-here)/api/appointment
+
+**Request Header:**
+```json
+{
+    "Authorization": "Bearer super-secret-token"
+}
+```
+**Request BODY:** (Content-Type: application/json) (raw json)
+```json
+{
+    "doctorId": 2,
+    "specialtyId": 1,
+    "hospitalId": 1,
+    "hospitalServiceId": 2,
+    "date": "2023-11-23"
+}
+```
+**RESPONSE:**
+```json
+{
+    "is_error": false,
+    "code": 200,
+    "errors": [],
+    "data": {
+        "appointment_id": 1
+    }
+}
+```
+<hr>
+
+## API -- appointment list
 TBD
 <hr>
 
-### 7) API -- appointment list
+## API -- appointment cancel
 TBD
 <hr>
 
-### 8) API -- appointment cancel
-TBD
-<hr>
-
-### 9) API -- medical list
+## API -- medical list
 TBD

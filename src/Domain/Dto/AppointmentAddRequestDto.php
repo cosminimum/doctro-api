@@ -2,7 +2,7 @@
 
 namespace App\Domain\Dto;
 
-class AppointmentConfirmRequestDto
+class AppointmentAddRequestDto
 {
     public function __construct(
         private readonly int $doctorId,
