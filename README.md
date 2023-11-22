@@ -9,9 +9,9 @@
 **[API -- list doctors](#api----list-doctors)**<br>
 **[API -- list doctor details](#api----list-doctor-details)**<br>
 **[API -- add appointment](#api----add-appointment)**<br>
-**[API -- appointment list](#api----appointment-list)**<br>
-**[API -- appointment cancel](#api----appointment-cancel)**<br>
-**[API -- medical list](#api----medical-list)**<br>
+**[API -- appointment list (TBD)](#api----appointment-list)**<br>
+**[API -- appointment cancel (TBD)](#api----appointment-cancel)**<br>
+**[API -- medical list (TBD)](#api----medical-list)**<br>
 <hr>
 
 ## Architecture layers
