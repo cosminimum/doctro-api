@@ -4,6 +4,7 @@ namespace App\Application\Story;
 
 use App\Application\Repository\AppointmentRepositoryInterface;
 use App\Domain\Dto\AppointmentListRequestDto;
+use App\Domain\Dto\AppointmentListResponseDto;
 
 class AppointmentListStory
 {
@@ -12,10 +13,10 @@ class AppointmentListStory
     ) {
     }
 
-    public function list(AppointmentListRequestDto $requestDto): array
+    public function list(?AppointmentListRequestDto $requestDto): AppointmentListResponseDto
     {
-        // todo: get appointments by filters
+        $rows = $this->appointmentRepository->getAppointmentListByFilters($requestDto);
 
-        return [];
+        return new AppointmentListResponseDto($rows);
     }
 }

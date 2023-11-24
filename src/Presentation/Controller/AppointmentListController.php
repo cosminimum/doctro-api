@@ -8,7 +8,7 @@ use App\Domain\Dto\AppointmentListRequestDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Annotation\Route;
 
 class AppointmentListController extends AbstractController
@@ -19,14 +19,16 @@ class AppointmentListController extends AbstractController
     }
 
     #[Route('/api/appointments', name: 'api_appointment_list', methods: ['GET'])]
-    public function list(#[MapRequestPayload] AppointmentListRequestDto $requestDto): JsonResponse
+    public function list(#[MapQueryString] ?AppointmentListRequestDto $requestDto): JsonResponse
     {
         $response = new ApiResponseDto();
 
         try {
             $results = $this->appointmentListStory->list($requestDto);
 
-            $response->setData($results);
+            $response->setData(
+                $results->toArray()
+            );
         } catch (\Throwable $throwable) {
             $response->setCode(Response::HTTP_INTERNAL_SERVER_ERROR)
                 ->setErrors(['general_error']);

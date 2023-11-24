@@ -5,11 +5,11 @@ namespace App\Domain\Dto;
 class AppointmentListRequestDto
 {
     public function __construct(
-        private readonly ?int $hospitalId,
-        private readonly ?int $specialtyId,
-        private readonly ?string $doctorName,
-        private readonly ?\DateTime $date,
-        private readonly ?string $status
+        private readonly ?int $hospitalId = null,
+        private readonly ?int $specialtyId = null,
+        private readonly ?string $doctorName = null,
+        private readonly ?\DateTime $date = null,
+        private readonly ?string $status = null
     ) {
     }
 

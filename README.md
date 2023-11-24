@@ -259,7 +259,77 @@
 <hr>
 
 ## API -- appointment list
-TBD
+[GET] http://(awesome-api-here)/api/appointments
+
+**Request Header:**
+```json
+{
+    "Authorization": "Bearer super-secret-token"
+}
+```
+**Request QUERY:**
+```json
+{
+    // "hospitalId": 1|2,
+    // "specialtyId": 1|2,
+    // "doctorName": "what's up doc",
+    // "date": "2023-11-23|24|25",
+    // "status": "TBD"
+}
+```
+###### *status filter not working -- TBD
+**RESPONSE:**
+```json
+{
+    "is_error": false,
+    "code": 200,
+    "errors": [],
+    "data": [
+        {
+            "appointment_id": 1,
+            "patient_id": 1,
+            "patient_name": "Pacient Unu",
+            "doctor_id": 2,
+            "doctor_name": "Doctor 1",
+            "specialty_id": 1,
+            "specialty_name": "Medicina Generala",
+            "hospital_service_id": 1,
+            "hospital_service_name": "Consult General",
+            "hospital_id": 1,
+            "hospital_name": "Colentina",
+            "appointment_date": "2023-11-23T00:00:00+02:00"
+        },
+        {
+            "appointment_id": 2,
+            "patient_id": 1,
+            "patient_name": "Pacient Unu",
+            "doctor_id": 3,
+            "doctor_name": "Doctor 2",
+            "specialty_id": 2,
+            "specialty_name": "Specialitate",
+            "hospital_service_id": 4,
+            "hospital_service_name": "Spec. Consult",
+            "hospital_id": 2,
+            "hospital_name": "Ilfov",
+            "appointment_date": "2023-11-24T00:00:00+02:00"
+        },
+        {
+            "appointment_id": 3,
+            "patient_id": 1,
+            "patient_name": "Pacient Unu",
+            "doctor_id": 4,
+            "doctor_name": "Doctor 3",
+            "specialty_id": 2,
+            "specialty_name": "Specialitate",
+            "hospital_service_id": 4,
+            "hospital_service_name": "Spec. Consult",
+            "hospital_id": 2,
+            "hospital_name": "Ilfov",
+            "appointment_date": "2023-11-25T00:00:00+02:00"
+        }
+    ]
+}
+```
 <hr>
 
 ## API -- appointment cancel
