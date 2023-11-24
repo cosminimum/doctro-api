@@ -2,6 +2,7 @@
 <hr>
 
 ### Table of Contents
+**[Setup & Run](#setup--run)**<br>
 **[Architecture layers](#architecture-layers)**<br>
 **[Register patient / doctor](#register-patient--doctor)**<br>
 **[User login](#user-login-suplogin-as-patient--doctorsup)**<br>
@@ -13,6 +14,19 @@
 **[API -- appointment cancel (TBD)](#api----appointment-cancel)**<br>
 **[API -- medical list (TBD)](#api----medical-list)**<br>
 <hr>
+
+## Setup & Run
+
+#### 1) Clone repo
+#### 2) Change database user/password in `doctro/.env` (line 30)
+#### 3) Create database & tables
+`./bin/console doctrine:database:create`<br>
+`./bin/console doctrine:schema:create`
+#### 4) Download & install symfony-cli
+from symfony: https://symfony.com/download <br>
+or using Homebrew: `brew install symfony-cli/tap/symfony-cli`
+#### 5) Run symfony server
+`symfony server:start`
 
 ## Architecture layers
 <table>
