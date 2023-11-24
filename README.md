@@ -23,7 +23,7 @@
 `./bin/console doctrine:database:create`<br>
 `./bin/console doctrine:schema:create`
 #### 4) Download & install symfony-cli
-from symfony: https://symfony.com/download <br>
+from symfony: `curl -sS https://get.symfony.com/cli/installer | bash` <br>
 or using Homebrew: `brew install symfony-cli/tap/symfony-cli`
 #### 5) Run symfony server
 `symfony server:start`
