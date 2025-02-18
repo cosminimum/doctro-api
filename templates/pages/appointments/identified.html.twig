@@ -124,7 +124,7 @@
                                                 </div>
                                             </div>
                                             <div class="flex flex-col">
-                                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active mb-px" href="#">{{ appointment.created|romanianDate }}</a>
+                                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active mb-px" href="#">{{ appointment.timeSlot.schedule.date|romanianDate }} {{ appointment.timeSlot.startTime|date('H:i') }}</a>
                                                 <span class="text-2sm text-gray-700">Dată</span>
                                             </div>
                                         </div>
