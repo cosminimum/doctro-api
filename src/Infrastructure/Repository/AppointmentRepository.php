@@ -43,7 +43,9 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             ->setDoctor($doctor)
             ->setMedicalSpecialty($medicalSpecialty)
             ->setHospitalService($hospitalService)
-            ->setTimeSlot($timeSlot);
+            ->setTimeSlot($timeSlot)
+            ->setIsActive(true)
+        ;
 
         $this->getEntityManager()->persist($appointment);
         $this->getEntityManager()->flush();
