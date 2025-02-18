@@ -125,6 +125,7 @@ class DoctorController extends AbstractController
             $appointment->setMedicalSpecialty($specialty);
             $appointment->setHospitalService($service);
             $appointment->setTimeSlot($block[0]);
+            $appointment->setIsActive(true);
 
             $em->persist($appointment);
             $em->flush();
