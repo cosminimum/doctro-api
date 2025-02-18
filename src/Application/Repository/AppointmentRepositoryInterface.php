@@ -5,7 +5,6 @@ namespace App\Application\Repository;
 use App\Domain\Dto\AppointmentAddRequestDto;
 use App\Domain\Dto\AppointmentDto;
 use App\Domain\Dto\AppointmentListRequestDto;
-use App\Infrastructure\Entity\Appointment;
 use App\Infrastructure\Entity\User;
 
 interface AppointmentRepositoryInterface

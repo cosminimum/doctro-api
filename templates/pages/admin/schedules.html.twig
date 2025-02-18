@@ -1,0 +1,104 @@
+{% extends 'states/starter.html.twig' %}
+
+{% import _self as macros %}
+{% macro maskName(name) %}
+    {% set len = name|length %}
+    {% if len <= 1 %}
+        {{ name }}
+    {% else %}
+        {% set mask = '' %}
+        {% for i in 1..(len - 3) %}
+            {% set mask = mask ~ '*' %}
+        {% endfor %}
+        {{ name|slice(0, 1) ~ mask ~ name|slice(-1) }}
+    {% endif %}
+{% endmacro %}
+
+{% block body %}
+    <div class="flex items-center justify-center grow bg-center bg-no-repeat page-bg p-7">
+        <div class="card card-grid h-full min-w-full">
+            <div class="card-header">
+                <h3 class="card-title">Programări Spitalul Județean de Urgență Alexandria</h3>
+            </div>
+            <div class="card-body">
+                <div data-datatable="true" data-datatable-page-size="5" id="appointments_table">
+                    <div class="scrollable-x-auto">
+                        <table class="table table-border" data-datatable-table="true">
+                            <thead>
+                            <tr>
+                                <th class="min-w-[280px]">
+                                        <span class="sort asc">
+                                            <span class="sort-label">Medic</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Pacient</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Status</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Dată</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        <div class="flex flex-col gap-2">
+                                                <span class="leading-none font-medium text-sm text-gray-900 hover:text-primary">
+                                                    Dr. {{ macros.maskName(appointment.doctor.firstName) }} {{ macros.maskName(appointment.doctor.lastName) }}
+                                                </span>
+                                            <span class="text-2sm text-gray-700 font-normal leading-3">
+                                                    {{ appointment.medicalSpecialty.name }} | {{ appointment.hospitalService.name }}
+                                                </span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {{ macros.maskName(appointment.patient.firstName) }} {{ macros.maskName(appointment.patient.lastName) }}
+                                    </td>
+                                    <td>
+                                        {% if appointment.isActive %}
+                                            <span class="badge badge-xs badge-outline badge-success text-2xs -mr-2.5">Activ</span>
+                                        {% else %}
+                                            <span class="badge badge-xs badge-outline badge-warning text-2xs -mr-2.5">Inactiv</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {{ appointment.timeSlot.schedule.date|date('d-m-Y') }} {{ appointment.timeSlot.startTime|date('H:i') }}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const datatableEl = document.querySelector('#appointments_table');
+        const datatable = new KTDataTable(datatableEl, {
+          pageSize: 5,
+          stateSave: true
+        });
+      });
+    </script>
+{% endblock %}

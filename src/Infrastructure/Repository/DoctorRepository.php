@@ -4,15 +4,15 @@ namespace App\Infrastructure\Repository;
 
 use App\Application\Repository\DoctorRepositoryInterface;
 use App\Domain\Dto\DoctorDetailsDto;
-use App\Domain\Dto\DoctorListRequestDto;
 use App\Domain\Dto\DoctorDto;
+use App\Domain\Dto\DoctorListRequestDto;
 use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\Doctor;
+use App\Infrastructure\Entity\User;
 use App\Infrastructure\Factory\DoctorDetailsDtoFactory;
 use App\Infrastructure\Factory\DoctorDtoFactory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
-use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -25,19 +25,19 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
         parent::__construct($registry, Doctor::class);
     }
 
-    public function addDoctor(UserCreateRequestDto $userData): int
+    public function addDoctor(User $user): int
     {
         $doctor = (new Doctor())
-            ->setEmail($userData->getEmail())
-            ->setFirstName($userData->getFirstName())
-            ->setLastName($userData->getLastName())
-            ->setCnp($userData->getCnp())
-            ->setPhone($userData->getPhone())
+            ->setEmail($user->getEmail())
+            ->setFirstName($user->getFirstName())
+            ->setLastName($user->getLastName())
+            ->setCnp($user->getCnp())
+            ->setPhone($user->getPhone())
             ->setRoles([Doctor::BASE_ROLE]);
 
         $newPassword = $this->passwordHasher->hashPassword(
             $doctor,
-            $userData->getPassword()
+            $user->getPassword()
         );
 
         $doctor->setPassword($newPassword);
@@ -126,5 +126,36 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
         return $result !== null
             ? DoctorDetailsDtoFactory::fromEntity($result)
             : null;
+    }
+
+    public function findDoctorsByService(int $serviceId): array
+    {
+        return $this->createQueryBuilder('d')
+            ->leftJoin('d.hospitalServices', 'hs')
+            ->where('hs.id = :serviceId')
+            ->setParameter('serviceId', $serviceId)
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findDoctorsWithAvailability(
+        int $serviceId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
+        return $this->createQueryBuilder('d')
+            ->leftJoin('d.hospitalServices', 'hs')
+            ->leftJoin('d.schedules', 'ds')
+            ->leftJoin('ds.timeSlots', 'ts')
+            ->where('hs.id = :serviceId')
+            ->andWhere('ds.date BETWEEN :startDate AND :endDate')
+            ->andWhere('ts.isBooked = :isBooked')
+            ->setParameter('serviceId', $serviceId)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->setParameter('isBooked', false)
+            ->distinct()
+            ->getQuery()
+            ->getResult();
     }
 }

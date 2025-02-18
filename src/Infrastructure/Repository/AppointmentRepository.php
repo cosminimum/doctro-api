@@ -11,6 +11,7 @@ use App\Infrastructure\Entity\Doctor;
 use App\Infrastructure\Entity\HospitalService;
 use App\Infrastructure\Entity\MedicalSpecialty;
 use App\Infrastructure\Entity\Patient;
+use App\Infrastructure\Entity\TimeSlot;
 use App\Infrastructure\Entity\User;
 use App\Infrastructure\Factory\AppointmentDtoFactory;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -31,6 +32,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         $doctor = $this->getEntityManager()->find(Doctor::class, $requestDto->getDoctorId());
         $medicalSpecialty = $this->getEntityManager()->find(MedicalSpecialty::class, $requestDto->getSpecialtyId());
         $hospitalService = $this->getEntityManager()->find(HospitalService::class, $requestDto->getHospitalServiceId());
+        $timeSlot = $this->getEntityManager()->find(TimeSlot::class, $requestDto->getTimeSlotId());
 
         if (!$patient || !$doctor || !$medicalSpecialty || !$hospitalService) {
             throw new \Exception('missing mandatory data on appointment add');
@@ -41,7 +43,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             ->setDoctor($doctor)
             ->setMedicalSpecialty($medicalSpecialty)
             ->setHospitalService($hospitalService)
-            ->setAppointmentDate($requestDto->getDate());
+            ->setTimeSlot($timeSlot);
 
         $this->getEntityManager()->persist($appointment);
         $this->getEntityManager()->flush();

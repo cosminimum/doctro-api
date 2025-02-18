@@ -1,0 +1,22 @@
+version: '3.5'
+
+name: doctro
+networks:
+  doctro-network:
+    driver: bridge
+
+services:
+  db:
+    image: mysql
+    container_name: doctro_db
+    environment:
+      MYSQL_ROOT_PASSWORD: doctro
+      MYSQL_DATABASE: doctro
+      MYSQL_ROOT_HOST: '%'
+    volumes:
+      - ./doctro-db/data:/var/lib/mysql
+      - ./doctro-db/etc/my.cnf:/etc/my.cnf
+    ports:
+      - "3307:3306"
+    networks:
+      - doctro-network

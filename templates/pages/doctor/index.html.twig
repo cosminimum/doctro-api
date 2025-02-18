@@ -1,0 +1,268 @@
+{% extends 'states/doctor-dashboard.html.twig' %}
+
+{% block body %}
+  <div class="grid gap-5 lg:gap-7.5">
+    <div class="grid lg:grid-cols-3 gap-5 lg:gap-7.5 items-stretch">
+      <div class="lg:col-span-2">
+        <div class="grid">
+          <div id="calendar"></div>
+        </div>
+      </div>
+      <div class="lg:col-span-1">
+        <div class="card h-full">
+          <div class="card-header">
+            <h3 class="card-title">Gestionați calendarul</h3>
+          </div>
+          <div class="card-group flex items-center justify-between py-4 gap-2.5">
+            <div class="flex flex-col justify-center gap-1.5">
+              <span class="leading-none font-medium text-sm text-gray-900">Creați o programare</span>
+              <span class="text-2sm text-gray-700">Adăugați o nouă întâlnire completând detaliile esențiale pentru a vă organiza eficient agenda.</span>
+            </div>
+            <a href="{{ path('doctor_add_appointment') }}" class="btn btn-sm btn-light btn-outline">Creați</a>
+          </div>
+          <div class="card-group flex items-center justify-between py-4 gap-2.5">
+            <div class="flex flex-col justify-center gap-1.5">
+              <span class="leading-none font-medium text-sm text-gray-900">Configurați programul de lucru</span>
+              <span class="text-2sm text-gray-700">Personalizați orele de funcționare pentru a organiza eficient activitățile zilnice.</span>
+            </div>
+            <button class="btn btn-sm btn-light btn-outline" data-modal-toggle="#config-slots">Configurați</button>
+            <div class="modal" data-modal="true" id="config-slots">
+              <div class="modal-content modal-center max-w-[600px] w-full">
+                <div class="modal-header justify-end border-0 pt-5">
+                  <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                    <i class="ki-filled ki-cross"></i>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Configurați programul de lucru</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="grid gap-5 mb-7">
+                        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
+                          <div class="schedule-row flex items-center justify-between flex-wrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5" data-day="{{ day }}">
+                            <div class="flex items-center flex-wrap gap-3.5">
+                              <div class="flex flex-col gap-px">
+                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active" href="#">{{ day }}</a>
+                                <div class="flex mt-1 gap-2">
+                                  <input class="input input-sm start-time" name="startTime" placeholder="De la" type="time" min="07:00" max="19:00"/>
+                                  <span class="items-center justify-center px-2">—</span>
+                                  <input class="input input-sm end-time" name="endTime" placeholder="Până la" type="time" min="07:00" max="19:00"/>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-4 lg:gap-6">
+                              <label class="switch switch-sm">
+                                <input class="active-checkbox" type="checkbox" value="1"/>
+                              </label>
+                            </div>
+                          </div>
+                        {% endfor %}
+                      </div>
+                      <div class="w-full">
+                        <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 mb-7">
+                          <label class="form-label max-w-56">Repetă până la</label>
+                          <div class="flex flex-col items-start grow gap-3 w-full">
+                            <input id="input-repeat-slots" class="input" type="text" placeholder="YYYY-MM-DD">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex justify-end pt-2.5">
+                        <button class="btn btn-primary" id="save-schedule-btn">Salvează</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-group flex items-center justify-between py-4 gap-2.5">
+            <div class="flex flex-col justify-center gap-1.5">
+              <span class="leading-none font-medium text-sm text-gray-900">Blocați intervale de timp</span>
+              <span class="text-2sm text-gray-700">Rezervați intervale specifice pentru întâlniri sau activități, prevenind suprapunerile.</span>
+            </div>
+            <button class="btn btn-sm btn-light btn-outline" data-modal-toggle="#block-slots">Blocați</button>
+            <div class="modal" data-modal="true" id="block-slots">
+              <div class="modal-content modal-center max-w-[600px] w-full">
+                <div class="modal-header justify-end border-0 pt-5">
+                  <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                    <i class="ki-filled ki-cross"></i>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Blocați intervalele de timp</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="grid gap-5 mb-7">
+                        <div class="flex items-center justify-between flex-wrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5">
+                          <div class="flex flex-col gap-px w-full">
+                            <label for="input-block-slots" class="mb-2">Interval (ex.: 2025-02-01 18:00 - 2025-03-01 18:00)</label>
+                            <input id="input-block-slots" class="input w-100" type="text" placeholder="YYYY-MM-DD HH:mm - YYYY-MM-DD HH:mm">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex justify-end pt-2.5">
+                        <button class="btn btn-primary" id="save-block-btn">Salvează</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-group flex items-center justify-between py-4 gap-2.5">
+            <div class="flex flex-col justify-center gap-1.5">
+              <span class="leading-none font-medium text-sm text-gray-900">Printați programările de astăzi</span>
+              <span class="text-2sm text-gray-700">Generați rapid o listă imprimabilă cu întâlnirile și evenimentele programate pentru ziua curentă.</span>
+            </div>
+            <a href="{{ path('doctor_appointments_today_pdf') }}" class="btn btn-sm btn-light btn-outline" target="_blank">Descărcați</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+
+{% block javascripts %}
+  {{ parent() }}
+  <script src="{{ asset('theme/vendors/fullcalendar/dist/index.global.js') }}"></script>
+  <script src="{{ asset('theme/vendors/datepicker/dist/datepicker.js') }}"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var calendarEl = document.getElementById('calendar');
+      const appointments = {{ appointments|default('[]')|raw }};
+      const doctorSchedules = {{ doctorSchedules|default('[]')|raw }};
+      var businessHoursArray = {};
+      doctorSchedules.forEach(schedule => {
+        var scheduleDate = new Date(schedule.date);
+        var day = scheduleDate.getDay();
+        day = (day === 0) ? 7 : day;
+
+        schedule.slots.forEach(slot => {
+          if (!slot.isBooked) {
+            if (!businessHoursArray[day]) {
+              businessHoursArray[day] = {
+                startTime: slot.startTime,
+                endTime: slot.endTime
+              };
+            } else {
+              if (slot.startTime < businessHoursArray[day].startTime) {
+                businessHoursArray[day].startTime = slot.startTime;
+              }
+              if (slot.endTime > businessHoursArray[day].endTime) {
+                businessHoursArray[day].endTime = slot.endTime;
+              }
+            }
+          }
+        });
+      });
+
+      var businessHours = [];
+      for (var day in businessHoursArray) {
+        businessHours.push({
+          daysOfWeek: [parseInt(day)],
+          startTime: businessHoursArray[day].startTime,
+          endTime: businessHoursArray[day].endTime
+        });
+      }
+
+      var blockedEvents = [];
+      doctorSchedules.forEach(schedule => {
+        schedule.slots.forEach(slot => {
+          if (slot.isBooked) {
+            blockedEvents.push({
+              start: schedule.date + 'T' + slot.startTime,
+              end: schedule.date + 'T' + slot.endTime,
+              display: 'background',
+              backgroundColor: '#FF0000'
+            });
+          }
+        });
+      });
+
+      var allEvents = appointments.concat(blockedEvents);
+      console.log(blockedEvents)
+
+      var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'timeGridWeek',
+        allDaySlot: false,
+        headerToolbar: { left: 'prev,next', center: 'title', right: '' },
+        locale: 'ro',
+        slotDuration: '00:15:00',
+        slotMinTime: '07:00:00',
+        slotMaxTime: '19:00:00',
+        snapDuration: '00:15:00',
+        slotLabelInterval: '00:15',
+        slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+
+        businessHours: businessHours,
+        events: allEvents,
+        eventClick: function(info) {
+          if (info.event.display !== "background") {
+            window.location.href = '/doctor/appointments/' + info.event.id + '/edit';
+          }
+        }
+      });
+      calendar.render();
+
+      new Datepicker('#input-repeat-slots', { time: false });
+      new Datepicker('#input-block-slots', { time: true, ranged: true });
+
+      const saveScheduleBtn = document.getElementById('save-schedule-btn');
+      if(saveScheduleBtn) {
+        saveScheduleBtn.addEventListener('click', async function() {
+          let schedules = {};
+          document.querySelectorAll('.schedule-row').forEach(function(row) {
+            const day = row.getAttribute('data-day');
+            const active = row.querySelector('.active-checkbox').checked;
+            const start = row.querySelector('.start-time').value;
+            const end = row.querySelector('.end-time').value;
+            schedules[day] = { active: active, start: start, end: end };
+          });
+          const repeatUntil = document.getElementById('input-repeat-slots').value;
+          const payload = { repeatUntil: repeatUntil, schedules: schedules };
+
+          try {
+            const response = await fetch('{{ path("doctor_configure_schedule") }}', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            alert(result.message);
+          } catch (error) {
+            console.error(error);
+          }
+        });
+      }
+
+      const saveBlockBtn = document.getElementById('save-block-btn');
+      if(saveBlockBtn) {
+        saveBlockBtn.addEventListener('click', async function() {
+          const rangeValue = document.getElementById('input-block-slots').value;
+          const parts = rangeValue.split(' - ');
+          if(parts.length !== 2) {
+            alert('Formatul intervalului este invalid.');
+            return;
+          }
+          const payload = { start: parts[0], end: parts[1] };
+
+          try {
+            const response = await fetch('{{ path("doctor_block_slots") }}', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+            alert(result.message);
+          } catch (error) {
+            console.error(error);
+          }
+        });
+      }
+    });
+  </script>
+{% endblock %}

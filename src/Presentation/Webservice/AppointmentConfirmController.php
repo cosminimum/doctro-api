@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presentation\Controller;
+namespace App\Presentation\Webservice;
 
 use App\Application\Story\AppointmentAddStory;
 use App\Domain\Dto\ApiResponseDto;

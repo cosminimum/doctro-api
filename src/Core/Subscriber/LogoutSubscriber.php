@@ -23,9 +23,9 @@ class LogoutSubscriber implements EventSubscriberInterface
         $token = $event->getToken();
         $response = $event->getResponse();
 
-        $this->repository->terminateTokenValidityByUserIdentifier(
-            $token->getUser()->getUserIdentifier()
-        );
+//        $this->repository->terminateTokenValidityByUserIdentifier(
+//            $token->getUser()->getUserIdentifier()
+//        );
 
         $event->setResponse($response);
     }

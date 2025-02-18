@@ -1,0 +1,58 @@
+{% extends 'states/starter.html.twig' %}
+
+{% block body %}
+    <style>
+        .page-bg {
+            background-image: url('{{ asset('theme/media/images/2600x1200/bg-10.png') }}');
+        }
+        .dark .page-bg {
+            background-image: url('{{ asset('theme/media/images/2600x1200/bg-10-dark.png') }}');
+        }
+    </style>
+    <div class="flex items-center justify-center grow bg-center bg-no-repeat page-bg">
+        <div class="card max-w-[370px] w-full">
+            {{ form_start(registrationForm, {'attr': {'class': 'card-body flex flex-col gap-5 p-10'}}) }}
+                <div class="text-center mb-2.5">
+                    <h3 class="text-lg font-medium text-gray-900 leading-none mb-2.5">Înregistrare</h3>
+                    <div class="flex items-center justify-center">
+                        <span class="text-2sm text-gray-700 me-1.5">Deja aveți un cont?</span>
+                        <a class="text-2sm link" href="{{ path('app_login') }}">Conectare</a>
+                    </div>
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="form-label text-gray-900">Email</label>
+                    {{ form_widget(registrationForm.email, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="form-label text-gray-900">Prenume</label>
+                    {{ form_widget(registrationForm.firstName, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="form-label text-gray-900">Nume</label>
+                    {{ form_widget(registrationForm.lastName, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="form-label text-gray-900">CNP</label>
+                    {{ form_widget(registrationForm.cnp, {'attr': {'class': 'input'}}) }}
+                </div>
+                <div class="flex flex-col gap-1">
+                    <label class="form-label text-gray-900">Telefon</label>
+                    {{ form_widget(registrationForm.phone, {'attr': {'class': 'input'}}) }}
+                </div>
+
+                <div class="flex flex-col gap-1">
+                    <label class="form-label font-normal text-gray-900">Parolă</label>
+                    {{ form_widget(registrationForm.plainPassword, {'attr': {'class': 'input'}}) }}
+                </div>
+                <label class="checkbox-group">
+                    <input class="checkbox checkbox-sm" name="check" type="checkbox" value="1"/>
+                    <span class="checkbox-label">Accept <a class="text-2sm link" href="#">Termene și Condiții</a></span>
+                </label>
+                <button class="btn btn-primary flex justify-center grow">
+                    Înregistrare
+                </button>
+            {{ form_end(registrationForm) }}
+        </div>
+    </div>
+{% endblock %}

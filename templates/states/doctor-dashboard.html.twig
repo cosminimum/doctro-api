@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block main %}
+    <div class="flex grow flex-col [[data-sticky-header=on]_&]:pt-[--tw-header-height-default]">
+        {% include 'components/header.html.twig' %}
+        {% include 'components/doctor-nav.html.twig' %}
+
+        <main class="grow" id="content" role="content">
+            <div class="container-fixed" id="content_container"></div>
+            <div class="container-fixed">
+                {% block body %}{% endblock %}
+            </div>
+        </main>
+
+        {% include 'components/footer.html.twig' %}
+    </div>
+{% endblock %}

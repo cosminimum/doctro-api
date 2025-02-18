@@ -7,8 +7,10 @@ use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\DiscriminatorColumn;
 use Doctrine\ORM\Mapping\DiscriminatorMap;
 use Doctrine\ORM\Mapping\InheritanceType;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'users')]
@@ -21,10 +23,12 @@ use Symfony\Component\Security\Core\User\UserInterface;
     Doctor::USER_TYPE => Doctor::class,
     Manager::USER_TYPE => Manager::class
 ])]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements
     UserInterface,
     PasswordAuthenticatedUserInterface
 {
+    public const ROLE_ADMIN = 'ROLE_ADMIN';
     use CreatedUpdatedTrait;
 
     #[ORM\Id]
@@ -55,6 +59,9 @@ class User implements
 
     #[ORM\Column(type: 'string')]
     private string $password;
+
+    #[ORM\Column]
+    private bool $isActive = true;
 
     public function getId(): int
     {
@@ -175,5 +182,17 @@ class User implements
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): static
+    {
+        $this->isActive = $isActive;
+
+        return $this;
     }
 }

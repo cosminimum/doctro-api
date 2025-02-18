@@ -1,0 +1,90 @@
+{% extends 'states/dashboard.html.twig' %}
+
+{% block body %}
+    <style>
+        .channel-stats-bg {
+            background-image: url('{{ asset('theme/media/images/2600x1600/bg-3.png') }}');
+        }
+        .dark .channel-stats-bg {
+            background-image: url('{{ asset('theme/media/images/2600x1600/bg-3-dark.png') }}');
+        }
+    </style>
+    <div class="mb-5 lg:mb-10">
+        <div class="container-fixed flex items-center justify-between flex-wrap gap-5">
+            <div class="flex flex-col justify-center gap-2">
+                <h1 class="font-medium text-lg text-gray-900">Programările mele</h1>
+                <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                    Primul pas către consultul de care aveți nevoie – rezolvați-vă programarea rapid și simplu.
+                </div>
+            </div>
+            <div class="flex items-center gap-1">
+                <a class="btn btn-primary btn-lg" href="{{ path('app_appointment_new') }}">
+                    Programează
+                </a>
+            </div>
+        </div>
+    </div>
+    <main class="grow" id="content" role="content">
+        <div class="container-fixed" id="content_container"></div>
+        <div class="container-fixed">
+            <div class="flex flex-col items-stretch gap-5 lg:gap-7.5">
+                <div class="flex flex-wrap items-center gap-5 justify-between">
+                    <div class="flex items-center flex-wrap gap-5">
+                        <div class="flex items-center gap-2.5">
+                            <button class="btn btn-lg btn-outline btn-primary">
+                                <i class="ki-filled ki-setting-4"></i>Filtre
+                            </button>
+                            <select class="select select-lg w-48">
+                                <option value="1">Programări viitoare</option>
+                                <option value="2">Programări trecute</option>
+                            </select>
+                        </div>
+                        <div class="flex">
+                            <label class="input input-md">
+                                <i class="ki-filled ki-magnifier"></i>
+                                <input placeholder="Căutați după nume" type="text" value=""/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div id="network_cards">
+                    <div class="card h-full h-full">
+                        <div class="card-body p-10 bg-[length:80%] rtl:[background-position:-70%_25%] [background-position:175%_25%] bg-no-repeat entry-callout-bg">
+                            <div class="flex flex-col justify-center gap-4">
+                                <div class="flex -space-x-2">
+                                    <div class="flex">
+                                        <img class="hover:z-5 relative shrink-0 rounded-full ring-1 ring-light-light size-10" src="{{ asset('theme/media/avatars/300-4.png') }}"/>
+                                    </div>
+                                    <div class="flex">
+                                        <img class="hover:z-5 relative shrink-0 rounded-full ring-1 ring-light-light size-10" src="{{ asset('theme/media/avatars/300-1.png') }}"/>
+                                    </div>
+                                    <div class="flex">
+                                        <img class="hover:z-5 relative shrink-0 rounded-full ring-1 ring-light-light size-10" src="{{ asset('theme/media/avatars/300-2.png') }}"/>
+                                    </div>
+                                    <div class="flex">
+                                        <span class="hover:z-5 relative inline-flex items-center justify-center shrink-0 rounded-full ring-1 font-semibold leading-none text-3xs size-10 text-success-inverse text-xs ring-success-light bg-success">S</span>
+                                    </div>
+                                </div>
+                                <h2 class="text-1.5xl font-semibold text-gray-900">
+                                    Programați-vă din
+                                    <a class="link" href="{{ path('app_register') }}">
+                                        contul dumneavoastră!
+                                    </a>
+                                </h2>
+                                <p class="text-sm font-normal text-gray-700 leading-5.5">
+                                    Dacă aveți deja un cont, vă puteți autentifica și face programarea direct din contul dumneavoastră.
+                                    <br/>
+                                    Dacă nu aveți încă un cont, îl puteți crea rapid sau puteți continua fără a vă înregistra.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="card-footer justify-center gap-2">
+                            <a class="btn btn-light" href="{{ path('app_register') }}">Creează cont</a>
+                            <a class="btn btn-primary" href="{{ path('app_appointment_new') }}">Programează</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

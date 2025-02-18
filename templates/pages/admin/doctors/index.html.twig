@@ -1,0 +1,134 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="flex mt-5">
+        <div class="card card-grid h-full min-w-full">
+            <div class="card-header">
+                <h3 class="card-title">Medici</h3>
+                <div class="flex gap-2">
+                    <div class="input input-sm max-w-48">
+                        <i class="ki-filled ki-magnifier"></i>
+                        <input placeholder="Caută medic" type="text"/>
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-sm btn-light">Descarcă</a>
+                    </div>
+                    <div>
+                        <button data-modal-toggle="#add-doctor" class="btn btn-sm btn-primary">Adaugă</button>
+                        <div class="modal" data-modal="true" id="add-doctor">
+                            <div class="modal-content modal-center max-w-[600px] w-full">
+                                <div class="modal-header justify-end border-0 pt-5">
+                                    <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                                        <i class="ki-filled ki-cross"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="card">
+                                        <div class="card-header">
+                                            <h3 class="card-title">Adaugă medic</h3>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">Prenume</label>
+                                                {{ form_widget(doctorForm.firstName, {'attr': {'class': 'input'}}) }}
+                                            </div>
+
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">Nume</label>
+                                                {{ form_widget(doctorForm.lastName, {'attr': {'class': 'input'}}) }}
+                                            </div>
+
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">Email</label>
+                                                {{ form_widget(doctorForm.email, {'attr': {'class': 'input'}}) }}
+                                            </div>
+
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">CNP</label>
+                                                {{ form_widget(doctorForm.cnp, {'attr': {'class': 'input'}}) }}
+                                            </div>
+
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">Telefon</label>
+                                                {{ form_widget(doctorForm.phone, {'attr': {'class': 'input'}}) }}
+                                            </div>
+
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">Parolă</label>
+                                                {{ form_widget(doctorForm.plainPassword, {'attr': {'class': 'input'}}) }}
+                                            </div>
+
+                                            <div class="flex justify-end pt-2.5">
+                                                <button type="submit" class="btn btn-primary">Salvează</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div data-datatable="true" data-datatable-page-size="5">
+                    <div class="scrollable-x-auto">
+                        <table class="table table-border" data-datatable-table="true">
+                            <thead>
+                            <tr>
+                                <th class="min-w-[280px]">
+                                        <span class="sort asc">
+                                            <span class="sort-label">Nume</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Specialitate</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Serviciu</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Dată</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td>
+                                    <div class="flex flex-col gap-2">
+                                        <a class="leading-none font-medium text-sm text-gray-900 hover:text-primary" href="#">Product Management</a>
+                                        <span class="text-2sm text-gray-700 font-normal leading-3">Product development & lifecycle</span>
+                                    </div>
+                                </td>
+                                <td></td>
+                                <td>21 Oct, 2024</td>
+                                <td></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                        <div class="flex items-center gap-2 order-2 md:order-1">
+                            Arată
+                            <select class="select select-sm w-16" data-datatable-size="true" name="perpage"></select>
+                            pe pagină
+                        </div>
+                        <div class="flex items-center gap-4 order-1 md:order-2">
+                            <span data-datatable-info="true"></span>
+                            <div class="pagination" data-datatable-pagination="true"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

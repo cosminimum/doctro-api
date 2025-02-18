@@ -1,0 +1,141 @@
+{% extends 'states/doctor-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="grid gap-5 lg:gap-7.5">
+        <div class="grid lg:grid-cols-3 gap-5 lg:gap-7.5 items-stretch">
+            <div class="lg:col-span-2">
+                <div class="grid">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+            <div class="lg:col-span-1">
+                <div class="card h-full">
+                    <div class="card-header">
+                        <h3 class="card-title">Actualizați programare</h3>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(form) }}
+                            <label class="form-label font-normal text-gray-900">Specialitate</label>
+                            {{ form_widget(form.specialty, {'attr': {'class': 'select'}}) }}
+
+                            <label class="form-label font-normal text-gray-900">Serviciu</label>
+                            {{ form_widget(form.service, {'attr': {'class': 'select'}}) }}
+
+                            <label class="form-label font-normal text-gray-900">Data și ora de start a programării</label>
+                            {{ form_widget(form.appointmentStart, {'attr': {'class': 'input'}}) }}
+
+                            <label class="form-label font-normal text-gray-900">Prenume</label>
+                            {{ form_widget(form.firstName, {'attr': {'class': 'input'}}) }}
+
+                            <label class="form-label font-normal text-gray-900">Nume</label>
+                            {{ form_widget(form.lastName, {'attr': {'class': 'input'}}) }}
+
+                            <label class="form-label font-normal text-gray-900">Email</label>
+                            {{ form_widget(form.email, {'attr': {'class': 'input'}}) }}
+
+                            <label class="form-label font-normal text-gray-900">Telefon</label>
+                            {{ form_widget(form.phone, {'attr': {'class': 'input'}}) }}
+
+                            <label class="form-label font-normal text-gray-900">CNP</label>
+                            {{ form_widget(form.cnp, {'attr': {'class': 'input'}}) }}
+
+                        {{ form_widget(form) }}
+                            <div class="text-right">
+                                <button class="btn btn-primary btn-sm mt-2">Actualizați</button>
+                            </div>
+
+                        {{ form_end(form) }}
+                        <form method="post" action="{{ path('doctor_delete_appointment', {'id': appointment.id}) }}"
+                              onsubmit="return confirm('Sigur doriți să ștergeți această programare?');"
+                              class="mt-3">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ appointment.id) }}">
+                            <div class="text-right">
+                                <button type="submit" class="btn btn-sm btn-outline btn-danger">Ștergeți</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('theme/vendors/fullcalendar/dist/index.global.js') }}"></script>
+    <script src="{{ asset('theme/vendors/datepicker/dist/datepicker.js') }}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        var calendarEl = document.getElementById('calendar');
+        const appointments = {{ appointments|default('[]')|raw }};
+        const doctorSchedules = {{ doctorSchedules|default('[]')|raw }};
+        var businessHoursArray = {};
+        doctorSchedules.forEach(schedule => {
+          var scheduleDate = new Date(schedule.date);
+          var day = scheduleDate.getDay();
+          day = (day === 0) ? 7 : day;
+
+          schedule.slots.forEach(slot => {
+            if (!slot.isBooked) {
+              if (!businessHoursArray[day]) {
+                businessHoursArray[day] = {
+                  startTime: slot.startTime,
+                  endTime: slot.endTime
+                };
+              } else {
+                if (slot.startTime < businessHoursArray[day].startTime) {
+                  businessHoursArray[day].startTime = slot.startTime;
+                }
+                if (slot.endTime > businessHoursArray[day].endTime) {
+                  businessHoursArray[day].endTime = slot.endTime;
+                }
+              }
+            }
+          });
+        });
+
+        var businessHours = [];
+        for (var day in businessHoursArray) {
+          businessHours.push({
+            daysOfWeek: [parseInt(day)],
+            startTime: businessHoursArray[day].startTime,
+            endTime: businessHoursArray[day].endTime
+          });
+        }
+
+        var blockedEvents = [];
+        doctorSchedules.forEach(schedule => {
+          schedule.slots.forEach(slot => {
+            if (slot.isBooked) {
+              blockedEvents.push({
+                start: schedule.date + 'T' + slot.startTime,
+                end: schedule.date + 'T' + slot.endTime,
+                display: 'background',
+                backgroundColor: '#FF0000'
+              });
+            }
+          });
+        });
+
+        var allEvents = appointments.concat(blockedEvents);
+        console.log(blockedEvents)
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+          initialView: 'timeGridWeek',
+          allDaySlot: false,
+          headerToolbar: { left: 'prev,next', center: 'title', right: '' },
+          locale: 'ro',
+          slotDuration: '00:15:00',
+          slotMinTime: '07:00:00',
+          slotMaxTime: '19:00:00',
+          snapDuration: '00:15:00',
+          slotLabelInterval: '00:15',
+          slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
+
+          businessHours: businessHours,
+          events: allEvents
+        });
+        calendar.render();
+      });
+    </script>
+{% endblock %}

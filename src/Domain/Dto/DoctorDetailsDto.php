@@ -14,7 +14,6 @@ class DoctorDetailsDto extends DoctorDto
     private const KEY_HOSPITAL_SERVICE_NAME = 'hospital_service_name';
     private const KEY_HOSPITAL_ID = 'hospital_id';
     private const KEY_HOSPITAL_NAME = 'hospital_name';
-    private const KEY_MEDICAL_SERVICE_ID = 'medical_service_id';
     private const KEY_MEDICAL_SERVICE_NAME = 'medical_service_name';
     private const KEY_MEDICAL_SERVICE_CODE = 'medical_service_code';
 
@@ -40,7 +39,6 @@ class DoctorDetailsDto extends DoctorDto
         string $hospitalServiceName,
         int $hospitalId,
         string $hospitalName,
-        int $medicalServiceId,
         string $medicalServiceName,
         string $medicalServiceCode
     ) : self {
@@ -49,7 +47,6 @@ class DoctorDetailsDto extends DoctorDto
             self::KEY_HOSPITAL_SERVICE_NAME => $hospitalServiceName,
             self::KEY_HOSPITAL_ID => $hospitalId,
             self::KEY_HOSPITAL_NAME => $hospitalName,
-            self::KEY_MEDICAL_SERVICE_ID => $medicalServiceId,
             self::KEY_MEDICAL_SERVICE_NAME => $medicalServiceName,
             self::KEY_MEDICAL_SERVICE_CODE => $medicalServiceCode
         ];

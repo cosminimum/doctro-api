@@ -7,9 +7,8 @@ class AppointmentAddRequestDto
     public function __construct(
         private readonly int $doctorId,
         private readonly int $specialtyId,
-        private readonly int $hospitalId,
         private readonly int $hospitalServiceId,
-        private readonly \DateTime $date
+        private readonly int $timeSlotId
     ) {
     }
 
@@ -23,18 +22,13 @@ class AppointmentAddRequestDto
         return $this->specialtyId;
     }
 
-    public function getHospitalId(): int
-    {
-        return $this->hospitalId;
-    }
-
     public function getHospitalServiceId(): int
     {
         return $this->hospitalServiceId;
     }
 
-    public function getDate(): \DateTime
+    public function getTimeSlotId(): int
     {
-        return $this->date;
+        return $this->timeSlotId;
     }
 }

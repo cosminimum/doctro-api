@@ -1,0 +1,58 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="card pb-2.5">
+        <div class="card-header" id="webhooks">
+            <h3 class="card-title">Notificări</h3>
+        </div>
+        <div class="card-body grid gap-5">
+            {{ form_start(form) }}
+            <div class="flex mb-3 mt-3">
+                <label class="form-label max-w-56 font-medium text-md">Activează Reamintire pacienți</label>
+                <div class="grow">
+                    <label class="switch">
+                        {{ form_widget(form.reminderEnabled) }}
+                    </label>
+                </div>
+            </div>
+            <div class="flex" id="reminder-settings">
+                <div class="flex gap-5">
+                    <div class="mb-3">
+                        <label class="form-label max-w-56">Mesaj SMS</label>
+                        {{ form_widget(form.reminderSmsMessage, {'attr': {'class': 'input'}}) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label max-w-56">Mesaj email</label>
+                        {{ form_widget(form.reminderEmailMessage, {'attr': {'class': 'input'}}) }}
+                    </div>
+                </div>
+            </div>
+            <div class="flex mb-3 mt-3">
+                <label class="form-label max-w-56 font-medium text-md">Activează Confirmare pacienți</label>
+                <div class="grow">
+                    <label class="switch">
+                        {{ form_widget(form.confirmationEnabled) }}
+                    </label>
+                </div>
+            </div>
+            <div class="flex" id="confirmation-settings">
+                <div class="flex gap-5">
+                    <div class="mb-3">
+                        <label class="form-label max-w-56">Mesaj SMS</label>
+                        {{ form_widget(form.confirmationSmsMessage, {'attr': {'class': 'input'}}) }}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label max-w-56">Mesaj email</label>
+                        {{ form_widget(form.confirmationEmailMessage, {'attr': {'class': 'input'}}) }}
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-end">
+                <button class="btn btn-primary">
+                    Salvează
+                </button>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+{% endblock %}

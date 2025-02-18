@@ -1,0 +1,184 @@
+{% extends 'states/doctor-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="card card-grid min-w-full">
+        <div class="card-header flex-wrap py-5">
+            <h3 class="card-title">Servicii</h3>
+            <div class="flex gap-6">
+                <div class="relative">
+                    <i class="ki-filled ki-magnifier leading-none text-md text-gray-500 absolute top-1/2 start-0 -translate-y-1/2 ms-3"></i>
+                    <input class="input input-md ps-8" data-datatable-search="#services_table" placeholder="Caută serviciu" type="text"/>
+                </div>
+                <div class="relative">
+                    <button class="btn btn-primary" data-modal-toggle="#add-service">Adaugă serviciu</button>
+                    <div class="modal" data-modal="true" id="add-service">
+                        <div class="modal-content modal-center max-w-[600px] w-full">
+                            <div class="modal-header justify-end border-0 pt-5">
+                                <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                                    <i class="ki-filled ki-cross"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Selectați serviciu</h3>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="grid gap-5 mb-7">
+                                            <div class="flex items-center justify-between flex-wrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5">
+                                                <div class="flex items-center flex-wrap gap-3.5">
+                                                    <div class="flex items-center">
+                                                        <div class="relative size-[50px] shrink-0">
+                                                            <svg class="w-full h-full stroke-gray-300 fill-gray-100" fill="none" height="48" viewBox="0 0 44 48" width="44" xmlns="http://www.w3.org/2000/svg">
+                                                                <path d="M16 2.4641C19.7128 0.320509 24.2872 0.320508 28 2.4641L37.6506 8.0359C41.3634 10.1795 43.6506 14.141 43.6506 18.4282V29.5718C43.6506 33.859 41.3634 37.8205 37.6506 39.9641L28 45.5359C24.2872 47.6795 19.7128 47.6795 16 45.5359L6.34937 39.9641C2.63655 37.8205 0.349365 33.859 0.349365 29.5718V18.4282C0.349365 14.141 2.63655 10.1795 6.34937 8.0359L16 2.4641Z" fill=""></path>
+                                                                <path d="M16.25 2.89711C19.8081 0.842838 24.1919 0.842837 27.75 2.89711L37.4006 8.46891C40.9587 10.5232 43.1506 14.3196 43.1506 18.4282V29.5718C43.1506 33.6804 40.9587 37.4768 37.4006 39.5311L27.75 45.1029C24.1919 47.1572 19.8081 47.1572 16.25 45.1029L6.59937 39.5311C3.04125 37.4768 0.849365 33.6803 0.849365 29.5718V18.4282C0.849365 14.3196 3.04125 10.5232 6.59937 8.46891L16.25 2.89711Z" stroke=""></path>
+                                                            </svg>
+                                                            <div class="absolute leading-none start-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4 rtl:translate-x-2/4">
+                                                                <i class="ki-filled ki-shield-tick text-xl text-gray-500"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="flex flex-col gap-px">
+                                                        <select id="services-select" class="select select-lg" name="serviceId">
+                                                            {% for hospitalService in hospitalServices %}
+                                                                <option value="{{ hospitalService.id }}">{{ hospitalService.name }}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="flex justify-end pt-2.5">
+                                            <button class="btn btn-primary" id="link-service-btn" type="button">Salvează</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div data-datatable="true" data-datatable-page-size="10" id="services_table">
+                <div class="scrollable-x-auto">
+                    <table class="table table-fixed table-border" data-datatable-table="true">
+                        <thead>
+                        <tr>
+                            <th class="w-[350px]">
+                                  <span class="sort asc">
+                                      <span class="sort-label text-gray-700 font-normal">Nume</span>
+                                      <span class="sort-icon"></span>
+                                  </span>
+                            </th>
+                            <th class="w-[200px]">
+                                  <span class="sort">
+                                      <span class="sort-label text-gray-700 font-normal">Preț</span>
+                                      <span class="sort-icon"></span>
+                                  </span>
+                            </th>
+                            <th class="w-[60px]"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="services-table-body">
+                        {% for service in services %}
+                            <tr id="service-row-{{ service.id }}">
+                                <td>
+                                    <div class="flex flex-col gap-1.5">
+                                        <a class="leading-none font-medium text-sm text-gray-900 hover:text-primary">{{ service.name }}</a>
+                                        <span class="text-2sm text-gray-700 font-normal">{{ service.description }}</span>
+                                    </div>
+                                </td>
+                                <td class="text-sm text-gray-800 font-normal">{{ service.price }} RON</td>
+                                <td class="text-center">
+                                    <a class="btn btn-sm btn-icon btn-clear btn-light unlink-service"
+                                       data-service-id="{{ service.id }}"
+                                       data-url="{{ path('doctor_unlink_service', {'id': service.id}) }}"
+                                       href="javascript:void(0);">
+                                        <i class="ki-filled ki-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                    <div class="flex items-center gap-2 order-2 md:order-1">Arată
+                        <select class="select select-sm w-16" data-datatable-size="true" name="perpage"></select>
+                        pe pagină
+                    </div>
+                    <div class="flex items-center gap-4 order-1 md:order-2">
+                        <span data-datatable-info="true"></span>
+                        <div class="pagination" data-datatable-pagination="true"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('link-service-btn').addEventListener('click', function() {
+          const select = document.getElementById('services-select');
+
+          const serviceId = select.value;
+          const url = "{{ path('doctor_link_service', {'id': 'SERVICE_ID'}) }}".replace('SERVICE_ID', serviceId);
+
+          const data = new FormData();
+          data.append('serviceId', serviceId);
+
+          fetch(url, {
+            method: 'POST',
+            body: data,
+            headers: {
+              'X-Requested-With': 'XMLHttpRequest'
+            }
+          })
+            .then(response => response.json())
+            .then(result => {
+              if (result.success) {
+                window.location.reload();
+              } else {
+                alert('Linking failed: ' + result.message);
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+            });
+        });
+
+        document.getElementById('services_table').addEventListener('click', function(e) {
+          const unlinkBtn = e.target.closest('.unlink-service');
+          if (unlinkBtn) {
+            e.preventDefault();
+            if (confirm('Sigur dorești să ștergi acest serviciu?')) {
+              const serviceId = unlinkBtn.getAttribute('data-service-id');
+              const url = unlinkBtn.getAttribute('data-url');
+
+              fetch(url, {
+                method: 'POST',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+                .then(response => response.json())
+                .then(result => {
+                  if (result.success) {
+                    window.location.reload();
+                  } else {
+                    alert('Unlink failed: ' + result.message);
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                });
+            }
+          }
+        });
+      });
+    </script>
+{% endblock %}

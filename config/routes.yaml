@@ -6,6 +6,12 @@ core:
 
 app:
     resource:
-        path: ../src/Presentation/Controller/
-        namespace: App\Presentation\Controller
+        path: ../src/Presentation/Webservice/
+        namespace: App\Presentation\Webservice
+    type: attribute
+
+frontend:
+    resource:
+        path: ../src/Presentation/Frontend/
+        namespace: App\Presentation\Frontend
     type: attribute

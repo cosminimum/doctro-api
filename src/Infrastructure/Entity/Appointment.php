@@ -4,6 +4,7 @@ namespace App\Infrastructure\Entity;
 
 use App\Infrastructure\Repository\AppointmentRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: AppointmentRepository::class)]
 #[ORM\Table(name: 'appointments')]
@@ -15,6 +16,7 @@ class Appointment
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: 'integer')]
+    #[Groups(['appointment'])]
     private int $id;
 
     #[ORM\ManyToOne(targetEntity: Patient::class, inversedBy: 'appointments')]
@@ -34,8 +36,12 @@ class Appointment
     #[ORM\JoinColumn(name: 'hospital_service_id', referencedColumnName: 'id', nullable: false)]
     private HospitalService $hospitalService;
 
-    #[ORM\Column(type: 'datetime')]
-    private \DateTime $appointmentDate;
+    #[ORM\ManyToOne(targetEntity: TimeSlot::class)]
+    #[ORM\JoinColumn(name: 'time_slot_id', referencedColumnName: 'id', nullable: false)]
+    private TimeSlot $timeSlot;
+
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private $isActive;
 
     // todo: mode ???
 
@@ -90,14 +96,27 @@ class Appointment
         return $this;
     }
 
-    public function getAppointmentDate(): \DateTime
+    public function getTimeSlot(): TimeSlot
     {
-        return $this->appointmentDate;
+        return $this->timeSlot;
     }
 
-    public function setAppointmentDate(\DateTime $appointmentDate): self
+    public function setTimeSlot(TimeSlot $timeSlot): Appointment
     {
-        $this->appointmentDate = $appointmentDate;
+        $this->timeSlot = $timeSlot;
+
+        return $this;
+    }
+
+    public function getIsActive()
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive($isActive)
+    {
+        $this->isActive = $isActive;
+
         return $this;
     }
 }

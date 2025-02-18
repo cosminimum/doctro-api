@@ -30,10 +30,7 @@ class AppointmentDtoFactory
             ->setSpecialtyId($appointment->getMedicalSpecialty()->getId())
             ->setSpecialtyName($appointment->getMedicalSpecialty()->getName())
             ->setHospitalServiceId($appointment->getHospitalService()->getId())
-            ->setHospitalServiceName($appointment->getHospitalService()->getName())
-            ->setHospitalId($appointment->getHospitalService()->getHospital()->getId())
-            ->setHospitalName($appointment->getHospitalService()->getHospital()->getName())
-            ->setAppointmentDate($appointment->getAppointmentDate());
+            ->setHospitalServiceName($appointment->getHospitalService()->getName());
 
         return $dto;
     }

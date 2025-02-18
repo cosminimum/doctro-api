@@ -11,3 +11,10 @@
 /var/
 /vendor/
 ###< symfony/framework-bundle ###
+.DS_Store
+.env
+.env.dev
+###> symfony/asset-mapper ###
+/public/assets/
+/assets/vendor/
+###< symfony/asset-mapper ###

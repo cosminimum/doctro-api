@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Programările de astăzi</title>
+    <style>
+        body { font-family: Arial, sans-serif; font-size: 14px; }
+        h1 { text-align: center; margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin: 0 auto; }
+        table, th, td { border: 1px solid #ccc; }
+        th, td { padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .no-data { text-align: center; font-style: italic; }
+    </style>
+</head>
+<body>
+<h1>Programarile de astazi</h1>
+<table>
+    <thead>
+    <tr>
+        <th>Nume Pacient</th>
+        <th>Specialitate</th>
+        <th>Serviciu</th>
+        <th>Interval Orar</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% if appointments is not empty %}
+        {% for appointment in appointments %}
+            <tr>
+                <td>{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</td>
+                <td>{{ appointment.medicalSpecialty.name }}</td>
+                <td>{{ appointment.hospitalService.name }}</td>
+                <td>
+                    {{ appointment.timeSlot.startTime|date('H:i') }} -
+                    {{ appointment.timeSlot.endTime|date('H:i') }}
+                </td>
+            </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="4" class="no-data">Nu exista programari pentru astazi.</td>
+        </tr>
+    {% endif %}
+    </tbody>
+</table>
+</body>
+</html>

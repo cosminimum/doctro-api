@@ -19,7 +19,7 @@ class AuthController extends AbstractController
     ) {
     }
 
-    #[Route('/login', name: 'login', methods: ['POST'])]
+    #[Route('/api/login', name: 'login', methods: ['POST'])]
     public function login(#[CurrentUser] ?User $user): JsonResponse
     {
         $response = new ApiResponseDto();
@@ -61,7 +61,7 @@ class AuthController extends AbstractController
         );
     }
 
-    #[Route('/logout', name: 'logout', methods: ['GET'])]
+    #[Route('/api/logout', name: 'logout', methods: ['GET'])]
     public function logout(): void
     {
         // todo: add logout subscriber --> invalidate last active token

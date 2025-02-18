@@ -19,11 +19,15 @@ security:
             lazy: true
             provider: app_user_provider
 
-            json_login:
-                check_path: login
+            form_login:
+                enable_csrf: true
+                login_path: app_login
+                check_path: app_login
 
             logout:
-                path: logout
+                path: app_logout
+                # where to redirect after logout
+                # target: app_any_route
 
             access_token:
                 token_handler: App\Core\Security\AccessTokenHandler
@@ -31,8 +35,10 @@ security:
     # Note: Only the *first* access control that matches will be used
     access_control:
         - { path: ^/login, roles: [ ] }
+        - { path: ^/register, roles: [ ] }
         - { path: ^/logout, roles: [ ] }
-        - { path: ^/api/, roles: [ IS_AUTHENTICATED_FULLY ] }
+#        - { path: ^/, roles: [ IS_AUTHENTICATED_FULLY ] }
+#        - { path: ^/api/, roles: [ IS_AUTHENTICATED_FULLY ] }
 
 when@test:
     security:

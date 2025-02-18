@@ -5,6 +5,7 @@ namespace App\Infrastructure\Repository;
 use App\Application\Repository\PatientRepositoryInterface;
 use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\Patient;
+use App\Infrastructure\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
@@ -18,7 +19,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         parent::__construct($registry, Patient::class);
     }
 
-    public function addPatient(UserCreateRequestDto $userData): int
+    public function addPatient(UserCreateRequestDto $userData): User
     {
         $user = (new Patient())
             ->setEmail($userData->getEmail())
@@ -38,7 +39,7 @@ class PatientRepository extends ServiceEntityRepository implements PatientReposi
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
 
-        return $user->getId();
+        return $user;
     }
 
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presentation\Controller\Crud;
+namespace App\Presentation\Webservice\Crud;
 
 use App\Application\Repository\PatientRepositoryInterface;
 use App\Domain\Dto\UserCreateRequestDto;
@@ -27,9 +27,9 @@ class PatientController extends AbstractController
     )]
     public function create(#[MapRequestPayload] UserCreateRequestDto $requestDto): JsonResponse
     {
-        $userId = $this->patientRepository->addPatient($requestDto);
+        $user = $this->patientRepository->addPatient($requestDto);
 
-        return $this->json(['user_id' => $userId], Response::HTTP_OK);
+        return $this->json(['user' => $user], Response::HTTP_OK);
     }
 
     #[Route(

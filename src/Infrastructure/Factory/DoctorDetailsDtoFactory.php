@@ -32,12 +32,7 @@ class DoctorDetailsDtoFactory
         foreach ($doctor->getHospitalServices()->toArray() as $hospitalService) {
             $dto->addHospitalService(
                 $hospitalService->getId(),
-                $hospitalService->getName(),
-                $hospitalService->getHospital()->getId(),
-                $hospitalService->getHospital()->getName(),
-                $hospitalService->getMedicalService()->getId(),
-                $hospitalService->getMedicalService()->getName(),
-                $hospitalService->getMedicalService()->getCode()
+                $hospitalService->getName(),w
             );
         }
 

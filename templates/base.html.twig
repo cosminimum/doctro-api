@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html class="h-full">
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %}Welcome!{% endblock %}</title>
+        <meta charset="utf-8"/>
+        <meta content="follow, index" name="robots"/>
+        <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport"/>
+        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 128 128%22><text y=%221.2em%22 font-size=%2296%22>⚫️</text><text y=%221.3em%22 x=%220.2em%22 font-size=%2276%22 fill=%22%23fff%22>sf</text></svg>">
+        {% block stylesheets %}
+            <link rel="preconnect" href="https://fonts.googleapis.com">
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+            <link href="https://fonts.googleapis.com/css2?family=Red+Hat+Display:ital,wght@0,300..900;1,300..900&display=swap" rel="stylesheet">
+            <link href="{{ asset('theme/vendors/apexcharts/apexcharts.css') }}" rel="stylesheet"/>
+            <link href="{{ asset('theme/vendors/keenicons/styles.bundle.css') }}" rel="stylesheet"/>
+            <link href="{{ asset('theme/css/styles.css') }}" rel="stylesheet"/>
+            <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+            <link rel="stylesheet" href="{{ asset('theme/vendors/datepicker/dist/css/datepicker.minimal.css') }}">
+            <link rel="stylesheet" href="{{ asset('theme/vendors/butterup/butterup.css') }}">
+        {% endblock %}
+
+        {% block javascripts %}
+            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="{{ asset('theme/vendors/butterup/butterup.js') }}"></script>
+            <script>
+              document.addEventListener("DOMContentLoaded", function() {
+                  {% for type, messages in app.flashes %}
+                    {% for message in messages %}
+                        butterup.toast({
+                          title: '{{ type|capitalize }}',
+                          message: '{{ message|e('js') }}',
+                          location: 'top-right',
+                          icon: false,
+                          dismissable: false,
+                          type: '{{ type }}'
+                        });
+                    {% endfor %}
+                  {% endfor %}
+              });
+            </script>
+        {% endblock %}
+    </head>
+    <body class="antialiased flex h-full text-base text-gray-700 [--tw-page-bg:var(--tw-light)] [--tw-page-bg-dark:var(--tw-coal-500)] [--tw-header-height-default:100px] [[data-sticky-header=on]&]:[--tw-header-height:60px] [--tw-header-height:--tw-header-height-default] bg-[--tw-page-bg] dark:bg-[--tw-page-bg-dark]">
+        <script>
+          const defaultThemeMode = 'light'; // light|dark|system
+          let themeMode;
+
+          if ( document.documentElement ) {
+            if ( localStorage.getItem('theme')) {
+              themeMode = localStorage.getItem('theme');
+            } else if ( document.documentElement.hasAttribute('data-theme-mode')) {
+              themeMode = document.documentElement.getAttribute('data-theme-mode');
+            } else {
+              themeMode = defaultThemeMode;
+            }
+
+            if (themeMode === 'system') {
+              themeMode = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+            }
+
+            document.documentElement.classList.add(themeMode);
+          }
+        </script>
+        {% block main %}{% endblock %}
+    </body>
+</html>

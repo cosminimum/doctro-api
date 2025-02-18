@@ -1,0 +1,191 @@
+{% extends 'states/dashboard.html.twig' %}
+
+{% block body %}
+    <style>
+        .channel-stats-bg {
+            background-image: url('{{ asset('theme/media/images/2600x1600/bg-3.png') }}');
+        }
+        .dark .channel-stats-bg {
+            background-image: url('{{ asset('theme/media/images/2600x1600/bg-3-dark.png') }}');
+        }
+    </style>
+    <div class="mb-5 lg:mb-10">
+        <div class="container-fixed flex items-center justify-between flex-wrap gap-5">
+            <div class="flex flex-col justify-center gap-2">
+                <h1 class="font-medium text-lg text-gray-900">Programările mele</h1>
+                <div class="flex items-center gap-2 text-sm font-normal text-gray-700">
+                    Primul pas către consultul de care aveți nevoie – rezolvați-vă programarea rapid și simplu.
+                </div>
+            </div>
+            <div class="flex items-center gap-1">
+                <a class="btn btn-primary btn-lg" href="{{ path('app_appointment_new') }}">
+                    Programează
+                </a>
+            </div>
+        </div>
+    </div>
+    <main class="grow" id="content" role="content">
+        <div class="container-fixed" id="content_container"></div>
+        <div class="container-fixed">
+            <div class="flex flex-col items-stretch gap-5 lg:gap-7.5">
+                <div class="flex flex-wrap items-center gap-5 justify-between">
+                    <div class="flex items-center flex-wrap gap-5">
+                        <div class="flex items-center gap-2.5">
+                            <button class="btn btn-lg btn-outline btn-primary">
+                                <i class="ki-filled ki-setting-4"></i>Filtre
+                            </button>
+                            <select class="select select-lg w-48">
+                                <option value="1">Programări viitoare</option>
+                                <option value="2">Programări trecute</option>
+                            </select>
+                        </div>
+                        <div class="flex">
+                            <label class="input input-md">
+                                <i class="ki-filled ki-magnifier"></i>
+                                <input placeholder="Căutați după nume" type="text" value=""/>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div id="network_cards">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 lg:gap-7.5">
+                        {% for appointment in appointments %}
+                            <div class="card px-5 lg:px-7.5 h-full bg-[length:85%] [background-position:9rem_-4rem] rtl:[background-position:-4rem_-4rem] bg-no-repeat channel-stats-bg">
+                                <div class="flex flex-col gap-4 pt-6">
+                                    <div class="flex justify-between">
+                                        <i class="ki-filled ki-calendar text-2xl text-gray-600"></i>
+                                        <span class="badge badge-xs badge-outline badge-success">Confirmată</span>
+                                    </div>
+
+                                    <div class="flex flex-col gap-2.5 mb-2">
+                                        <h3 class="text-base font-medium leading-none text-gray-900">Dr. {{ appointment.doctor.firstName }} {{ appointment.doctor.lastName }}</h3>
+                                    </div>
+                                    <div class="flex items-center justify-between flex-wrap lg:flex-nowrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5">
+                                        <div class="flex items-center flex-wrap lg:flex-nowrap gap-3.5">
+                                            <div class="relative size-[50px] shrink-0">
+                                                <svg class="w-full h-full stroke-gray-300 fill-gray-100" fill="none" height="48" viewBox="0 0 44 48" width="44" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M16 2.4641C19.7128 0.320509 24.2872 0.320508 28 2.4641L37.6506 8.0359C41.3634 10.1795 43.6506 14.141 43.6506
+			18.4282V29.5718C43.6506 33.859 41.3634 37.8205 37.6506 39.9641L28 45.5359C24.2872 47.6795 19.7128 47.6795 16 45.5359L6.34937
+			39.9641C2.63655 37.8205 0.349365 33.859 0.349365 29.5718V18.4282C0.349365 14.141 2.63655 10.1795 6.34937 8.0359L16 2.4641Z" fill="">
+                                                    </path>
+                                                    <path d="M16.25 2.89711C19.8081 0.842838 24.1919 0.842837 27.75 2.89711L37.4006 8.46891C40.9587 10.5232 43.1506 14.3196 43.1506
+			18.4282V29.5718C43.1506 33.6804 40.9587 37.4768 37.4006 39.5311L27.75 45.1029C24.1919 47.1572 19.8081 47.1572 16.25 45.1029L6.59937
+			39.5311C3.04125 37.4768 0.849365 33.6803 0.849365 29.5718V18.4282C0.849365 14.3196 3.04125 10.5232 6.59937 8.46891L16.25 2.89711Z" stroke="">
+                                                    </path>
+                                                </svg>
+                                                <div class="absolute leading-none start-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4 rtl:translate-x-2/4">
+                                                    <i class="ki-filled ki-artificial-intelligence text-xl text-gray-500"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active mb-px" href="#">{{ appointment.medicalSpecialty.name }}</a>
+                                                <span class="text-2sm text-gray-700">Specialitate</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between flex-wrap lg:flex-nowrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5">
+                                        <div class="flex items-center flex-wrap lg:flex-nowrap gap-3.5">
+                                            <div class="relative size-[50px] shrink-0">
+                                                <svg class="w-full h-full stroke-gray-300 fill-gray-100" fill="none" height="48" viewBox="0 0 44 48" width="44" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M16 2.4641C19.7128 0.320509 24.2872 0.320508 28 2.4641L37.6506 8.0359C41.3634 10.1795 43.6506 14.141 43.6506
+			18.4282V29.5718C43.6506 33.859 41.3634 37.8205 37.6506 39.9641L28 45.5359C24.2872 47.6795 19.7128 47.6795 16 45.5359L6.34937
+			39.9641C2.63655 37.8205 0.349365 33.859 0.349365 29.5718V18.4282C0.349365 14.141 2.63655 10.1795 6.34937 8.0359L16 2.4641Z" fill="">
+                                                    </path>
+                                                    <path d="M16.25 2.89711C19.8081 0.842838 24.1919 0.842837 27.75 2.89711L37.4006 8.46891C40.9587 10.5232 43.1506 14.3196 43.1506
+			18.4282V29.5718C43.1506 33.6804 40.9587 37.4768 37.4006 39.5311L27.75 45.1029C24.1919 47.1572 19.8081 47.1572 16.25 45.1029L6.59937
+			39.5311C3.04125 37.4768 0.849365 33.6803 0.849365 29.5718V18.4282C0.849365 14.3196 3.04125 10.5232 6.59937 8.46891L16.25 2.89711Z" stroke="">
+                                                    </path>
+                                                </svg>
+                                                <div class="absolute leading-none start-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4 rtl:translate-x-2/4">
+                                                    <i class="ki-filled ki-shield-search text-xl text-gray-500"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active mb-px" href="#">{{ appointment.hospitalService.name }}</a>
+                                                <span class="text-2sm text-gray-700">Serviciu</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between flex-wrap lg:flex-nowrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5">
+                                        <div class="flex items-center flex-wrap lg:flex-nowrap gap-3.5">
+                                            <div class="relative size-[50px] shrink-0">
+                                                <svg class="w-full h-full stroke-gray-300 fill-gray-100" fill="none" height="48" viewBox="0 0 44 48" width="44" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M16 2.4641C19.7128 0.320509 24.2872 0.320508 28 2.4641L37.6506 8.0359C41.3634 10.1795 43.6506 14.141 43.6506
+			18.4282V29.5718C43.6506 33.859 41.3634 37.8205 37.6506 39.9641L28 45.5359C24.2872 47.6795 19.7128 47.6795 16 45.5359L6.34937
+			39.9641C2.63655 37.8205 0.349365 33.859 0.349365 29.5718V18.4282C0.349365 14.141 2.63655 10.1795 6.34937 8.0359L16 2.4641Z" fill="">
+                                                    </path>
+                                                    <path d="M16.25 2.89711C19.8081 0.842838 24.1919 0.842837 27.75 2.89711L37.4006 8.46891C40.9587 10.5232 43.1506 14.3196 43.1506
+			18.4282V29.5718C43.1506 33.6804 40.9587 37.4768 37.4006 39.5311L27.75 45.1029C24.1919 47.1572 19.8081 47.1572 16.25 45.1029L6.59937
+			39.5311C3.04125 37.4768 0.849365 33.6803 0.849365 29.5718V18.4282C0.849365 14.3196 3.04125 10.5232 6.59937 8.46891L16.25 2.89711Z" stroke="">
+                                                    </path>
+                                                </svg>
+                                                <div class="absolute leading-none start-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4 rtl:translate-x-2/4">
+                                                    <i class="ki-filled ki-time text-xl text-gray-500"></i>
+                                                </div>
+                                            </div>
+                                            <div class="flex flex-col">
+                                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active mb-px" href="#">{{ appointment.created|romanianDate }}</a>
+                                                <span class="text-2sm text-gray-700">Dată</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="flex my-8 items-center justify-center gap-1 cursor-pointer">
+                                    <button class="btn btn-lg btn-primary" data-modal-toggle="#appointment-details-{{ appointment.id }}">Vezi detalii programare</button>
+                                    <div class="modal" data-modal="true" id="appointment-details-{{ appointment.id }}">
+                                        <div class="modal-content modal-center max-w-[600px] w-full">
+                                            <div class="modal-header justify-end border-0 pt-5">
+                                                <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                                                    <i class="ki-filled ki-cross"></i>
+                                                </button>
+                                            </div>
+                                            <div class="modal-body flex flex-col items-center pt-0 pb-10">
+                                                <div class="card">
+                                                    <div class="card-body lg:py-7.5">
+                                                        <div class="flex flex-col items-stretch gap-5 lg:gap-7.5">
+                                                            <div class="flex flex-wrap items-center gap-5 justify-between">
+                                                                <div class="flex flex-col gap-1">
+                                                                    <div class="flex items-center gap-2.5">
+                                                                        <h2 class="text-2xl font-semibold text-gray-900">
+                                                                            Dr. {{ appointment.doctor.firstName }} {{ appointment.doctor.lastName }}
+                                                                        </h2>
+                                                                        <span class="badge badge-sm badge-success badge-outline">Confirmată</span>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="flex gap-2.5">
+                                                                    <div class="flex flex-col gap-2">
+                                                                        <a class="btn btn-sm btn-light" href="#">Modifică programarea</a>
+                                                                        <a class="btn btn-sm btn-light" href="#">Printează tipizat</a>
+                                                                        <a class="btn btn-sm btn-danger btn-outline" href="#">Anulează programarea</a>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="flex items-center flex-wrap gap-2 lg:gap-5">
+                                                                <div class="grid grid-cols-1 content-between gap-1.5 border border-dashed border-gray-400 shrink-0 rounded-md px-3.5 py-2 min-w-24 max-w-auto">
+                                                                    <span class="text-gray-900 text-md leading-none font-medium">{{ appointment.medicalSpecialty.name }}</span>
+                                                                    <span class="text-gray-700 text-2sm">Specialitate</span>
+                                                                </div>
+                                                                <div class="grid grid-cols-1 content-between gap-1.5 border border-dashed border-gray-400 shrink-0 rounded-md px-3.5 py-2 min-w-24 max-w-auto">
+                                                                    <span class="text-gray-900 text-md leading-none font-medium">{{ appointment.hospitalService.name }}</span>
+                                                                    <span class="text-gray-700 text-2sm">Serviciu</span>
+                                                                </div>
+                                                                <div class="grid grid-cols-1 content-between gap-1.5 border border-dashed border-gray-400 shrink-0 rounded-md px-3.5 py-2 min-w-24 max-w-auto">
+                                                                    <span class="text-gray-900 text-md leading-none font-medium">{{ appointment.timeSlot.schedule.date|romanianDate }} {{ appointment.timeSlot.startTime|date('H:i') }}</span>
+                                                                    <span class="text-gray-700 text-2sm">Dată</span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+{% endblock %}

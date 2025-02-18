@@ -1,0 +1,193 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="grid lg:grid-cols-3 gap-y-5 lg:gap-7.5 items-stretch">
+        <div class="lg:col-span-3">
+            <div class="grid md:grid-cols-3 gap-5 lg:gap-7.5 h-full items-stretch">
+                <style>
+                    .channel-stats-bg {
+                        background-image: url('{{ asset('theme/media/images/2600x1600/bg-3.png') }}');
+                    }
+                    .dark .channel-stats-bg {
+                        background-image: url('{{ asset('theme/media/images/2600x1600/bg-3-dark.png') }}');
+                    }
+                </style>
+                <div class="card px-5 lg:px-7.5 h-full bg-[length:85%] [background-position:9rem_-4rem] rtl:[background-position:-4rem_-4rem] bg-no-repeat channel-stats-bg">
+                    <div class="flex flex-col gap-4 pt-6">
+                        <i class="ki-filled ki-calendar-2 text-2xl text-gray-600"></i>
+                        <div class="flex flex-col gap-2.5 mb-2">
+                            <h3 class="text-base font-medium leading-none text-gray-900">Programări în timp</h3>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 items-center gap-1">
+                        <div class="px-3" id="line_appointments_over_time"></div>
+                    </div>
+                </div>
+                <div class="card px-5 lg:px-7.5 h-full bg-[length:85%] [background-position:9rem_-4rem] rtl:[background-position:-4rem_-4rem] bg-no-repeat channel-stats-bg">
+                    <div class="flex flex-col gap-4 pt-6">
+                        <i class="ki-filled ki-shield-search text-2xl text-gray-600"></i>
+                        <div class="flex flex-col gap-2.5 mb-2">
+                            <h3 class="text-base font-medium leading-none text-gray-900">Programări pe specialitate</h3>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 items-center gap-1">
+                        <div class="px-3" id="bar_appointments_by_specialty"></div>
+                    </div>
+                </div>
+                <div class="card px-5 lg:px-7.5 h-full bg-[length:85%] [background-position:9rem_-4rem] rtl:[background-position:-4rem_-4rem] bg-no-repeat channel-stats-bg">
+                    <div class="flex flex-col gap-4 pt-6">
+                        <i class="ki-filled ki-calendar-tick text-2xl text-gray-600"></i>
+                        <div class="flex flex-col gap-2.5 mb-2">
+                            <h3 class="text-base font-medium leading-none text-gray-900">Distribuția în intervale orare</h3>
+                        </div>
+                    </div>
+                    <div class="flex mb-4 items-center gap-1">
+                        <div class="px-3" id="line_hourly_distribution"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="flex mt-5">
+        <div class="card card-grid h-full min-w-full">
+            <div class="card-header">
+                <h3 class="card-title">Programări</h3>
+                <div class="flex gap-2">
+                    <div class="input input-sm max-w-48">
+                        <i class="ki-filled ki-magnifier"></i>
+                        <input placeholder="Caută programări" type="text"/>
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-sm btn-light">Descarcă</a>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div data-datatable="true" data-datatable-page-size="5">
+                    <div class="scrollable-x-auto">
+                        <table class="table table-border" data-datatable-table="true">
+                            <thead>
+                                <tr>
+                                    <th class="min-w-[280px]">
+                                        <span class="sort asc">
+                                            <span class="sort-label">Medic</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Pacient</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Status</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                    </th>
+                                    <th class="min-w-[135px]">
+                                        <span class="sort">
+                                            <span class="sort-label">Dată</span>
+                                            <span class="sort-icon"></span>
+                                        </span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>
+                                        <div class="flex flex-col gap-2">
+                                            <span class="leading-none font-medium text-sm text-gray-900 hover:text-primary">Dr. {{ appointment.doctor.firstName }} {{ appointment.doctor.lastName }}</span>
+                                            <span class="text-2sm text-gray-700 font-normal leading-3">{{ appointment.medicalSpecialty.name }} | {{ appointment.hospitalService.name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</td>
+                                    <td>
+                                        {% if appointment.isActive %}
+                                            <span class="badge badge-xs badge-outline badge-success text-2xs -mr-2.5">Activ</span>
+                                        {% else %}
+                                            <span class="badge badge-xs badge-outline badge-warning text-2xs -mr-2.5">Inactiv</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ appointment.timeSlot.schedule.date|date('d-m-Y') }} {{ appointment.timeSlot.startTime|date('H:i') }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                        <div class="flex items-center gap-2 order-2 md:order-1">
+                            Arată
+                            <select class="select select-sm w-16" data-datatable-size="true" name="perpage"></select>
+                            pe pagină
+                        </div>
+                        <div class="flex items-center gap-4 order-1 md:order-2">
+                            <span data-datatable-info="true"></span>
+                            <div class="pagination" data-datatable-pagination="true"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        // Chart: Programări în timp (Line Chart)
+        var lineAppointmentsOverTimeOptions = {
+          chart: {
+            type: 'line',
+            height: 250,
+            toolbar: { show: false }
+          },
+          series: [{
+            name: 'Appointments',
+            data: [10, 20, 15, 30, 25, 35, 40] // mock data
+          }],
+          xaxis: {
+            categories: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică']
+          }
+        };
+        new ApexCharts(document.querySelector("#line_appointments_over_time"), lineAppointmentsOverTimeOptions).render();
+
+        // Chart: Programări pe specialitate (Bar Chart)
+        var barAppointmentsBySpecialtyOptions = {
+          chart: {
+            type: 'bar',
+            height: 250,
+            toolbar: { show: false }
+          },
+          series: [{
+            name: 'Appointments',
+            data: [15, 25, 35, 45, 20] // mock data
+          }],
+          xaxis: {
+            categories: ['Cardiologie', 'Dermatologie', 'Neurologie', 'Oncologie', 'Pediatrie']
+          }
+        };
+        new ApexCharts(document.querySelector("#bar_appointments_by_specialty"), barAppointmentsBySpecialtyOptions).render();
+
+        // Chart: Distribuția în intervale orare (Line Chart)
+        var lineHourlyDistributionOptions = {
+          chart: {
+            type: 'line',
+            height: 250,
+            toolbar: { show: false }
+          },
+          series: [{
+            name: 'Appointments',
+            data: [5, 10, 15, 20, 15, 10, 5, 2, 8, 12] // mock data
+          }],
+          xaxis: {
+            categories: ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM']
+          }
+        };
+        new ApexCharts(document.querySelector("#line_hourly_distribution"), lineHourlyDistributionOptions).render();
+      });
+    </script>
+{% endblock %}

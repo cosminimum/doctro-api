@@ -4,6 +4,7 @@ namespace App\Application\Story;
 
 use App\Application\Repository\PatientRepositoryInterface;
 use App\Domain\Dto\UserCreateRequestDto;
+use App\Infrastructure\Entity\User;
 
 class PatientRegisterStory
 {
@@ -12,12 +13,8 @@ class PatientRegisterStory
     ) {
     }
 
-    public function register(UserCreateRequestDto $requestDto): int
+    public function register(UserCreateRequestDto $requestDto): User
     {
-        $userId = $this->patientRepository->addPatient($requestDto);
-
-        // todo: additional stuff after register action
-
-        return $userId;
+        return $this->patientRepository->addPatient($requestDto);
     }
 }

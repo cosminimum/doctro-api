@@ -1,0 +1,177 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="flex mt-5">
+        <div class="card card-grid h-full min-w-full">
+            <div class="card-header">
+                <h3 class="card-title">Servicii</h3>
+                <div class="flex gap-2">
+                    <div class="input input-sm max-w-48">
+                        <i class="ki-filled ki-magnifier"></i>
+                        <input placeholder="Caută serviciu" type="text" data-datatable-search="#service_table"/>
+                    </div>
+                    <div>
+                        <a href="#" class="btn btn-sm btn-light">Descarcă</a>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-primary" data-modal-toggle="#add-service">Adaugă</button>
+                        <div class="modal" data-modal="true" id="add-service">
+                            <div class="modal-content modal-center max-w-[600px] w-full">
+                                <div class="modal-header justify-end border-0 pt-5">
+                                    <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                                        <i class="ki-filled ki-cross"></i>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="card-header">
+                                        <h3 class="card-title">Adaugă medic</h3>
+                                    </div>
+                                    <div class="modal-body">
+                                        {{ form_start(serviceForm) }}
+                                        <div class="flex flex-col gap-1">
+                                            <label class="form-label text-gray-900">Nume</label>
+                                            {{ form_widget(serviceForm.name, {'attr': {'class': 'input'}}) }}
+                                        </div>
+
+                                        <div class="flex flex-col gap-1">
+                                            <label class="form-label text-gray-900">Descriere</label>
+                                            {{ form_widget(serviceForm.description, {'attr': {'class': 'input'}}) }}
+                                        </div>
+
+                                        <div class="flex flex-col gap-1">
+                                            <label class="form-label text-gray-900">Preț</label>
+                                            {{ form_widget(serviceForm.price, {'attr': {'class': 'input'}}) }}
+                                        </div>
+
+                                        <div class="flex flex-col gap-1">
+                                            <label class="form-label text-gray-900">Durată</label>
+                                            {{ form_widget(serviceForm.duration, {'attr': {'class': 'select'}}) }}
+                                        </div>
+
+                                        <div class="flex flex-col gap-1">
+                                            <label class="form-label text-gray-900">Mod</label>
+                                            {{ form_widget(serviceForm.mode, {'attr': {'class': 'select'}}) }}
+                                        </div>
+
+                                        <div class="flex flex-col gap-1">
+                                            <label class="switch switch-sm">
+                                                Serviciu activ
+                                                {{ form_widget(serviceForm.isActive) }}
+                                            </label>
+                                        </div>
+
+                                        <div class="flex justify-end pt-2.5">
+                                            <button type="submit" class="btn btn-primary">Salvează</button>
+                                        </div>
+                                        {{ form_end(serviceForm) }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body">
+                <div data-datatable="true" data-datatable-page-size="5" id="service_table">
+                    <div class="scrollable-x-auto">
+                        <table class="table table-border" data-datatable-table="true">
+                            <thead>
+                            <tr>
+                                <th class="min-w-[280px]">
+                                    <span class="sort asc">
+                                        <span class="sort-label">Nume</span>
+                                        <span class="sort-icon"></span>
+                                    </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                    <span class="sort">
+                                        <span class="sort-label">Mod</span>
+                                        <span class="sort-icon"></span>
+                                    </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                    <span class="sort">
+                                        <span class="sort-label">Durată</span>
+                                        <span class="sort-icon"></span>
+                                    </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                    <span class="sort">
+                                        <span class="sort-label">Preț</span>
+                                        <span class="sort-icon"></span>
+                                    </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                    <span class="sort">
+                                        <span class="sort-label">Status</span>
+                                        <span class="sort-icon"></span>
+                                    </span>
+                                </th>
+                                <th class="min-w-[135px]">
+                                    <span class="sort-label">Acțiuni</span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for service in services %}
+                                <tr>
+                                    <td>
+                                        <div class="flex flex-col gap-2">
+                                            <span class="leading-none font-medium text-sm text-gray-900 hover:text-primary">{{ service.name }}</span>
+                                            <span class="text-2sm text-gray-700 font-normal leading-3">{{ service.description }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="badge badge-xs badge-outline badge-info text-2xs -mr-2.5">{{ service.mode }}</span>
+                                    </td>
+                                    <td>{{ service.duration }}</td>
+                                    <td>{{ service.price }}</td>
+                                    <td>
+                                        {% if service.isActive %}
+                                            <span class="badge badge-xs badge-outline badge-success text-2xs -mr-2.5">Activ</span>
+                                        {% else %}
+                                            <span class="badge badge-xs badge-outline badge-warning text-2xs -mr-2.5">Inactiv</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a class="btn btn-sm btn-icon btn-clear btn-light" href="{{ path('admin_edit_service', {id: service.id}) }}">
+                                            <i class="ki-filled ki-notepad-edit"></i>
+                                        </a>
+                                        <a class="btn btn-sm btn-icon btn-clear btn-light" href="#">
+                                            <i class="ki-filled ki-trash"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                        <div class="flex items-center gap-2 order-2 md:order-1">
+                            Arată
+                            <select class="select select-sm w-16" data-datatable-size="true" name="perpage"></select>
+                            pe pagină
+                        </div>
+                        <div class="flex items-center gap-4 order-1 md:order-2">
+                            <span data-datatable-info="true"></span>
+                            <div class="pagination" data-datatable-pagination="true"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const datatableEl = document.querySelector('#service_table');
+        const datatable = new KTDataTable(datatableEl, {
+          pageSize: 5,
+          stateSave: true
+        });
+      });
+    </script>
+{% endblock %}

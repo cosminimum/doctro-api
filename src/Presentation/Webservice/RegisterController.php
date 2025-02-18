@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presentation\Controller;
+namespace App\Presentation\Webservice;
 
 use App\Application\Story\DoctorRegisterStory;
 use App\Application\Story\PatientRegisterStory;
@@ -20,7 +20,7 @@ class RegisterController extends AbstractController
     ) {
     }
 
-    #[Route('/register/patient', name: 'register', methods: ['POST'])]
+    #[Route('/api/register/patient', name: 'register', methods: ['POST'])]
     public function registerPatient(#[MapRequestPayload] UserCreateRequestDto $requestDto): JsonResponse
     {
         $userId = $this->patientRegisterStory->register($requestDto);
@@ -33,7 +33,7 @@ class RegisterController extends AbstractController
         );
     }
 
-    #[Route('/register/doctor', name: 'register_doctor', methods: ['POST'])]
+    #[Route('/api/register/doctor', name: 'register_doctor', methods: ['POST'])]
     public function registerDoctor(#[MapRequestPayload] UserCreateRequestDto $requestDto): JsonResponse
     {
         $userId = $this->doctorRegisterStory->register($requestDto);

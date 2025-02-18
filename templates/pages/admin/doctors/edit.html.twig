@@ -1,0 +1,22 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Editează Medic</h3>
+        </div>
+        <div class="card-body">
+            {{ form_start(doctorForm) }}
+            {{ form_row(doctorForm.firstName) }}
+            {{ form_row(doctorForm.lastName) }}
+            {{ form_row(doctorForm.email) }}
+            {{ form_row(doctorForm.cnp) }}
+            {{ form_row(doctorForm.phone) }}
+            {{ form_row(doctorForm.plainPassword) }}
+            <div class="flex justify-end pt-2.5">
+                <button type="submit" class="btn btn-primary">Actualizează</button>
+            </div>
+            {{ form_end(doctorForm) }}
+        </div>
+    </div>
+{% endblock %}

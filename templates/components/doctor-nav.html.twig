@@ -1,0 +1,25 @@
+<div class="border-b border-gray-200 pb-5 lg:pb-0 mb-5 lg:mb-10">
+    <div class="container-fixed flex flex-wrap justify-between items-center gap-2">
+        <div class="grid">
+            <div class="scrollable-x-auto">
+                <div class="menu gap-5 lg:gap-7.5" data-menu="true">
+                    <div class="menu-item border-b-2 border-b-transparent {{ app.request.attributes.get('_route') == 'homepage' ? 'menu-item-active:border-b-gray-900 menu-item-here:border-b-gray-900 active' : '' }}">
+                        <a class="menu-link gap-2.5 pb-2 lg:pb-4" href="{{ path('homepage') }}" tabindex="0">
+                            <span class="menu-title text-nowrap text-sm text-gray-800 {{ app.request.attributes.get('_route') == 'homepage' ? 'menu-item-active:text-gray-900 menu-item-active:font-medium menu-item-here:text-gray-900 menu-item-here:font-medium menu-item-show:text-gray-900 menu-link-hover:text-gray-900' : '' }}">Calendar</span>
+                        </a>
+                    </div>
+                    <div class="menu-item border-b-2 border-b-transparent {{ app.request.attributes.get('_route') == 'doctor_services' ? 'menu-item-active:border-b-gray-900 menu-item-here:border-b-gray-900 active' : '' }}">
+                        <a class="menu-link gap-2.5 pb-2 lg:pb-4" href="{{ path('doctor_services') }}" tabindex="0">
+                            <span class="menu-title text-nowrap text-sm text-gray-800 {{ app.request.attributes.get('_route') == 'doctor_services' ? 'menu-item-active:text-gray-900 menu-item-active:font-medium menu-item-here:text-gray-900 menu-item-here:font-medium menu-item-show:text-gray-900 menu-link-hover:text-gray-900' : '' }}">Servicii</span>
+                        </a>
+                    </div>
+                    <div class="menu-item border-b-2 border-b-transparent {{ app.request.attributes.get('_route') == 'doctor_appointments' ? 'menu-item-active:border-b-gray-900 menu-item-here:border-b-gray-900 active' : '' }}">
+                        <a class="menu-link gap-2.5 pb-2 lg:pb-4" href="{{ path('doctor_appointments') }}" tabindex="0">
+                            <span class="menu-title text-nowrap text-sm text-gray-800 {{ app.request.attributes.get('_route') == 'doctor_appointments' ? 'menu-item-active:text-gray-900 menu-item-active:font-medium menu-item-here:text-gray-900 menu-item-here:font-medium menu-item-show:text-gray-900 menu-link-hover:text-gray-900' : '' }}">Programări</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
