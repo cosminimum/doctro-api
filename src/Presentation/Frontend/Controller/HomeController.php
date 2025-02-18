@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Presentation\Controller;
+namespace App\Presentation\Webservice;
 
 use App\Domain\Dto\ApiResponseDto;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
