@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Detalii Programare #{{ appointment.id }}</title>
+    <style>
+        body { font-family: Helvetica, sans-serif; }
+        .header { text-align: center; margin-bottom: 20px; }
+        .details { margin: 0 30px; }
+        .details table { width: 100%; border-collapse: collapse; }
+        .details th, .details td { border: 1px solid #ddd; padding: 8px; }
+        .details th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+<div class="header">
+    <h1>Detalii Programare</h1>
+    <p>ID: {{ appointment.id }}</p>
+</div>
+
+<div class="details">
+    <table>
+        <tr>
+            <th>Medic</th>
+            <td>{{ appointment.doctor.firstName }} {{ appointment.doctor.lastName }}</td>
+        </tr>
+        <tr>
+            <th>Specialitate</th>
+            <td>{{ appointment.medicalSpecialty.name }}</td>
+        </tr>
+        <tr>
+            <th>Serviciu</th>
+            <td>{{ appointment.hospitalService.name }}</td>
+        </tr>
+        <tr>
+            <th>Ora</th>
+            <td>{{ appointment.timeSlot.startTime|date('H:i') }}</td>
+        </tr>
+        <tr>
+            <th>Data</th>
+            <td>{{ appointment.timeSlot.schedule.date|date('d-m-Y') }}</td>
+        </tr>
+        <tr>
+            <th>Nume</th>
+            <td>{{ appointment.patient.firstName }} {{ appointment.patient.lastName }}</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>{{ appointment.patient.email }}</td>
+        </tr>
+        <tr>
+            <th>Telefon</th>
+            <td>{{ appointment.patient.phone }}</td>
+        </tr>
+    </table>
+</div>
+</body>
+</html>

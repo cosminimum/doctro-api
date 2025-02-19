@@ -8,6 +8,8 @@ use App\Infrastructure\Entity\DoctorSchedule;
 use App\Infrastructure\Entity\Patient;
 use App\Infrastructure\Entity\User;
 use App\Infrastructure\Repository\AppointmentRepository;
+use App\Infrastructure\Repository\HospitalServiceRepository;
+use App\Infrastructure\Repository\MedicalSpecialtyRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,11 +18,17 @@ use Symfony\Component\Routing\Annotation\Route;
 class HomeController extends AbstractController
 {
     #[Route('/', name: 'homepage', methods: ['GET'])]
-    public function home(AppointmentRepository $appointmentRepository, EntityManagerInterface $em): Response
-    {
+    public function home(
+        AppointmentRepository $appointmentRepository,
+        MedicalSpecialtyRepository $medicalSpecialtyRepository,
+        HospitalServiceRepository $hospitalServiceRepository,
+        EntityManagerInterface $em
+    ): Response {
         if ($this->getUser() && in_array(Patient::BASE_ROLE, $this->getUser()->getRoles())) {
             return $this->render('pages/appointments/identified.html.twig', [
                 'appointments' => $appointmentRepository->findBy(['patient' => $this->getUser()]),
+                'specialties' => $medicalSpecialtyRepository->findAll(),
+                'services' => $hospitalServiceRepository->findAll(),
             ]);
         }
 

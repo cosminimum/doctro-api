@@ -1,10 +1,26 @@
 {% extends 'states/dashboard.html.twig' %}
 
 {% block body %}
+    {% if appointment is defined %}
+        <script>
+          window.appointmentEditData = {
+            doctorId: {{ appointment.doctor.id|json_encode|raw }},
+            specialtyId: {{ appointment.medicalSpecialty.id|json_encode|raw }},
+            serviceId: {{ appointment.hospitalService.id|json_encode|raw }},
+            slotId: {{ appointment.timeSlot.id|json_encode|raw }},
+            firstName: {{ appointment.patient.firstName|json_encode|raw }},
+            lastName: {{ appointment.patient.lastName|json_encode|raw }},
+            email: {{ appointment.patient.email|json_encode|raw }},
+            phone: {{ appointment.patient.phone|json_encode|raw }},
+            cnp: {{ appointment.patient.cnp|json_encode|raw }}
+          };
+        </script>
+    {% endif %}
+
     <div class="flex grow gap-5 lg:gap-7.5">
         <div class="hidden lg:block w-[230px] shrink-0">
             <div class="w-[230px] card py-5 px-2" data-sticky="true" data-sticky-animation="true" data-sticky-class="fixed z-[4] left-auto top-[calc(var(--tw-header-height)+1rem)]" data-sticky-name="scrollspy" data-sticky-offset="200" data-sticky-target="body">
-                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2" data-scrollspy="true" data-scrollspy-offset="80px|lg:110px" data-scrollspy-target="body">
+                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2">
                     <select id="select-specialty" class="select select-lg" name="select">
                         <option selected disabled>Alege specialitatea</option>
                         {% for specialty in specialties %}
@@ -12,13 +28,13 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2" data-scrollspy="true" data-scrollspy-offset="80px|lg:110px" data-scrollspy-target="body">
-                    <select id="select-service" class="select select-lg" name="select">
+                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2">
+                    <select id="select-service" class="select select-lg" name="select" disabled>
                         <option selected disabled>Alege serviciul</option>
                     </select>
                 </div>
-                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2" data-scrollspy="true" data-scrollspy-offset="80px|lg:110px" data-scrollspy-target="body">
-                    <select id="select-doctor" class="select select-lg" name="select">
+                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2">
+                    <select id="select-doctor" class="select select-lg" name="select" disabled>
                         <option selected disabled>Alege medic</option>
                     </select>
                 </div>
@@ -27,29 +43,28 @@
         <div id="slots-container" class="flex flex-col grow">
             <style>
                 .upgrade-bg {
-                    background-image: url('{{asset('theme/media/images/2600x1200/bg-5.png')}}');
+                    background-image: url('{{ asset('theme/media/images/2600x1200/bg-5.png') }}');
                 }
                 .dark .upgrade-bg {
                     background-image: url('{{ asset('theme/media/images/2600x1200/bg-5-dark.png') }}');
                 }
             </style>
             <div class="card rounded-xl">
-                <div class="flex items-center flex-wrap sm:flex-wrap justify-between grow gap-2 p-5 rtl:[background-position:-30%_41%] [background-position:121%_41%] bg-no-repeat bg-[length:660px_310px] upgrade-bg">
+                <div class="flex items-center flex-wrap sm:flex-wrap justify-between grow gap-2 p-5 bg-no-repeat bg-[length:660px_310px] upgrade-bg">
                     <div class="flex items-center gap-4">
                         <div class="relative size-[50px] shrink-0">
-                            <svg class="w-full h-full stroke-brand-clarity fill-brand-light" fill="none" height="48" viewbox="0 0 44 48" width="44" xmlns="http://www.w3.org/2000/svg">
+                            <svg class="w-full h-full stroke-brand-clarity fill-brand-light" fill="none" height="48" viewBox="0 0 44 48" width="44" xmlns="http://www.w3.org/2000/svg">
                                 <path d="M16 2.4641C19.7128 0.320509 24.2872 0.320508 28 2.4641L37.6506 8.0359C41.3634 10.1795 43.6506 14.141 43.6506
-			18.4282V29.5718C43.6506 33.859 41.3634 37.8205 37.6506 39.9641L28 45.5359C24.2872 47.6795 19.7128 47.6795 16 45.5359L6.34937
-			39.9641C2.63655 37.8205 0.349365 33.859 0.349365 29.5718V18.4282C0.349365 14.141 2.63655 10.1795 6.34937 8.0359L16 2.4641Z" fill="">
+                                    18.4282V29.5718C43.6506 33.859 41.3634 37.8205 37.6506 39.9641L28 45.5359C24.2872 47.6795 19.7128 47.6795 16 45.5359L6.34937
+                                    39.9641C2.63655 37.8205 0.349365 33.859 0.349365 29.5718V18.4282C0.349365 14.141 2.63655 10.1795 6.34937 8.0359L16 2.4641Z" fill="">
                                 </path>
                                 <path d="M16.25 2.89711C19.8081 0.842838 24.1919 0.842837 27.75 2.89711L37.4006 8.46891C40.9587 10.5232 43.1506 14.3196 43.1506
-			18.4282V29.5718C43.1506 33.6804 40.9587 37.4768 37.4006 39.5311L27.75 45.1029C24.1919 47.1572 19.8081 47.1572 16.25 45.1029L6.59937
-			39.5311C3.04125 37.4768 0.849365 33.6803 0.849365 29.5718V18.4282C0.849365 14.3196 3.04125 10.5232 6.59937 8.46891L16.25 2.89711Z" stroke="">
+                                    18.4282V29.5718C43.1506 33.6804 40.9587 37.4768 37.4006 39.5311L27.75 45.1029C24.1919 47.1572 19.8081 47.1572 16.25 45.1029L6.59937
+                                    39.5311C3.04125 37.4768 0.849365 33.6803 0.849365 29.5718V18.4282C0.849365 14.3196 3.04125 10.5232 6.59937 8.46891L16.25 2.89711Z" stroke="">
                                 </path>
                             </svg>
-                            <div class="absolute leading-none start-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4 rtl:translate-x-2/4">
-                                <i class="ki-filled ki-information-4 text-xl text-brand">
-                                </i>
+                            <div class="absolute leading-none start-2/4 top-2/4 -translate-y-2/4 -translate-x-2/4">
+                                <i class="ki-filled ki-information-4 text-xl text-brand"></i>
                             </div>
                         </div>
                         <div class="flex flex-col gap-1.5">
@@ -76,45 +91,77 @@
         </div>
     </div>
 
-
+    {# The hidden Symfony form used to submit the appointment #}
     <div class="hidden">
         {{ form(form, {'attr': {'id': 'appointmentForm'}}) }}
     </div>
+
+    {# A simple modal for confirming the appointment (used for both create & edit) #}
+    <div id="appointmentModal" class="modal hidden">
+        <div class="modal-content">
+            <h2>{{ appointment is defined ? 'Edit Appointment' : 'New Appointment' }}</h2>
+            <form id="modalAppointmentForm">
+                <div>
+                    <label for="modal-firstname">First Name</label>
+                    <input id="modal-firstname" type="text" name="firstname">
+                </div>
+                <div>
+                    <label for="modal-lastname">Last Name</label>
+                    <input id="modal-lastname" type="text" name="lastname">
+                </div>
+                <div>
+                    <label for="modal-email">Email</label>
+                    <input id="modal-email" type="email" name="email">
+                </div>
+                <div>
+                    <label for="modal-phone">Phone</label>
+                    <input id="modal-phone" type="text" name="phone">
+                </div>
+                <div>
+                    <label for="modal-cnp">CNP</label>
+                    <input id="modal-cnp" type="text" name="cnp">
+                </div>
+                <button type="button" class="confirm-appointment">Confirm</button>
+                <button type="button" class="close-modal">Close</button>
+            </form>
+        </div>
+    </div>
+
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
-        const form = {
+        const formElements = {
           specialty: document.getElementById('select-specialty'),
           service: document.getElementById('select-service'),
           doctor: document.getElementById('select-doctor')
         };
 
-        if (form.specialty) {
-          form.specialty.addEventListener('change', async () => {
-            if (form.specialty.value) {
-              const services = await fetchServices(form.specialty.value);
-              updateSelect(form.service, services);
-              form.service.disabled = false;
+        if (formElements.specialty) {
+          formElements.specialty.addEventListener('change', async () => {
+            if (formElements.specialty.value) {
+              const services = await fetchServices(formElements.specialty.value);
+              updateSelect(formElements.service, services);
+              formElements.service.disabled = false;
             }
           });
         }
 
-        if (form.service) {
-          form.service.addEventListener('change', async () => {
-            if (form.service.value) {
-              const doctors = await fetchDoctors(form.service.value);
-              updateSelect(form.doctor, doctors);
-              form.doctor.disabled = false;
+        if (formElements.service) {
+          formElements.service.addEventListener('change', async () => {
+            if (formElements.service.value) {
+              const doctors = await fetchDoctors(formElements.service.value);
+              updateSelect(formElements.doctor, doctors);
+              formElements.doctor.disabled = false;
               await searchAvailableSlots();
             }
           });
         }
 
-        if (form.doctor) {
-          form.doctor.addEventListener('change', searchAvailableSlots);
+        if (formElements.doctor) {
+          formElements.doctor.addEventListener('change', searchAvailableSlots);
         }
 
         const observer = new MutationObserver(mutations => {
@@ -124,7 +171,6 @@
             }
           });
         });
-
         const slotsContent = document.getElementById('slots-content');
         if (slotsContent) {
           observer.observe(slotsContent, {
@@ -145,10 +191,10 @@
           e.preventDefault();
           const modal = this.closest('.modal');
           const formData = {
-            doctorId: modal.querySelector('.doctor-entity').getAttribute('data-doctor-id'),
-            specialtyId: modal.querySelector('.specialty-entity').getAttribute('data-specialty-id'),
-            serviceId: modal.querySelector('.service-entity').getAttribute('data-service-id'),
-            slotId: modal.querySelector('.slot-entity').getAttribute('data-slot-id'),
+            doctorId: modal.getAttribute('data-doctor-id') || document.getElementById('select-doctor').value,
+            specialtyId: modal.getAttribute('data-specialty-id') || document.getElementById('select-specialty').value,
+            serviceId: modal.getAttribute('data-service-id') || document.getElementById('select-service').value,
+            slotId: modal.getAttribute('data-slot-id') || modal.getAttribute('data-slot-id'),
             firstName: modal.querySelector('input[name="firstname"]').value,
             lastName: modal.querySelector('input[name="lastname"]').value,
             cnp: modal.querySelector('input[name="cnp"]').value,
@@ -194,15 +240,7 @@
           try {
             const response = await fetch(`/api/doctors?service=${serviceId}`);
             if (!response.ok) throw new Error('Network response was not ok');
-            const result = await response.json();
-
-            if (!result.is_error && Array.isArray(result.data)) {
-              return result.data.map(doctor => ({
-                id: doctor.id,
-                name: `${doctor.first_name} ${doctor.last_name}`
-              }));
-            }
-            return [];
+            return await response.json();
           } catch (error) {
             console.error('Error fetching doctors:', error);
             return [];
@@ -212,21 +250,16 @@
         async function searchAvailableSlots() {
           const container = document.getElementById('slots-container');
           const content = document.getElementById('slots-content');
-
-          if (!form.service.value) return;
-
+          if (!formElements.service.value) return;
           container.classList.remove('hidden');
           content.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div></div>';
-
           try {
             const isDoctorSelected = (value) => value && value !== "Alege medic";
-
             const params = new URLSearchParams({
-              specialty: form.specialty.value,
-              service: form.service.value,
-              ...(isDoctorSelected(form.doctor.value) && { doctor: form.doctor.value })
+              specialty: formElements.specialty.value,
+              service: formElements.service.value,
+              ...(isDoctorSelected(formElements.doctor.value) && { doctor: formElements.doctor.value })
             });
-
             const response = await fetch(`/api/slots?${params}`);
             if (!response.ok) throw new Error('Network response was not ok');
             const html = await response.text();
@@ -236,12 +269,16 @@
           }
         }
 
-        function updateSelect(select, options) {
+        function updateSelect(select, options, defaultValue = null) {
+          select.innerHTML = '<option selected disabled>Alege</option>';
           options.forEach(option => {
             if (option && option.id && option.name) {
               const optionElement = document.createElement('option');
               optionElement.value = option.id;
               optionElement.textContent = option.name;
+              if (defaultValue && option.id == defaultValue) {
+                optionElement.selected = true;
+              }
               select.appendChild(optionElement);
             }
           });
@@ -249,6 +286,42 @@
 
         function showError(message) {
           alert(message);
+        }
+
+        const appointmentModal = document.getElementById('appointmentModal');
+        const closeModalButtons = appointmentModal.querySelectorAll('.close-modal');
+        closeModalButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            appointmentModal.classList.add('hidden');
+          });
+        });
+
+        function openAppointmentPopup(data) {
+          appointmentModal.querySelector('input[name="firstname"]').value = data.firstName || '';
+          appointmentModal.querySelector('input[name="lastname"]').value = data.lastName || '';
+          appointmentModal.querySelector('input[name="email"]').value = data.email || '';
+          appointmentModal.querySelector('input[name="phone"]').value = data.phone || '';
+          appointmentModal.querySelector('input[name="cnp"]').value = data.cnp || '';
+          appointmentModal.setAttribute('data-doctor-id', data.doctorId || '');
+          appointmentModal.setAttribute('data-specialty-id', data.specialtyId || '');
+          appointmentModal.setAttribute('data-service-id', data.serviceId || '');
+          appointmentModal.setAttribute('data-slot-id', data.slotId || '');
+          appointmentModal.classList.remove('hidden');
+        }
+
+        if (window.appointmentEditData) {
+          const data = window.appointmentEditData;
+          formElements.specialty.value = data.specialtyId;
+          formElements.specialty.dispatchEvent(new Event('change'));
+          setTimeout(() => {
+            formElements.service.value = data.serviceId;
+            formElements.service.dispatchEvent(new Event('change'));
+            setTimeout(() => {
+              formElements.doctor.value = data.doctorId;
+              formElements.doctor.dispatchEvent(new Event('change'));
+              openAppointmentPopup(data);
+            }, 500);
+          }, 500);
         }
       });
     </script>

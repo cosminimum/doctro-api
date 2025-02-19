@@ -448,9 +448,10 @@ class DoctorController extends AbstractController
 
         if ($this->isCsrfTokenValid('delete' . $appointment->getId(), $request->request->get('_token'))) {
             $appointment->getTimeSlot()->setIsBooked(false);
-            $em->remove($appointment);
+            $appointment->setIsActive(false);
+            $em->persist($appointment);
             $em->flush();
-            $this->addFlash('success', 'Programarea a fost ștearsă cu succes!');
+            $this->addFlash('success', 'Programarea a fost anulată cu succes!');
         } else {
             $this->addFlash('error', 'Tokenul CSRF nu este valid.');
         }

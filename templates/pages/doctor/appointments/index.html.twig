@@ -42,6 +42,7 @@
                                             <span class="sort-icon"></span>
                                         </span>
                                 </th>
+                                <th></th>
                             </tr>
                             </thead>
                             <tbody>
@@ -62,6 +63,11 @@
                                         {% endif %}
                                     </td>
                                     <td>{{ appointment.timeSlot.schedule.date|date('d-m-Y') }} {{ appointment.timeSlot.startTime|date('H:i') }}</td>
+                                    <td>
+                                        <a class="btn btn-sm btn-icon btn-clear btn-light" href="{{ path('doctor_edit_appointment', {id: appointment.id}) }}">
+                                            <i class="ki-filled ki-notepad-edit"></i>
+                                        </a>
+                                    </td>
                                 </tr>
                             {% endfor %}
                             </tbody>
