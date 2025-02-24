@@ -1,6 +1,17 @@
 {% extends 'states/doctor-dashboard.html.twig' %}
 
 {% block body %}
+  {% set days = {
+    'Monday': 'Luni',
+    'Tuesday': 'Marți',
+    'Wednesday': 'Miercuri',
+    'Thursday': 'Joi',
+    'Friday': 'Vineri',
+    'Saturday': 'Sâmbătă',
+    'Sunday': 'Duminică'
+  } %}
+
+
   <div class="grid gap-5 lg:gap-7.5">
     <div class="grid lg:grid-cols-3 gap-5 lg:gap-7.5 items-stretch">
       <div class="lg:col-span-2">
@@ -40,11 +51,11 @@
                     </div>
                     <div class="card-body">
                       <div class="grid gap-5 mb-7">
-                        {% for day in ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'] %}
-                          <div class="schedule-row flex items-center justify-between flex-wrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5" data-day="{{ day }}">
+                        {% for engDay, roDay in days %}
+                          <div class="schedule-row flex items-center justify-between flex-wrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5" data-day="{{ engDay }}">
                             <div class="flex items-center flex-wrap gap-3.5">
                               <div class="flex flex-col gap-px">
-                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active" href="#">{{ day }}</a>
+                                <a class="text-sm font-medium text-gray-900 hover:text-primary-active" href="#">{{ roDay }}</a>
                                 <div class="flex mt-1 gap-2">
                                   <input class="input input-sm start-time" name="startTime" placeholder="De la" type="time" min="07:00" max="19:00"/>
                                   <span class="items-center justify-center px-2">—</span>
@@ -197,16 +208,19 @@
         snapDuration: '00:15:00',
         slotLabelInterval: '00:15',
         slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
-
         businessHours: businessHours,
         events: allEvents,
         eventClick: function(info) {
           if (info.event.display !== "background") {
             window.location.href = '/doctor/appointments/' + info.event.id + '/edit';
           }
+        },
+        dateClick: function(info) {
+          window.location.href = '{{ path("doctor_add_appointment") }}?date=' + encodeURIComponent(info.dateStr);
         }
       });
       calendar.render();
+
 
       new Datepicker('#input-repeat-slots', { time: false });
       new Datepicker('#input-block-slots', { time: true, ranged: true });

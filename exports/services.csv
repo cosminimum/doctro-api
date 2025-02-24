@@ -1,0 +1,926 @@
+name,code,price,mode
+ABCESE,SPT_70,128.66,SPITALIZARE
+adenoidectomia fara tonsilectomie,SPT_C016,589.67,SPITALIZARE
+ALTA DEPLASARE A UNUI ALT DISC INTERVERREBAL SPECIFICAT FARA INDICATIE OPERATORIE M54.4,SPT_M074,313.33,SPITALIZARE
+"Alta deplasarea a unui alt disc intervertebral specificat, fara indicatie operatorie",SPT_M074,313.33,SPITALIZARE
+Alta durere abdominala si nespecificata,SPT_M092,134.41,SPITALIZARE
+Alte anemii prin carenta de fier,SPT_M009,532.02,SPITALIZARE
+Alte anemii prin carenta de fier D50.8,SPT_M009,528.18,SPITALIZARE
+"Alte boli cerebrovasculare, specificate",SPT_M031,322.4,SPITALIZARE
+Alte boli pulmonare interstitiale specificate,SPT_M049,380.09,SPITALIZARE
+Alte boli specificate ale vezicii biliare,SPT_M067,263.17,SPITALIZARE
+Alte colecistite,SPT_M066,290.9,SPITALIZARE
+Alte forme de angina pectorala (*fara coronarografie),SPT_M024,273.62,SPITALIZARE
+Alte forme de angina pectorala (*fara coronografie,SPT_M024,273.62,SPITALIZARE
+Alte forme de angina pectorala (fara coronarografie),SPT_M024,273.62,SPITALIZARE
+Alte forme specificate de diabet mellitus cu control slab,SPT_M108,427.32,SPITALIZARE
+Alte gastrite acute,SPT_M054,298.71,SPITALIZARE
+Alte gastrite acute,SPT_M054,311.6,SPITALIZARE
+Alte incizii si drenaje ale tegumentelor si tesutului subcutanat,SPT_C083,519.43,SPITALIZARE
+Alte incizii si drenaje ale tegumentelor si tesutului subcutanat,SPT_C106,519.43,SPITALIZARE
+Alte infectii acute ale cailor respiratorii superioare cu localizari multiple,SPT_M036,171.71,SPITALIZARE
+Alte ingrijiri medicale specificate,SPT_M098,331.17,SPITALIZARE
+Alte pneumonii bacteriene,SPT_M039,398.65,SPITALIZARE
+"Alte pneumonii, cu micro-organisme nespecificate",SPT_M041,375.98,SPITALIZARE
+Alte sangerari anormale specificate ale uterului si vaginului,SPT_M084,389.85,SPITALIZARE
+"Amigdalita acuta, nespecificata",SPT_M035,165.12,SPITALIZARE
+Amplasarea si ajustarea unei proteze urinare,SPT_M096,127.48,SPITALIZARE
+AMPUTATIE DEGET MANA,SPT_26,128.66,SPITALIZARE
+ANALGEZIE AUTOCONTROLATA,SPT_100,69.4,SPITALIZARE
+ANALGEZIE AUTOCONTROLATA,TR,69.4,SPITALIZARE
+Anemia prin carenta de fier nespecificata,SPT_M010,340.34,SPITALIZARE
+Anemia prin carenta de fier secundara unei pierderi de sange (cronica),SPT_M008,335.03,SPITALIZARE
+Anemia prin carenta de fier secundara unei pierderi de sange cronica,SPT_M008,335.03,SPITALIZARE
+"Anemia prin carenta de fier, nespecificata",SPT_M008,340.34,SPITALIZARE
+"Anemia prin carenta de fier, nespecificata",SPT_M010,340.34,SPITALIZARE
+"Anemii prin carenta de fier ,nespecificata D50.9",SPT_M010,340.34,SPITALIZARE
+Anemii prin carenta de fier sec. unei pierderi de sange D50.0,SPT_M008,335.03,SPITALIZARE
+Anestezie de contact si infiltratie,15,0,SPITALIZARE
+ANESTEZIE DE CONTACT SI INFILTRATIE,SPT_37,46.06,SPITALIZARE
+Anestezie generala cu diprivan,18,0,SPITALIZARE
+Anestezie generala inhalatorie,14,0,SPITALIZARE
+ANESTEZIE GENERALA INHALATORIE,SPT_36,239.38,SPITALIZARE
+ANESTEZIE GENERALA INHALATORIE,SPT_40,300,SPITALIZARE
+Anestezie locala,17,0,SPITALIZARE
+ANESTEZIE LOCALA,SPT_39,16.63,SPITALIZARE
+Anestezie locoregionala de infiltratie,16,0,SPITALIZARE
+ANESTEZIE LOCOREGIONALA DE INFILTRATIE,SPT_38,114.99,SPITALIZARE
+aplicarea dispozitivului de fixare externa neclasificata altundeva,SPT_C081,965.45,SPITALIZARE
+ARTRITA JUVENILA PENTRU TRATAMENTUL CU IMUNOSUPRESOARE,SPT_93,200,SPITALIZARE
+ARTROPATIA PSORIAZICA PENTRU TRATAMENTUL CU IMUNOSUPRESOARE,SPT_91,200,SPITALIZARE
+Artropatia psoriazica pentru tratamentul cu imunosupresoare (4),SPT_92,200,SPITALIZARE
+Astmul cu predominenta alergica,SPT_M047,177.3,SPITALIZARE
+ASTUMUL CU PREDOMINANTA ALERGICA,SPT_M047,177.3,SPITALIZARE
+ATEROSCLEROZA ARTERELOR EXTREMITATILOR CU CLAUDICATIE INTERMITENTA,SPT_M100,273.62,SPITALIZARE
+Ateroscleroza cerebrala,SPT_M030,322.4,SPITALIZARE
+Avort fals,SPT_M086,97.77,SPITALIZARE
+"Avort spontan incomplet, fara complicatii",SPT_M087,98.84,SPITALIZARE
+B3040-Dementa si alte tulburari cronice ale functiei cerebrale,TR01_86,276,SPITALIZARE
+B3072 Tumori ale sistemului nervos fara cc catastrofale sau severe,TR01_88,210.42,SPITALIZARE
+B3114 ACCIDENT AVSCULAR CEREBRAL DECEDAT SAU TRANSFERAT SUB 5 ZILE,TR01_89,109.54,SPITALIZARE
+B3132 INFECTII ALE SISTEMULUI NERVOS CU EXCEPTIA MENINGITEI VIRALE FARA CC CATASROFALE SAU SEVERE,TR01_226,276,SPITALIZARE
+B3132 INFECTII ALE SISTEMULUI NERVOS CU EXCEPTIA MENINGITEI VIRALE FARA CC CATASROFALE SAU SEVERE,TR01_62,276,SPITALIZARE
+B3150 STUPOARE SI COMA NONTRAUMATICA,TR01_90,151.3,SPITALIZARE
+B3160 Convulsii febrile,TR01_144,77.28,SPITALIZARE
+B3180 Cefalee,TR01_145,74.77,SPITALIZARE
+B3192 Leziune intracraniana fara CC catastrofale sau severe,TR01_146,226.07,SPITALIZARE
+B3210 Alte leziuni ale capului,TR01_147,66.07,SPITALIZARE
+B3210-Alte leziuni ale capului,TR01_87,66.07,SPITALIZARE
+B3222 Alte tulburari ale sistemului nervos fara cc catastrofale sau severe,TR01_148,153.04,SPITALIZARE
+Biopsia leziunii peniene,SPT_C107,538.48,SPITALIZARE
+BIOPSIA PENIANA,SPT_C107,538.48,SPITALIZARE
+Biopsia tegumentului si tesutului subcutanat,SPT_C082,609.55,SPITALIZARE
+Biopsia tegumentuluisi tesutului subcutanat,SPT_C082,609.55,SPITALIZARE
+BIOPSIA TRANS RECTALA (CU ALTA BIOPSIE) A PROSTATEI,SPT_C114,538.48,SPITALIZARE
+Biopsia transrectala (cu ac de biopsie) a prostatei,SPT_C114,538.48,SPITALIZARE
+Biopsie ganglioni laterocervicali si supraclaviculari,SPT_C097,416.26,SPITALIZARE
+BIOPSIE GANGLIONI LIMFATICI,SPT_C097,416.26,SPITALIZARE
+Biposia tegumentului si tesutului subcutanat,SPT_C082,609.55,SPITALIZARE
+BLOCAJ NERVI PERIFERICI,SPT_104,120.5,SPITALIZARE
+BLOCAJ NERVI PERIFERICI,TR,120.5,SPITALIZARE
+"Boala inflamatorie pelviana feminina, nespecificata",SPT_M080,138.35,SPITALIZARE
+Boala Lyme (* diagnostic si tratament),SPT_M105,626.03,SPITALIZARE
+Boala pancreasului nespecificata,SPT_M111,250,SPITALIZARE
+"Boala pulmonara interstitiala, nespecificata",SPT_M050,381.74,SPITALIZARE
+"Boala pulmonara obstructiva cronica cu exacerbare acuta, nespecificata",SPT_M045,353.94,SPITALIZARE
+Boala pulmonara obstructiva cronica cu infectie acuta a cailor respiratorii inferioare,SPT_M044,353.94,SPITALIZARE
+Boala pulmonara obstructiva cronica cu infectie acuta a cailor respiratorii inferioare,SPT_M044,375.74,SPITALIZARE
+Boala refluxului gastro-esofagian cu esofagita,SPT_M051,307.15,SPITALIZARE
+Boala refluxului gastro-esofagian fara esofagita,SPT_M052,230.01,SPITALIZARE
+Boli rare,SPT_97,200,SPITALIZARE
+Bronsiectazia,SPT_M048,355.11,SPITALIZARE
+"Bronsita acuta, nespecificata",SPT_M043,168.46,SPITALIZARE
+BURSITA COT,SPT_22,128.66,SPITALIZARE
+"C08006-Refacerea staticii palpebrale (entropion, ectropion , lagoftalmie) ptoza palpebrala",SPT_C104,246.93,SPITALIZARE
+"C1080 ALTE PROCEDURI ASUPRA CORNEEI ,SCLEREI SI CONJUNCTIVEI",TR01_96,189.36,SPITALIZARE
+C1090 PROCEDURI PRIVIND CAILE LACRIMARE,TR01,130.47,SPITALIZARE
+C1100 ALTE PROCEDURI LA NIVELUL OCHIULUI,TR01_97,143.45,SPITALIZARE
+C3012 INFECTII OCULARE ACUTE MAJORE VARSTA &lt;55 FARA CC CATASTROFALE SAU SEVERE,TR01_99,194.77,SPITALIZARE
+C3012 Infectii oculare acute si majore varsta &amp;lt; 55 fara CC catastrofale sau severe,TR01_149,194.77,SPITALIZARE
+C3042 ALTE TULBURARI ALE OCHIULUI FARA CC,TR01_98,81.72,SPITALIZARE
+Cardiomiopatie ischemica,SPT_M024,273.62,SPITALIZARE
+Cardiomiopatie ischemica,SPT_M099,273.62,SPITALIZARE
+Cardiomiopatie ischemica,SPT_M24,273.62,SPITALIZARE
+"Cardiopatie ischemica cronica, nespecificata, fara coronarografie",SPT_M026,302.74,SPITALIZARE
+CefaleeB3180,TR01_208,74.77,SPITALIZARE
+CefaleeB3180,TR01_221,74.77,SPITALIZARE
+CefaleeB3180,TR01_85,74.77,SPITALIZARE
+CH PL+REP,TR01_21,69.55,SPITALIZARE
+CH VASC,TR01_20,133.15,SPITALIZARE
+Chimioterapie,4,0,SPITALIZARE
+chimioterapie cu antiemetice,SPT_3.8,80,SPITALIZARE
+Chimioterapie cu monitorizare,SPT_3.7,200,SPITALIZARE
+Chimioterapie*) cu monitorizare,SPT_3.7,280,SPITALIZARE
+Chirurgia varicelor,SPT_C071,808.68,SPITALIZARE
+Chirurgia varicelor,SPT_C075,808.68,SPITALIZARE
+Chirurgia varicelor,SPT_C076,808.68,SPITALIZARE
+"Chirurgie maxilo-faciala/chirurgie orodentara Odontectomie (molar inclus, molar semiinclus, canin inclus, canin semiinclus), regularizare creasta hemiarcada, tratament hiperostoza tuberozitara; Tratamentul hiperplaziei mucoasei tuberozitare, excizia hiperplaziei de mucoasa, extirparea formatiunilor tumorale (osoase - de parti moi), adancirea santului vestibular sau lingual, superior sau inferior, alveoloplastie, rezectie apicala cu obturatie/fara obturatie, amputatie radiculara, premolarizare, metoda chirurgicala ortodontica (tunelizare)",19,0,SPITALIZARE
+CHIST SINOVIAL,SPT_19,128.66,SPITALIZARE
+CHIST SINOVIAL PICIOR,SPT_27,128.66,SPITALIZARE
+CHISTURI,SPT_71,128.66,SPITALIZARE
+Chiuretaj cu biopsia de col uterin,SPT_C087.1,444.84,SPITALIZARE
+Chiuretaj cu biopsia de endometru,SPT_C087,444.84,SPITALIZARE
+CIRCUMCIZIE LA BARBAT,SPT_C069,193.54,SPITALIZARE
+CircumcizieM1050,TR01_118,146,SPITALIZARE
+Circumicizie la barbat,SPT_C069,193.54,SPITALIZARE
+Ciroza hepatica ? monitorizare pacienti cu ascita/hidrotorax,SPT_150,258.39,SPITALIZARE
+Cistita acuta,SPT_M077,221.39,SPITALIZARE
+Cistostomia percutanata cu insertia percutanata a cateterului suprapubic,SPT_C122,259.72,SPITALIZARE
+CITOSCOPIA,SPT_C123,297.5,SPITALIZARE
+Colecistectomia laparoscopica,SPT_C048,1050.94,SPITALIZARE
+Colecistita cronica,SPT_M065,339.14,SPITALIZARE
+Colonoscopia flexibila pana la cec,SPT_C065,634.18,SPITALIZARE
+Colonoscopia flexibila pana la cec,SPT_C066,634.18,SPITALIZARE
+Colonoscopia flexibila pana la flexura hepatica,SPT _C066,634.18,SPITALIZARE
+Colonoscopia flexibila pana la flexura hepatica,SPT_C065,634.18,SPITALIZARE
+COLONOSCOPIE FLEXIBILA PANA LA CEC,SPT_C065,371.57,SPITALIZARE
+COLONOSCOPIE FLEXIBILA PANA LA CEC CU BIOPSIE,SPT_C067,480.31,SPITALIZARE
+COLONOSCOPIE FLEXIBILA PANA LA FLEXURA HEPATICA CU BIOPSIE,SPT_C067,480.31,SPITALIZARE
+Corectia diformitatii osoase,SPT_C039,1421.61,SPITALIZARE
+CORECTIA ECTROPIONULUI SAU ENTROPIONULUI PRIN ALTE CORECTII ALE RETRACTORILOR INFERIORI ,SPT_C102,246.93,SPITALIZARE
+CORECTIA ECTROPIONULUI SAU ENTROPIONULUI PRIN STRANGEREA SAU SCURTAREA RETRACTORILOR INFERIORI,SPT_C101,246.93,SPITALIZARE
+CORECTIA ECTROPIONULUI SAU ENTROPIONULUI PRIN TEHNICI DE SUTURA,SPT_C103,246.93,SPITALIZARE
+"Corectie fren, infiltratie trigeminala",22,0,SPITALIZARE
+"Coxartroza primara, bilaterala",SPT_M072,196.79,SPITALIZARE
+Cura chirurgicala a herniei inghinale,SPT_C055,589.67,SPITALIZARE
+Curetajul aspirativ al cavitatii uterine,SPT_C029,594.99,SPITALIZARE
+Curetajul uterin fara dilatare,SPT_C028,594.99,SPITALIZARE
+D17.1-Tumora lipomatoasa benigna a pielii si a tesutului subcutanat al trunchiului,SPT_M007,225.87,SPITALIZARE
+"D2020 Proceduri endoscopice de zi, pentru afectiuni ORL",TR01_106,55.64,SPITALIZARE
+"D3012 STARE MALIGNA NAS, GAR,URECHI FARA CC CATASTROFALE SAU SEVERE",TR01_141,154.78,SPITALIZARE
+D3030 Epistaxis,TR01_150,81.72,SPITALIZARE
+D3042 OTITA MEDIE SI INFECAIA CAILOR RESPIRATORII SUPERIOARE FARA CC,TR01_105,83.46,SPITALIZARE
+D3042 Otita medie si infectie a cailor respiratorii superioare cu CC,TR01_151,83.46,SPITALIZARE
+D3050 Laringitraheita si epiglotita,TR01_152,66.07,SPITALIZARE
+D3060 TRAUMATISM SI DIFORMITATE NAZALA,TR01_103,71.29,SPITALIZARE
+"D3072 ALTE DIAGNOSTICE PRIVIND NASUL, GATUL, URECHEA , GURA FARA CC",TR01_104,67.81,SPITALIZARE
+"D3072 Alte diagnostice prvind urechea, nasul , gura si gatul fara CC",TR01_154,67.81,SPITALIZARE
+D3082 Tulburari orale si dentare cu execeptia extractiilor si reconstruirilor de zi,TR01_153,39.99,SPITALIZARE
+Debridarea excizionala a partilor moi,SPT_C078,649.77,SPITALIZARE
+Debridarea excizionala a tegumentului si tesutului subcutanat,SPT_C079,649.77,SPITALIZARE
+Debridarea non excizionala a tegumentului si tesutului subcutanat,SPT_C077,162.44,SPITALIZARE
+Decompresia  tunelului carpian,SPT_C041,674.75,SPITALIZARE
+Depistarea precoce a leziunilor precanceroase ale sanului,SPT_172,102,SPITALIZARE
+Depistarea si diagonsticarea precoce a leziunilor displazice ale  colului uterin,SPT_174,171.24,SPITALIZARE
+DezechilibruD3020,TR01_101,88.71,SPITALIZARE
+DezechilibruD3020,TR01_228,88.68,SPITALIZARE
+Diabet mellitus  (zaharat) tip 1 cu control slab,SPT_M013,303.12,SPITALIZARE
+Diabet mellitus  (zaharat) tip 2 fara complicatii,SPT_M015,305.81,SPITALIZARE
+Diabet mellitus (zaharat) tip 2 cu control slab,SPT_M014,341.86,SPITALIZARE
+Diabet mellitus tip 1 cu complicatii microvasculare multiple,SPT_M106,378.9,SPITALIZARE
+Diabet mellitus tip 2 cu complicatii microvasculare multiple,SPT_M107,427.32,SPITALIZARE
+Diagnostic si monitorizare artrita precoce,SPT_142,200,SPITALIZARE
+Diagonsticarea precoce a leziunilor displazice ale  colului uterin - Se efectueaza de medicii din specialitatea obstetrica-ginecologie,SPT_176,217,SPITALIZARE
+Diapepsia,SPT_M057,180.12,SPITALIZARE
+Diareea si gastro-enterita probabil infectioase,SPT_M003,255.4,SPITALIZARE
+Dilatarea si curetajul uterin [D&C],SPT_C027,594.99,SPITALIZARE
+"Dinti ectopici, dinti din focarul de fractura, excizia bridelor",20,0,SPITALIZARE
+Dispepsia,SPT_M057,180.12,SPITALIZARE
+DISTRUGEREA ENDOSCOPICA A VERUCILOR URETRALE,SPT_C118,480.31,SPITALIZARE
+Dorsalgie joasa,SPT_M074,314.33,SPITALIZARE
+Dorsalgie joasa,SPT_M076,315.25,SPITALIZARE
+Dorsalgie joasa,SPT_M076,378.19,SPITALIZARE
+E3033 Infectii respiratorii /inflamatii fara CC,TR01_155,154.78,SPITALIZARE
+E3090 Pneumotorax,TR01_201,201.73,SPITALIZARE
+E3090 Pneumotorax,TR01_217,201.73,SPITALIZARE
+E3090 Pneumotorax,TR01_38,201.73,SPITALIZARE
+E3103 BRONSITA SI ASTM &lt;50 FARA CC,TR01_202,92.16,SPITALIZARE
+E3103 BRONSITA SI ASTM &lt;50 FARA CC,TR01_63,92.16,SPITALIZARE
+E3103 Bronsita si astm vartsa &amp;lt;50 fara CC,TR01_156,92.16,SPITALIZARE
+E3123 TUMORI RESPIRATORII FARA CC,TR01_135,130.41,SPITALIZARE
+E3143 REVERSAT PLEURAL FARA CC,TR01_170,166.95,SPITALIZARE
+E3143 REVERSAT PLEURAL FARA CC,TR01_207,166.95,SPITALIZARE
+E3143 REVERSAT PLEURAL FARA CC,TR01_247,166.95,SPITALIZARE
+E3143 REVERSAT PLEURAL FARA CC,TR01_82,166.95,SPITALIZARE
+E3163 ALT DIAGNOSTIC AL SSITEMULUI RESPIRATOR FARA CC,TR01_203,106.07,SPITALIZARE
+E3163 ALT DIAGNOSTIC AL SSITEMULUI RESPIRATOR FARA CC,TR01_64,106.07,SPITALIZARE
+Edem gestational,SPT_M088,198.65,SPITALIZARE
+Edem gestional,SPT_M088,198.65,SPITALIZARE
+EDEM LOCALIZAT,SPT_M102,198.65,SPITALIZARE
+EDEM LOCALIZAT  R60.0,SPT_M102,198.65,SPITALIZARE
+"Electroterapia leziunilor tegumentare, leziune unica",SPT_C089,273.03,SPITALIZARE
+"Electroterapia leziunilor tegumentare, leziuni multiple/leziune unic?",SPT_C089,273.03,SPITALIZARE
+"Electroterapia leziunilor tegumentare, leziuni multiple/leziune unica",SPT_C089,273.03,SPITALIZARE
+Endoscopie digestiva inferioara,SPT_C065,371.57,SPITALIZARE
+Endoscopie digestiva inferioara,SPT_C066,371.57,SPITALIZARE
+Endoscopie digestiva inferioara cu biopsie,SPT_C067,480.31,SPITALIZARE
+Endoscopie digestiva inferioara cu biopsie,SPT_C068,480.31,SPITALIZARE
+"Endoscopie digestiva inferioara cu sedare, cu polipectomie si biopsie 1-3 blocuri, fara hemostaza - colonoscopie flexibila pana la cec",SPT_310,1076,SPITALIZARE
+"Endoscopie digestiva inferioara cu sedare, fara biopsie - colonoscopie flexibila pana la cec",SPT_308,636,SPITALIZARE
+"Endoscopie digestiva inferioara fara sedare, fara biopsie - colonoscopie flexibila pana la cec",SPT_309,587,SPITALIZARE
+ENDOSCOPIE DIGESTIVA INFERIOARA J05502,SPT_C065,371.57,SPITALIZARE
+Endoscopie digestiva superioara,SPT_C059,371.57,SPITALIZARE
+Endoscopie digestiva superioara,SPT_C061,371.57,SPITALIZARE
+Endoscopie digestiva superioara,SPT_C061,480.31,SPITALIZARE
+Endoscopie digestiva superioara,SPT_C061,635.28,SPITALIZARE
+Endoscopie digestiva superioara,SPT_C062,371.57,SPITALIZARE
+Endoscopie digestiva superioara cu biopsie,SPT_C060,480.31,SPITALIZARE
+Endoscopie digestiva superioara cu biopsie,SPT_C063,480.31,SPITALIZARE
+EpistaxisD3030,TR01_102,81.72,SPITALIZARE
+Esofagoscopia cu biopsie,SPT_C067,480.31,SPITALIZARE
+"Evaluarea gravidei pentru infectii cu risc pt sarcina (rubeola , toxoplasmoza , infectia CMV ,hepatita)",SPT_120,340,SPITALIZARE
+Evaluarea si tratamentul anemiei prin carenta de fier cu fier injectabil intravenos,SPT_177,670.39,SPITALIZARE
+Examinare fibroscopica a faringelui,SPT_C084,444.84,SPITALIZARE
+Excizia chistului Baker,SPT_C042,682.96,SPITALIZARE
+EXCIZIA GRANULOMULUI OMBILICAL,SPT_C148,300,SPITALIZARE
+Excizia leziunilor tegumentare si tesutului subcutanat,SPT_C086,555.8,SPITALIZARE
+Excizia leziunilor tegumentare si tesutului subcutanat in alte zone,SPT_C086,555.8,SPITALIZARE
+Excizia locala a leziunilor sanului,SPT_C047,413.52,SPITALIZARE
+EXCIZIA PINGUECULEI,SPT_C128,246.93,SPITALIZARE
+EXCIZIA PTERIGIONULUI,SPT_C100,246.93,SPITALIZARE
+EXCIZIA TUMORII LIMBUSULUI,SPT_C125,246.93,SPITALIZARE
+EXCIZIA TUMORII LIMBUSULUI CU KERACTETOMIE,SPT_C126,246.93,SPITALIZARE
+EXCIZIE POLICERVICAL DILATATIA SI CHIURETAJUL UTERULUI,SPT_C028,219.55,SPITALIZARE
+Extragere intranazala de polipo din antrum-ul maxilar,SPT_C133,742.92,SPITALIZARE
+Extragerea endoscopica a litiazei vezicale,SPT_C121,480.31,SPITALIZARE
+Extragerea endoscopica a stentului ureteral,SPT_C091,360.11,SPITALIZARE
+F3032 INSUFICIENTA CARDIACA SI SOC FARA CC,TR01_239,208.68,SPITALIZARE
+F3032 INSUFICIENTA CARDIACA SI SOC FARA CC,TR01_65,208.68,SPITALIZARE
+F3062  Tulburari vasculare periferice fara CC catastrofal sau sever,TR01_46,118.24,SPITALIZARE
+F3072 ARTEROSCLEROZA CORONARIANA FARA CC,TR01_240,73.03,SPITALIZARE
+F3072 ARTEROSCLEROZA CORONARIANA FARA CC,TR01_66,73.03,SPITALIZARE
+F3082 HIPERTENSIUNE FARA CC,TR01_246,97.37,SPITALIZARE
+F3082 HIPERTENSIUNE FARA CC,TR01_81,97.37,SPITALIZARE
+F3090 BOALA CONGENITALA DE INIMA,TR01_241,104.33,SPITALIZARE
+F3090 Boala congenitala de inima,TR01_67,104.33,SPITALIZARE
+F3102 TULBURARI VALVULARE FARA CC CATASTROFALE SAU SEVERE,TR01_242,69.55,SPITALIZARE
+F3102 TULBURARI VALVULARE FARA CC CATASTROFALE SAU SEVERE,TR01_68,69.55,SPITALIZARE
+F3122 ARTIMIE NON MAJORA SI TULBURRAI DE CONDUCERE FARA CC CATARSTROFALE SAU SEVERE,TR01_243,100.8,SPITALIZARE
+F3122 ARTIMIE NON MAJORA SI TULBURRAI DE CONDUCERE FARA CC CATARSTROFALE SAU SEVERE,TR01_69,100.8,SPITALIZARE
+F3132 ANGINA INSTABILA FARA CC CATARSTROFALE SAU SEVERE,TR01_244,116.5,SPITALIZARE
+F3132 ANGINA INSTABILA FARA CC CATARSTROFALE SAU SEVERE,TR01_70,116.5,SPITALIZARE
+F3150 DURERE TORACIA,TR01_166,73.03,SPITALIZARE
+F3150 DURERE TORACIA,TR01_71,73.03,SPITALIZARE
+"Faringita acuta,nespecificata (*pentru copii 0-5 ani)",SPT_M034,163.63,SPITALIZARE
+"Faringita acuta,nespecificata (pentru copii 0-5 ani)",SPT_M034,160.54,SPITALIZARE
+"Faringita acuta,nespecificata (pentru copii 0-5 ani)",SPT_M034,163.63,SPITALIZARE
+Fasciectomia palmara pentru contractura Dupuytren,SPT_C044,674.75,SPITALIZARE
+Fasciotomia subcutanata pentru maladia Dupuytren,SPT_C043,674.75,SPITALIZARE
+Fibrobronhoscopia,SPT_C015,629.69,SPITALIZARE
+FLEBITA SI TROMBOFLEBITA EXTREMITATILOR INFERIAORE NESPECIFICATA I80.3,SPT_M101,383.92,SPITALIZARE
+FLEBITA SI TROMBOFLEBITA EXTREMITATILOR INFERIOARE NESPECIFICATA,SPT_M101,383.92,SPITALIZARE
+"Flebita si tromboflebita extremitatilor inferioare, nespecificata",SPT_M101,383.92,SPITALIZARE
+G1082 PROCEDURI PT HENRIE ABDOMINALA SI LATE HERNII VARSTA 1-59 FARA CC CATASTROFALE SAU SEVERE,TR01_41,269.73,SPITALIZARE
+G1090 PROCEDURI PT HENRIA INGHINALA SI FEMURALA VARSTA &gt;0,TR01_44,264.07,SPITALIZARE
+"G2012 Alte gastroscopii pentru boli digestive majore, de zi",TR01_50,48.7,SPITALIZARE
+G2020 COLONOSCOPIE COMPLEXA,TR01_49,112.05,SPITALIZARE
+"G2033 Alte colonoscopii, de zi",TR01_51,57.39,SPITALIZARE
+"G2042 Alte gastroscopii pentru boli digestive care nu sunt majore, de zi",TR01_52,46.96,SPITALIZARE
+"G2053 Gastroscopie complexa, de zi",TR01_40,66.07,SPITALIZARE
+"G2053 Gastroscopie complexa, de zi",TR01_53,66.25,SPITALIZARE
+G3012 STARE MALIGNA DIGESTIVA FARA CC CATASTROFAL SAU SEVER,TR01_138,139.13,SPITALIZARE
+G3040  Ulcer peptic necomplicat,TR01_187,60.86,SPITALIZARE
+G3040  Ulcer peptic necomplicat,TR01_209,60.86,SPITALIZARE
+G3040 Ulcer pepticnecomplicat,TR01_25,60.86,SPITALIZARE
+G3072  Durere abdominala sau adenita mezenterica fara CC,TR01_190,64.34,SPITALIZARE
+G3072  Durere abdominala sau adenita mezenterica fara CC,TR01_197,64.34,SPITALIZARE
+G3072  Durere abdominala sau adenita mezenterica fara CC,TR01_213,64.34,SPITALIZARE
+G3072 Durere abdominala sau adenita mezenterica fara CC,TR01_29,64.34,SPITALIZARE
+G3112 Alte diagnostice ale sistemului digestiv  fara CC,TR01_31,66.07,SPITALIZARE
+G3112 Alte diagnostice ale sistemului digestiv fara CC,TR01_191,66.07,SPITALIZARE
+G3112 Alte diagnostice ale sistemului digestiv fara CC,TR01_198,66.07,SPITALIZARE
+G3112 Alte diagnostice ale sistemului digestiv fara CC,TR01_215,66.07,SPITALIZARE
+G45.0 Sindrom vertebro-bazilar,SPT_M022,227.98,SPITALIZARE
+GANGLIONI LIMFATICI MARITI LOCALIZATI,SPT_M093,512.98,SPITALIZARE
+GANGLIONI LIMFATICI MARITI LOCALIZATI R59.0,SPT_M093,512.98,SPITALIZARE
+GANGLIONI LIMFATICI MARITI LOCALIZATI R59.0,SPT_M093,512.98,SPITALIZARE
+"Gastrita cronica, nespecificata",SPT_M055,313.43,SPITALIZARE
+Gastroduodenita nespecificata,SPT_M056,216.25,SPITALIZARE
+"Gastro-duodenita, nespecificata",SPT_M056,216.25,SPITALIZARE
+Gastroenterita si colita neinfecctioase nespecificate,SPT_M058,241.02,SPITALIZARE
+Gastroenterita si colita neinfectioase nespecificate,SPT_M058,241.02,SPITALIZARE
+"Gastroenterita si colita neinfectioase, nespecificate",SPT_M058,241.02,SPITALIZARE
+GLAUCOM,SPT_11,48.57,SPITALIZARE
+"Gonartroza, nespecificata",SPT_M073,202.45,SPITALIZARE
+Gusa multinodulara netoxica,SPT_M011,340.34,SPITALIZARE
+H3022 STARE MALIGNA A SSITEMULUI HEPATOBILIAR SI PANCREASULUI &gt;69 FARA CC CATRSTROFALE,TR01_136,173.91,SPITALIZARE
+H3032  Tulburari ale pancreasului cu exceptia starii maligne fara CC catastrofal sau sever,TR01_189,160,SPITALIZARE
+H3032  Tulburari ale pancreasului cu exceptia starii maligne fara CC catastrofal sau sever,TR01_212,160,SPITALIZARE
+H3032 Tulburari ale pancreasului cu exceptia starii maligne fara CC catastrofal sau sever,TR01_28,160,SPITALIZARE
+H3032 TULBURRARAI AKE PANCREASULUI CU EXECPTIA STARII MALIGNE FARA CC CATASTROFALE SAU SEVERE,TR01_72,160,SPITALIZARE
+H3052 Tulburari ale tractului biliar fara CC,TR01_188,95.63,SPITALIZARE
+H3052 Tulburari ale tractului biliar fara CC,TR01_196,95.63,SPITALIZARE
+H3052 Tulburari ale tractului biliar fara CC,TR01_210,95.63,SPITALIZARE
+H3052 Tulburari ale tractului biliar fara CC,TR01_26,95.63,SPITALIZARE
+H3052 TULBURARI ARE TRACTULUI BILAR FARA CC,TR01_73,95.63,SPITALIZARE
+HALUX VALGUS,SPT_17,128.66,SPITALIZARE
+Hemodializa in insuficienta renala cronica,1,0,SPITALIZARE
+Hemoroidectomia,SPT_C054,631.35,SPITALIZARE
+"Hepatita activa cronica, neclasificata altundeva",SPT_M062,405.55,SPITALIZARE
+Hepatita alcoolica,SPT_M061,271.45,SPITALIZARE
+Hepatita reactiva nespecifica,SPT_M063,474.96,SPITALIZARE
+"Hepatite cronice cu etiologie B,C si D",SPT_86,200,SPITALIZARE
+HIDRODILATAREA VEZICII URINARE SUB CONTROL ENDOSCOPIC,SPT_C119,480.31,SPITALIZARE
+Hiperemeza gravidica usoara,SPT_M089,125.86,SPITALIZARE
+Hiperlipidemie mixta,SPT_M109,381.48,SPITALIZARE
+"Hipertrofia preputului, fimoza, parafimoza",SPT_M079,229.22,SPITALIZARE
+HIV/SIDA,5,0,SPITALIZARE
+I1140 REVEZIA BONTULUI DE AMPUTATIE,TR01_109,460,SPITALIZARE
+I1190 Alte proceduri la nivelul cotului si antebratului,TR01_108,361.54,SPITALIZARE
+I1200 ALTE PROCEDURI LA NIVELUL LABEI PICIORULUI,TR01_110,361.54,SPITALIZARE
+I1262 Alte proceduri la nivelul tesutului conjunctiv fara CC,TR01_113,338.59,SPITALIZARE
+I1262 Alte proceduri la nivelul tesutului conjunctiv fara CC,TR01_180,338.59,SPITALIZARE
+I1262 Alte proceduri la nivelul tesutului conjunctiv fara CC,TR01_37,338.59,SPITALIZARE
+I3010 FRACTURI ALE DIAFIZEI FEMURALE,TR01_229,276,SPITALIZARE
+I3020 FRACTURI ALE EXTERMITATII DISTALE FEMURALE,TR01_111,372.13,SPITALIZARE
+I3030 ENTORSE LUXATII SI DIZLOCARI ALE SOLDULUI PELVISULUI SI COAPSEI,TR01_112,147.9,SPITALIZARE
+I3062 TULBURARI INFLAMATORII MUCULOSCHELETALE FARA CC CATASTROFALE SAU SEVERE,TR01_114,116.5,SPITALIZARE
+I3062 TULBURARI INFLAMATORII MUCULOSCHELETALE FARA CC CATASTROFALE SAU SEVERE,TR01_234,71.29,SPITALIZARE
+"I3083 Tulburari nechirurgicale ale coloanei, de zi",TR01_115,52.16,SPITALIZARE
+I3100 ARTROPATII NESPECIFICE,TR01_233,151.3,SPITALIZARE
+I3100 ARTROPATII NESPECIFICE,TR01_238,151.3,SPITALIZARE
+I3100 ARTROPATII NESPECIFICE,TR01_75,151.3,SPITALIZARE
+I3113  ALTE TULBURARI MUSCULOTENDINOASE &lt;70 FARA CC,TR01_232,73.03,SPITALIZARE
+I3113  ALTE TULBURARI MUSCULOTENDINOASE &lt;70 FARA CC,TR01_74,73.03,SPITALIZARE
+I3122 TULBURARI MUSCULO TENDINOASE FARA CC CATASTROFALE SAU SEVERE &lt;80,TR01_116,92.16,SPITALIZARE
+I3133 INGRIJIRI POSTPROCEDURALE ALE IMPLANTURILOR PROTEZELOR MUSCULOSCHELETALE VARSTA &lt; 60 FARA CC,TR01_230,95.63,SPITALIZARE
+I3163 ALTE TULBURARI MUSCULO SCHELETALE &lt;70 ANI,TR01_117,71.3,SPITALIZARE
+I3163 ALTE TULBURARI MUSCULO SCHELETALE &lt;70 ANI,TR01_222,71.29,SPITALIZARE
+IMPLANT CRISTALIN,SPT_7,1050,SPITALIZARE
+Implant de cristalin,7,0,SPITALIZARE
+Implant de cristalin,SPT_7,1050,SPITALIZARE
+Implantare cateter pleural,SPT_C099,653.15,SPITALIZARE
+Incizia si drenajul abcceselor tegumentelor si ale tesutului subcutanat,SPT_C083,519.43,SPITALIZARE
+Incizia si drenajul abceselor tegumentelor si ale tesutului subcutanat,SPT_C083,519.43,SPITALIZARE
+INCIZIA SI DRENAJUL ABCESELOR TEGUMENTELOR SI ALE TESUTULUI SUBCUTANAT,SPT_C105,519.43,SPITALIZARE
+Incizia si drenajul hematomului tegumentar si al tesutului subcutanat,SPT_C083,519.43,SPITALIZARE
+Incizia si drenajul tegumentelor si ale tesutului subcutanat,SPT_C083,519.43,SPITALIZARE
+Incizia si drenajul tegumentelor si ale tesutului subcutanat,SPT_C105,487.36,SPITALIZARE
+Incizia si drenajul tegumentelor si ale tesutului subcutanat,SPT_C105,519.43,SPITALIZARE
+Incizia si drenajul tegumentelor si ale tesutului subcutanat,SPT_C106,519.43,SPITALIZARE
+Indepartarea corpilor straini din tegument si tesutul subcutanat cu incizie,SPT_C088,454.09,SPITALIZARE
+"Indepartarea de brosa, surub sau fir metalic, neclasificata in alta parte",SPT_C037,492.38,SPITALIZARE
+"Indepartarea de placa, tija sau cui, neclasificata in alta parte",SPT_C038,492.38,SPITALIZARE
+Indepartarea dispozitivului de fixare externa,SPT_C093,379.98,SPITALIZARE
+Indepartarea materialului de osteosinteza,SPT_C038,492.38,SPITALIZARE
+"Infectia bacteriana, nespecificata",SPT_M001,304.46,SPITALIZARE
+"Infectia bacteriana, nespecificata",SPT_M004,304.46,SPITALIZARE
+"Infectia intestinala bacteriana, nespecificata",SPT_M001,304.46,SPITALIZARE
+INFECTIA INTESTINALA VIRALA NESPECIFICATA,SPT_M002,241.74,SPITALIZARE
+"Infectia intestinala virala, nespecificata",SPT_M002,241.74,SPITALIZARE
+"Infectia tractului urinar, cu localizare nespecificata",SPT_M078,213.11,SPITALIZARE
+Infectie cu SARS-CoV-2 confirmata - fara tratament,SPT_198,205.37,SPITALIZARE
+"Infectie cu SARS-CoV2 confirmata, cu asigurarea medicatiei prin farmacia cu circuit inchis a spitalului",SPT_197,501.67,SPITALIZARE
+"Infectie cu SARS-CoV2 confirmata, cu asigurarea medicatiei prin farmacia cu circuit inchis a spitalului - cu investigatie RX",SPT_196,533.67,SPITALIZARE
+"Infectie cu SARS-CoV2 confirmata, cu asigurarea medicatiei prin Ministerul Sanatatii",SPT_192,213.37,SPITALIZARE
+"Infectii acute ale cailor respiratorii superioare, nespecificate",SPT_M037,163.56,SPITALIZARE
+Infectiile vezicii urinare in sarcina,SPT_M090,127.48,SPITALIZARE
+Ingrijiri acordate mamei pentru cicatrice uterina datorita unei interventii chirurgicale anterioare,SPT_M091,464.82,SPITALIZARE
+Insuficienta (valva) aortic? (* fara coronarografie; fara indicatie de interventie chirurgicala),SPT_M029,381.12,SPITALIZARE
+Insuficienta (valva) aortică (fara coronarografie; fara indicatie de interventie chirurgicala),SPT_M029,381.12,SPITALIZARE
+Insuficienta mitrala (valva) (fara indicatie de interventie chirurgicala),SPT_M027,379.67,SPITALIZARE
+Insuficienta venoasa (cronica) (periferica),SPT_M104,383.92,SPITALIZARE
+INSUFICIENTA VENOASA( CRONICA) ( PERIFERICA) I87.2,SPT_M104,383.92,SPITALIZARE
+Internare prenatala si pentru alte probleme obstetriceO3051,TR01_91,100.85,SPITALIZARE
+Intrerupere de sarcina cu recomandare medicala,8,0,SPITALIZARE
+Intreruperea a mai multor vene tributare unei vene varicoase,SPT_C075,808.68,SPITALIZARE
+J00-RINO-FARINGITA ACUTA PT COPII 0-5 ANI,SPT_M033,167.15,SPITALIZARE
+J1032 PROCEDURI MINORE PT AFECTIUNI NEMALIGNE ALE SANULUI,TR01_57,171.9,SPITALIZARE
+J3012 Ulceratii ale pielii de zi,TR01_179,0.12,SPITALIZARE
+J3012 Ulceratii ale pielii de zi,TR01_185,34.78,SPITALIZARE
+J3012 Ulceratii ale pielii de zi,TR01_216,34.78,SPITALIZARE
+J3012 Ulceratii ale pielii de zi,TR01_36,34.78,SPITALIZARE
+J3022  Tulburari maligne ale sanului (varsta &gt;69 fara CC) sau fara (CC catastrofale sau severe),TR01_131,66.07,SPITALIZARE
+J3030 TULBURARI NEMALIGNE ALE SANULUI,TR01_55,76.51,SPITALIZARE
+J3042 CELULITA VARSTA &gt;59 ANI FARA CC CATASTROALE SAU SEVERE,TR01_176,154.78,SPITALIZARE
+J3042 CELULITA VARSTA &gt;59 ANI FARA CC CATASTROALE SAU SEVERE,TR01_181,154.78,SPITALIZARE
+J3042 CELULITA VARSTA &gt;59 ANI FARA CC CATASTROALE SAU SEVERE,TR01_184,0.56,SPITALIZARE
+J3042 CELULITA VARSTA &gt;59 ANI FARA CC CATASTROALE SAU SEVERE,TR01_42,154.78,SPITALIZARE
+J3052 TRAUMA PIELII TESUTULUI SUBCUTANAT SI PIELII &lt;70 ANI,TR01_48,74.77,SPITALIZARE
+J3062  Tulburari minore ale pielii de zi,TR01_174,43.47,SPITALIZARE
+J3062  Tulburari minore ale pielii de zi,TR01_177,43.47,SPITALIZARE
+J3062  Tulburari minore ale pielii de zi,TR01_186,43.47,SPITALIZARE
+J3062  Tulburari minore ale pielii de zi,TR01_199,43.47,SPITALIZARE
+J3062  Tulburari minore ale pielii de zi,TR01_236,43.47,SPITALIZARE
+J3062  Tulburari minore ale pielii de zi,TR01_34,43.47,SPITALIZARE
+J3072  Tulburari majore ale pielii de zi,TR01_175,24.34,SPITALIZARE
+J3072  Tulburari majore ale pielii de zi,TR01_178,24.34,SPITALIZARE
+J3072  Tulburari majore ale pielii de zi,TR01_183,24.34,SPITALIZARE
+J3072  Tulburari majore ale pielii de zi,TR01_200,24.34,SPITALIZARE
+J3072  Tulburari majore ale pielii de zi,TR01_237,24.34,SPITALIZARE
+J3072  Tulburari majore ale pielii de zi,TR01_35,24.34,SPITALIZARE
+K 3012 diabet fara CC catastrofale sau severe,TR01_142,158.25,SPITALIZARE
+K3052 TULBURARI ENDOCRINE FARA CC CATASTROFALE SAU SEVERE,TR01_76,133.89,SPITALIZARE
+L1012 INSERTIE OPERATORIE A CATETERULUI PERITONEAL PT DIALIZA FARA C CAATSTROFALE SAU SEVERE,TR01_43,460,SPITALIZARE
+L1062 Proceduri transuretrale cu exceptia prostatectomiei fara CC catastrofale sau severe,TR01_122,238,SPITALIZARE
+L1072 Proceduri ale uretrei fara CC catastrofal sau sever,TR01_121,247,SPITALIZARE
+"L2020 Cistouretro-scopie, de zi",TR01_123,56,SPITALIZARE
+"L2020 Cistouretro-scopie, de zi",TR01_130,56,SPITALIZARE
+L3032 TUMORI RINCIHI SI TRACT URINAR FARA CC,TR01_140,168.69,SPITALIZARE
+L3043  Infectii ale rinichiului si tractului urinar varsta &lt;70 fara CC catastrofale sau severe,TR01_214,118.24,SPITALIZARE
+L3043 INFECTII ALE RINICHIULUI SI TRACTULUI URINAR &lt;70MANI FARA CC CATASTROFALE SAU SEVERE,TR01_125,118,SPITALIZARE
+L3043 INFECTII ALE RINICHIULUI SI TRACTULUI URINAR &lt;70MANI FARA CC CATASTROFALE SAU SEVERE,TR01_194,118.24,SPITALIZARE
+L3043 Infectii ale rinichiului si tractului urinar varsta &lt;70 fara CC catastrofale sau severe,TR01_30,118.24,SPITALIZARE
+L3050  Pietre si obstructie urinara,TR01_211,90.42,SPITALIZARE
+L3050 Pietre si obstructie urinara,TR01_27,90.42,SPITALIZARE
+L3062 SEMNE SI SIMPTOME ALE RINICHIULUI SI TRACTULUI URINAR FARA CC CATSTROFALE SAU SEVERE,TR01_127,92,SPITALIZARE
+L3062 SEMNE SI SIMPTOME ALE RINICHIULUI SI TRACTULUI URINAR FARA CC CATSTROFALE SAU SEVERE,TR01_171,92.16,SPITALIZARE
+L3062 SEMNE SI SIMPTOME ALE RINICHIULUI SI TRACTULUI URINAR FARA CC CATSTROFALE SAU SEVERE,TR01_224,92.16,SPITALIZARE
+L3083 ALTE DIAGNOSTICE LA NIVELUL RINICHIULUI SI TRACTULUI URINA FARA CC CATASTROFALE SAU SEVERE,TR01_126,85,SPITALIZARE
+L3083 ALTE DIAGNOSTICE LA NIVELUL RINICHIULUI SI TRACTULUI URINA FARA CC CATASTROFALE SAU SEVERE,TR01_169,85.2,SPITALIZARE
+L3083 ALTE DIAGNOSTICE LA NIVELUL RINICHIULUI SI TRACTULUI URINA FARA CC CATASTROFALE SAU SEVERE,TR01_223,85.2,SPITALIZARE
+L60.0-Unghia incarnata,SPT_M071,297.32,SPITALIZARE
+Litotritie,6,0,SPITALIZARE
+LITOTRITIE,SPT_6,350,SPITALIZARE
+LTA DEPLASARE A UNUI ALT DISC INTERVERTEBRAL SPECIFICT FARA INDICATIE OPERATORIE M54.4,SPT_M074,313.33,SPITALIZARE
+Lumbago cu sciatica,SPT_M075,347.28,SPITALIZARE
+M1032 Proceduri la nivelul penisului fara CC,TR01_120,261,SPITALIZARE
+"M2010 Cistouretroscopie fara CC, de zi",TR01_124,52,SPITALIZARE
+M3012  Stare maligna a sistemului reproductiv masculin fara CC catastrofale sau severe,TR01_132,95.63,SPITALIZARE
+M3032 INFLAMATII ALE SSITEMULUI REPRODUCTIV MASCULIN FARA CC,TR01_129,207,SPITALIZARE
+M3032 INFLAMATII ALE SSITEMULUI REPRODUCTIV MASCULIN FARA CC,TR01_173,207,SPITALIZARE
+M3050 ALTE DIAGNOSTICE ALE SSITEMULUI REPRODUCTIV MASCULIN,TR01_128,70,SPITALIZARE
+M3050 ALTE DIAGNOSTICE ALE SSITEMULUI REPRODUCTIV MASCULIN,TR01_172,69.55,SPITALIZARE
+MALNUTRITIA PROTEIN-ENERGETICA USOARA,SPT_M016,362.46,SPITALIZARE
+Malnutritia proteino-energetica moderata,SPT_M016,362.46,SPITALIZARE
+Malnutritia proteino-energetica usoara,SPT_M017,362.46,SPITALIZARE
+Menstruatie excesiva si frecventa cu ciclu menstrual neregulat,SPT_M082,233.25,SPITALIZARE
+Menstruatie excesiva si frecventa cu ciclu menstrual regulat,SPT_M081,332.24,SPITALIZARE
+Miringoplastia abort transcanelar,SPT_C141,742.92,SPITALIZARE
+"Miringotomia cu insertie de tub, unilateral",SPT_C001,283.18,SPITALIZARE
+MONIROTIZAREA TALASEMIEI SI HEMOFILIEI,SPT_87,200,SPITALIZARE
+"Monitorizare afectiuni oncologice, cu investigatii de inalta performanta",SPT_121,409,SPITALIZARE
+"Monitorizare afectiuni oncologice, fara investigatii de inalta performanta",SPT_122,204.48,SPITALIZARE
+Monitorizare bolnavi HIV/SIDA,SPT_80,165.58,SPITALIZARE
+Monitorizare bolnavi HIV/SIDA,SPT_80,200,SPITALIZARE
+Monitorizare insuficienta renala cronica,SPT_123,204.48,SPITALIZARE
+MONITORIZARE PACEMAKER DEFRILITOR IMPLANTABIL,SPT_128,309,SPITALIZARE
+Monitorizare pacemakere/defibrilator implantabil,SPT_128,282.83,SPITALIZARE
+Monitorizare pacemakere/defibrilator implantabil,SPT_128,309,SPITALIZARE
+Monitorizare pacienti cu insuficienta cardiaca congestiva pentru asigurati cu afectiuni cardio-vasculare grave de debut sau devenite cronice,SPT_129,327,SPITALIZARE
+MONITORIZARE PACIENTI CU INSUFICIENTA CARDIACA CONGESTIVA PT ASIGURATI CU AFECTIUNI CARDIOVASCULARE GRAVE DE DEBUT SAU DEVENITE CRONICE,SPT_129,327,SPITALIZARE
+MONITORIZARE PACIENTI CU TULBURARI DE RITM SAU CONDUCERE CU AFECTIUNI CARDIOVASCULARE DE DEBUT SAU DEVENITE CRONICE ,SPT_130,394,SPITALIZARE
+Monitorizare Talasemie - Hemofilie,SPT_86,200,SPITALIZARE
+Monitorizarea afectiuni oncologice cu investigatii de inalta performanta,SPT_121,409,SPITALIZARE
+Monitorizarea afectiuni oncologice fara investigatii de inalta performanta,SPT_122,162.47,SPITALIZARE
+Monitorizarea bolilor hematologice,SPT_143,193.13,SPITALIZARE
+Monitorizarea bolilor hematologice,SPT_143,200,SPITALIZARE
+Monitorizarea dializei peritoneale,2,0,SPITALIZARE
+Monitorizarea pacientilor cu tulburari de ritm / conducere cu afectiuni cardiovasculare grave de debut sau devenite cronice,SPT_130,394,SPITALIZARE
+"Monitorizarea si tratamentul colagenenozelor: poliartrita reumatoida,lupus  eritematos  sistemic,  dermato-polimiozita,  sindrom  Sjorgen, vasculite sistemice.",SPT_141,200,SPITALIZARE
+"Monitorizarea si tratamentul colagenenozelor:poliartrita reumatoida , lupus , dermato-polimiozita",SPT_141,192.83,SPITALIZARE
+Monitorizarea sifilisului genital primar si sifilisului secundar al pielii si mucoaselor,SPT_135,130,SPITALIZARE
+Monitorizarea talasemiei si hemofiliei,SPT_85,200,SPITALIZARE
+N2010 VAGINOSCOPIE/COLPOSCOPIE DE ZI PENTRU AFECTIUNI ALE SISTEMULUI REPRODUCTIV FEMININ,TR01_56,52.16,SPITALIZARE
+N3012 STARE MALIGNA A SSIT REPRODUCTIV FEMININ FARA CC CATASTROFALE SAU SEVERE,TR01_139,160.02,SPITALIZARE
+N3020 INFECTII SISTEM REPRODUCTIV FEMININ,TR01_54,109.54,SPITALIZARE
+N3032 Tulburari menstruale si alte tulburari ale sistemului genital feminin fara CC,TR01_157,50.43,SPITALIZARE
+"O2010  Vaginoscopie/Colposcopie de zi, pentru sarcina, nastere sau lauzie",TR01_94,52.16,SPITALIZARE
+O3020 POSTPARTUM SI POSTAVORT CU PROCEDURI IN SALA DE OPERATIE,TR01_93,93.9,SPITALIZARE
+O3042 TRAVALIU FALS DUPA 37 DE SAPTAMANI FARA CC CATASTROFALE,TR01_92,39.99,SPITALIZARE
+"O3052 Internare prenatala si pentru alte probleme obstetrice, de zi",TR01_95,26.08,SPITALIZARE
+Obezitate datorita unui exces caloric,SPT_M018,305.19,SPITALIZARE
+Operatie cu lambou,21,0,SPITALIZARE
+ORJELET,SPT_10,48.57,SPITALIZARE
+P00601-Indepartarea corpilor straini din tegument si tesutul subcutanat cu incizie,SPT_C088,454.09,SPITALIZARE
+P00701-Incizia si drenajul hematomului tegumentar si al tesutului subcutanat,SPT_C083,519.43,SPITALIZARE
+P00703-Incizia si drenajul tegumentelor si ale tesutului subcutanat,SPT_C106,519.43,SPITALIZARE
+"P01309-Electroterapia leziunilor tegumentare, leziune unica",SPT_C089,273.03,SPITALIZARE
+P01701-Biopsia tegumentului si tesutului subcutanat,SPT_C082,609.55,SPITALIZARE
+P01901-Excizia leziunilor tegumentare si tesutului subcutanat in alte zone,SPT_C086,555.8,SPITALIZARE
+P02504-Rezectia partiala a unghiei incarnate,SPT_C092,283.18,SPITALIZARE
+P02902-Repararea plagilor tegumentare si ale tesutului subcutanat in alte zone implicand si tesuturile profunde,SPT_C090,555.8,SPITALIZARE
+Pietre si obstructie urinaraL3050,TR01_119,90,SPITALIZARE
+Plaga deschisa a altor parti ale pumnului si mainii,SPT_M095,245.74,SPITALIZARE
+PLAGA DESCHISA A ALTOR PARTI ALE PUMNULUI S61.88,SPT_M095,245.74,SPITALIZARE
+Plaga deschisa a degetului (degetelor) fara vatamarea unghiei,SPT_M094,246.68,SPITALIZARE
+Plaga deschisa a degetului(lor) fara vatamarea unghiei,SPT_M094,246.68,SPITALIZARE
+PLAGA DESCHISA A DEGETULUI/LOR FARA VATAMAREA UNGHIEI S61.0,SPT_M094,246.68,SPITALIZARE
+Plaga deschisa a pumnului si mainii,SPT_M095,245.74,SPITALIZARE
+PLAGI,SPT_69,128.66,SPITALIZARE
+"Pneumonia lobara, nespecificata",SPT_M040,402.62,SPITALIZARE
+Pneumonia lombara nespecificata,SPT_M040,402.62,SPITALIZARE
+"Pneumonia virala, nespecificata",SPT_M038,372.77,SPITALIZARE
+"Pneumonie, nespecificata",SPT_M042,417.73,SPITALIZARE
+POLIARTRITA REUMATOIDA PENTRU TRATAMENTUL CU IMUNOSUPRESOARE,SPT_94,200,SPITALIZARE
+PROCEDEE INCHISE DE RESTABILIRE A PERMEABILITATII SISTEMULUI CANALICULAR LACRIMAL 1 OCHI,SPT_C131,589.67,SPITALIZARE
+Proceduri specifice de terapia durerii: Analgezia controlata,SPT_100,69.4,SPITALIZARE
+Psoriazis vulgaris,SPT_M069,313.52,SPITALIZARE
+Psoriazis vulgaris,SPT_M069,316.09,SPITALIZARE
+Q3023 Tulburari ale globulelor rosii fara CC catastrofale sau severe,TR01_158,62.6,SPITALIZARE
+Q3030 Anomalii de coagulare,TR01_159,109.54,SPITALIZARE
+Q3030 ANOMALII DE COAGULARE,TR01_182,109.54,SPITALIZARE
+Q3030 ANOMALII DE COAGULARE,TR01_195,109.54,SPITALIZARE
+Q3030 ANOMALII DE COAGULARE,TR01_245,109.54,SPITALIZARE
+Q3030 ANOMALII DE COAGULARE,TR01_248,109.54,SPITALIZARE
+Q3030 ANOMALII DE COAGULARE,TR01_77,109.54,SPITALIZARE
+R3013  Leucemie acuta fara CC catastrofale sau severe,TR01_133,168.69,SPITALIZARE
+"R3023  Limfom si leucemie non-acuta, de zi",TR01_134,36.51,SPITALIZARE
+R3032 ALTE TULBURARI NEOPLAZICE FARA CC,TR01_137,135.63,SPITALIZARE
+Radioterapie,3,0,SPITALIZARE
+Rahianestezie,13,0,SPITALIZARE
+RAHIANESTEZIE,SPT_35,158.11,SPITALIZARE
+Realizarea fistulei arterio-venoase la persoanele dializate,SPT_C095,283.18,SPITALIZARE
+Realizarea fistulei arterio-venoase la persoanele dializate,SPT_C095.1,283.18,SPITALIZARE
+Reducerea parafimozei,SPT_C070,193.54,SPITALIZARE
+REPARAREA PLAGILOR TEGUMENTARE SI ALE TESUTULUI SUBCUTANAT IN ALTE ZONE IMPLICAND SI TESUTURILE PROFUNDE,SPT_C090,555.8,SPITALIZARE
+"Repararea plagilor tegumentare si ale tesutului subcutanat, implicand tesuturile mai profunde",SPT_C090,530.97,SPITALIZARE
+"Repararea plagilor tegumentare si ale tesutului subcutanat, implicand tesuturile mai profunde",SPT_C090,555.8,SPITALIZARE
+REPOZITIONAREA CRISTALINULUI ARTIFICIAL,SPT_C129,246.93,SPITALIZARE
+REZECTIA ENDOSCOPICA DE LEZIUNE SAU TESUT VEZICAL,SPT_C120,480.31,SPITALIZARE
+Rezectia partiala a unghiei incarnate,SPT_C092,283.18,SPITALIZARE
+Rezolvarea contracturii Dupuytren,SPT_C043,674.75,SPITALIZARE
+Rezolvarea contracturii Dupuytren,SPT_C044,674.75,SPITALIZARE
+Rino-faringita acuta [guturaiul comun] (*pentru copii 0-5 ani),SPT_M033,167.15,SPITALIZARE
+Rino-faringita acuta [guturaiul comun] (pentru copii 0-5 ani),SPT_M033,167.15,SPITALIZARE
+Rinoplastia implicand corectarea conturului osos,SPT_C006,742.92,SPITALIZARE
+Rinoplastie folosind grefa cartilaginoasa septala sau nazala,SPT_C008,742.92,SPITALIZARE
+Rinoplastie posttraumatica (reducerea si imobilizarea  fracturilor piramidei nazale dupa un traumatism recent ),SPT_C005,742.92,SPITALIZARE
+Rinoplastie totala,SPT_C007,742.92,SPITALIZARE
+RUPTURA CHIST SINOVIAL PICIOR,SPT_23,128.66,SPITALIZARE
+S3010 HIV DE ZI,TR01_61,52.16,SPITALIZARE
+S3023 BOLI CONXE HIV FARA CC CATSTROFALE SAU SEVERE,TR01_220,276,SPITALIZARE
+S3023 BOLI CONXE HIV FARA CC CATSTROFALE SAU SEVERE,TR01_60,276,SPITALIZARE
+S61.0-Plaga deschisa a degetului (degetelor) fara vatamarea unghiei,SPT_M094,246.68,SPITALIZARE
+S61.88-Plaga deschisa a altor parti ale pumnului si mainii,SPT_M095,245.74,SPITALIZARE
+Sangerari excesive in perioada de premenopauza,SPT_M083,323.27,SPITALIZARE
+Sangerari postmenopauza,SPT_M085,311.36,SPITALIZARE
+schelroza multipla si ataxia de origine cerbeloasa fara CC B3092,TR01_83,118.23,SPITALIZARE
+SECTIUNE TENDOANE MANA,SPT_25,128.66,SPITALIZARE
+SECTIUNE TENDOANE PICIOR,SPT_24,128.66,SPITALIZARE
+"Servicii medicale de oftalmologie (evisceratie, orjelet, glaucom, pterigion, entropion,strabism, crioaplicatie, electrorezectie)",9,0,SPITALIZARE
+Servicii medicale flebologie (operatie flebologie),12,0,SPITALIZARE
+"Servicii medicale ORL (rezectie septala, amigdalectomie, adenoidectomie, excizie formatiune tumorala, polipectomie nazala)",11,0,SPITALIZARE
+"Servicii medicale ortopedie (halux valgus, artroscopie genunchi, chist sinovial, Dupuytren, bursita genunchi, bursita cot, ruptura chist sinovial picior, sectiune tendoane picior, sectiune tendoane mana, amputatie deget mana, chist sinovial picior, sectiune tendoane picior)",10,0,SPITALIZARE
+Sindroame dupa chirurgia gastrica,SPT_M068,285.59,SPITALIZARE
+Sindrom vertebro-bazilar,SPT_M022,227.98,SPITALIZARE
+Sindromul intestinului iritabil cu diaree,SPT_M059,322.47,SPITALIZARE
+SINDROMUL INTESTINULUI IRITABIL CU DIAREE,SPT_M060,322.47,SPITALIZARE
+Sindromul intestinului iritabil fara diaree,SPT_M060,309.88,SPITALIZARE
+Stenoza (valva) aortica (fara indicatie de interventie chirurgicala),SPT_M028,400.68,SPITALIZARE
+Supravegherea altor sarcini cu risc crescut (evaluarea gravidelor cu uter cicatriceal in trimestrul III),SPT_171,142,SPITALIZARE
+T3032 Febra de origine necunoscuta fara CC,TR01_160,109.54,SPITALIZARE
+T3032 FEBRA DE ORIGINE NECUNOSCUTA FARA CC,TR01_204,109.54,SPITALIZARE
+T3032 FEBRA DE ORIGINE NECUNOSCUTA FARA CC,TR01_227,109.54,SPITALIZARE
+T3032 FEBRA DE ORIGINE NECUNOSCUTA FARA CC,TR01_78,109.54,SPITALIZARE
+T3042 BOALA VIRALA &lt;60 ANI FARA CC,TR01_218,85.2,SPITALIZARE
+T3042 BOALA VIRALA &lt;60 ANI FARA CC,TR01_58,85.2,SPITALIZARE
+T3052 ALTE BOLI INFECTIOASE SAU PARAZITARE FARA CC CATASATROFALE SAU SEVERE,TR01_219,154.78,SPITALIZARE
+T3052 ALTE BOLI INFECTIOASE SAU PARAZITARE FARA CC CATASATROFALE SAU SEVERE,TR01_59,154.78,SPITALIZARE
+Terapia chirurgical? a fimozei,SPT_C069,193.54,SPITALIZARE
+Terapia chirurgical? a fimozei,SPT_C070,193.54,SPITALIZARE
+Terapia chirurgicala a apendicitei cronice,SPT_C144,742.92,SPITALIZARE
+Terapia chirurgicala a fimozei,SPT_C069,193.54,SPITALIZARE
+Terapia chirurgicala a fimozei,SPT_C070,193.54,SPITALIZARE
+Terapia chirurgicala a fisurii perianale,SPT_C145,500,SPITALIZARE
+Terapia chirurgicala a granulomului  ombilical,SPT_C148,300,SPITALIZARE
+Terapia chirurgicala a granulomului ombilical,SPT_C148,300,SPITALIZARE
+Terapia chirurgicala a tumorilor de perete abdominal sau ombilic,SPT_C147,300,SPITALIZARE
+Tonsilectomia cu adenoidectomie,SPT_C004,589.67,SPITALIZARE
+Tonsilectomia fara adenoidectomie,SPT_C003,589.67,SPITALIZARE
+TRATAMENTUL SI PROFILAXIA RABIEI,SPT_82,40,SPITALIZARE
+TRATAMENTUL SI PROFILAXIA RABIEI CU ANTITETANIC,SPT_3.10,165.78,SPITALIZARE
+TRATAMENTUL SI PROFILAXIA RABIEI FARA ANTITETANIC,SPT_3.11,111,SPITALIZARE
+"Tratamentul si profilaxia rabiei, cu antitetanic",SPT_3.10,171,SPITALIZARE
+"Tratamentul si profilaxia rabiei, fara antitetanic",SPT_3.11,111,SPITALIZARE
+"Trauma a pielii, tesutului subcutanat si sanului varsta &gt;69J3051",TR01_47,153.04,SPITALIZARE
+Tulburare anxioasa si depresiva mixta,SPT_M020,297.53,SPITALIZARE
+"Tulburare de apetit, nespecificata",SPT_M021,297.53,SPITALIZARE
+Tulburari ale nervilor cranieni si periferici fara  CCB3122,TR01_84,69.55,SPITALIZARE
+Tumora lipomatoasa benigna a pielii si a tesutului subcutanat al trunchiului,SPT_M007,225.87,SPITALIZARE
+"Ulcerul duodenal, acut fara hemoragie sau perforatie, diagnosticat anterior",SPT_M053,200.82,SPITALIZARE
+Unghia incarnata,SPT_M071,290.21,SPITALIZARE
+Unghia incarnata,SPT_M071,297.32,SPITALIZARE
+URETROTOMIA OPTICA,SPT_C117,480.31,SPITALIZARE
+Urgente medico-chirurgicale in camera de garda,SPT_115,50,SPITALIZARE
+Urgente medico-chirurgicale in camera de garda,TR,50,SPITALIZARE
+Urticaria alergica (fara Edem Quinke),SPT_M070,204.48,SPITALIZARE
+V3012 Intoxicatie cu alcool si sevraj fara CC,TR01_161,67.81,SPITALIZARE
+V3020 Intoxicatii medicamentoase si sevraj,TR01_162,201.73,SPITALIZARE
+Vene varicoase ale extremitatilor inferioare fara ulceratie sau inflamatie,SPT_M032,383.92,SPITALIZARE
+Vene varicoase ale extremitatilor inferioare fara ulceratie sau inflamatie,SPT_M103,383.92,SPITALIZARE
+VENE VARICOASE CU ULCERATIE ALE EXTREMITATILOR INFERIOARE,SPT_M103,383.92,SPITALIZARE
+VENE VARICOASE CU ULCERATIE ALE EXTREMITATILOR INFERIOARE I83.0,SPT_M103,383.92,SPITALIZARE
+W3020 Traumatisme multiple fara proceduri semnificative,TR01_225,276,SPITALIZARE
+W3020 Traumatisme multiple fara proceduri semnificative,TR01_231,276,SPITALIZARE
+W3020 Traumatisme multiple fara proceduri semnificative,TR01_39,276,SPITALIZARE
+X 3032 OTRAVIRE/EFECTE TOXICE ALE MEDICAMENTELOR SI ALE ALTOR SUBSTANTE VARSTA&lt;60 ANI FARA CC,TR01_167,67.81,SPITALIZARE
+X 3032 OTRAVIRE/EFECTE TOXICE ALE MEDICAMENTELOR SI ALE ALTOR SUBSTANTE VARSTA&lt;60 ANI FARA CC,TR01_193,67.81,SPITALIZARE
+X 3032 OTRAVIRE/EFECTE TOXICE ALE MEDICAMENTELOR SI ALE ALTOR SUBSTANTE VARSTA&lt;60 ANI FARA CC,TR01_79,67.81,SPITALIZARE
+X1010 TRANSFER DE TESUT MICROVASCULAR SAU GREFA DE PIELE PT LEZIUNI ALE MAINII,TR01_45,381.63,SPITALIZARE
+X3020 Reactii alergice,TR01_163,67.81,SPITALIZARE
+X3020 REACTII ALERGICE,TR01_80,67.81,SPITALIZARE
+X3032 Otravire /efecte toxice ale medicamentelor si ale altor substante varsta &amp;lt;60 fara CC,TR01_165,67.81,SPITALIZARE
+"Y3010  Arsuri, pacienti transferati catre alte unitati de ingrijiri acute &lt;5 zile",TR01_143,69.55,SPITALIZARE
+Z2010 Monitorizare dupa tratament complet cu endos,TR01_32,46.95,SPITALIZARE
+Z2010 Monitorizare dupa tratament complet cu endoscopie,TR01_107,46.95,SPITALIZARE
+Z2010 Monitorizare dupa tratament complet cu endoscopie,TR01_192,46.95,SPITALIZARE
+Z3052 Alti factori care influienteaza starea de sanatate,TR01_33,36.51,SPITALIZARE
+Z51.88-Alte ingrijiri medicale specificate,SPT_M098,331.17,SPITALIZARE
+Ecografie abdomen,R_029,53.92,LABORATOR
+Ecografie generală (abdomen + pelvis),R_028,70.44,LABORATOR
+Ecografie pelvis,R_030,40.44,LABORATOR
+Ex. radiologic centură scapulară,R_005,40.35,LABORATOR
+Ex. radiologic colon dublu contrast,R_015,134,LABORATOR
+"Ex. radiologic colon la copil, inclusiv dezinvaginare",R_016,94.35,LABORATOR
+Ex. radiologic cranian în proiecţie sinusuri anterioare ale feţei,R_002,40.35,LABORATOR
+Ex. radiologic cranian standard,R_001,40.35,LABORATOR
+Ex. radiologic părţi schelet în 2 planuri,R_003,40.35,LABORATOR
+Ex. radiologic torace ansamblu,R_010,40.35,LABORATOR
+Ex. radiologic torace osos (sau părţi) în mai multe planuri/Ex. radiologic torace şi organe toracice,R_011,40.35,LABORATOR
+"Ex. radiologic tract digestiv până la regiunea ileo-cecală, cu substanţă de contrast",R_014,110,LABORATOR
+Ex. radiologic tract digestiv superior (inclusiv unghiul duodenojejunal) cu substanţă de contrast,R_013,75.49,LABORATOR
+Ex. radiologic tract urinar (urografie minutată) cu substanţă de contrast,R_017,296,LABORATOR
+Ex. radiologic vizualizare generală a abdomenului nativ,R_012,40.35,LABORATOR
+Examen radiologic articulații sacro-iliace,R_5,40.35,LABORATOR
+Examen radiologic articulatii sacro- iliace,R_5,40.35,LABORATOR
+Examen radiologic centură scapulară,R_005,40.35,LABORATOR
+Examen radiologic coloană vertebrală cervicală,R_7_A,40.35,LABORATOR
+Examen radiologic coloană vertebrală lombosacrată,R_7_C,40.35,LABORATOR
+Examen radiologic coloană vertebrală toracală,R_7_B,40.35,LABORATOR
+Examen radiologic torace ansamblu,R_010,40.35,LABORATOR
+Radiografie de membre-Antebrat drept,R_004_C1,40.35,LABORATOR
+Radiografie de membre-Antebrat stang,R_004_C2,40.35,LABORATOR
+Radiografie de membre-Brat drept,R_004_A1,40.35,LABORATOR
+Radiografie de membre-Brat stang,R_004_A2,40.35,LABORATOR
+Radiografie de membre-Calcaneu drept,R_004_L1,40.35,LABORATOR
+Radiografie de membre-Calcaneu stâng,R_004_L2,40.35,LABORATOR
+Radiografie de membre-Coapsă dreaptă,R_004_G2,40.35,LABORATOR
+Radiografie de membre-Coapsă stângă,R_004_G1,40.35,LABORATOR
+Radiografie de membre-Cot drept,R_004_B1,40.35,LABORATOR
+Radiografie de membre-Cot stang,R_004_B2,40.35,LABORATOR
+Radiografie de membre-Gambă dreaptă,R_004_I1,40.35,LABORATOR
+Radiografie de membre-Gambă stângă,R_004_I2,40.35,LABORATOR
+Radiografie de membre-Genunchi drept,R_004_H1,40.35,LABORATOR
+Radiografie de membre-Genunchi stâng,R_004_H2,40.35,LABORATOR
+Radiografie de membre-Gleznă dreaptă,R_004_J1,40.35,LABORATOR
+Radiografie de membre-Gleznă stângă,R_004_J2,40.35,LABORATOR
+Radiografie de membre-Mână dreapta,R_004_E1,40.35,LABORATOR
+Radiografie de membre-Mână stângă,R_004_E2,40.35,LABORATOR
+Radiografie de membre-Șold drept,R_004_F1,40.35,LABORATOR
+Radiografie de membre-Șold stâng,R_004_F2,40.35,LABORATOR
+Radiografie de membre-Picior drept,R_004_K1,40.35,LABORATOR
+Radiografie de membre-Picior stâng,R_004_K2,40.35,LABORATOR
+Radiografie de membre-Pumn drept,R_004_D1,40.35,LABORATOR
+Radiografie de membre-Pumn stang,R_004_D2,40.35,LABORATOR
+Radiografie panoramică,R_024,40.44,LABORATOR
+Radiografie retroalveolară,R_023,20.22,LABORATOR
+"Administrare tratament prin injectarea partilor moi (intramuscular, intradermic si subcutanat)",6.03,7,AMBULATOR
+Administrare tratament prin punctie intravenoasa,7.06,11,AMBULATOR
+Aerosoli/sedinta (maxim 3 sedinte),6.01,7,AMBULATOR
+Aspiratia si lavajul sinusului nazal prin punctie,4.11,15,AMBULATOR
+Audiograma,2.05,20,AMBULATOR
+Biometrie,1.02,10,AMBULATOR
+Biomicroscopia; gonioscopia; oftalmoscopia,1.01,10,AMBULATOR
+Biopsie aspirativă de măduvă osoasă,2.181,40,AMBULATOR
+Blocaje chimice pentru spasticitate (toxina botulinica),8.03,14,AMBULATOR
+Body pletismografia cu masurarea difuziunii prin membrana alveolo-capilara a monoxidului de carbon,2.161,40,AMBULATOR
+Capilaroscopie,3.7,20,AMBULATOR
+Cardiologie pediatrica: consiliere psihologica clinica,K9,30,AMBULATOR
+Cardiologie pediatrica: evaluare psihologica clinica si psihodiagnostic,K8,30,AMBULATOR
+Cardiologie: Consiliere psihologica clinica ( pacienti af post infectie Covid),K5.1,30,AMBULATOR
+Cardiologie: Evaluare psihologica clinica si psihodiagnostic( pacienti infectie COVID),K4,30,AMBULATOR
+Cardiologie: Kinetoterapie cu aparate speciale,K3,10,AMBULATOR
+Cardiologie: Kinetoterapie de grup,K2,10,AMBULATOR
+Cardiologie: Kinetoterapie individuala,K1,20,AMBULATOR
+Cauterizare de col uterin,5.06,25,AMBULATOR
+"Cauterizarea conjunctivei, corneei, ectropionului",4.08,15,AMBULATOR
+Chirurgie cardiovasculara: Consiliere psihologica clinica,C12,30,AMBULATOR
+Chirurgie cardiovasculara: Evaluare psihologica clinica si psihodiagnostic,C11,30,AMBULATOR
+Chirurgie oncologică-PSIHONC: Serviciu de consiliere psihologică,PO.C2,30,AMBULATOR
+Chirurgie oncologică-PSIHONC: Serviciu de consultație psihologică,PO.C1,30,AMBULATOR
+Chirurgie oncologică-PSIHONC: Serviciu de evaluare clinică psihologică,PO.C3,30,AMBULATOR
+Chirurgie oncologică-PSIHONC: Serviciu de stabilire a planului de intervenție psihologică,PO.C4,30,AMBULATOR
+Chirurgie orala si maxilo-faciala: Consiliere psihologica clinica,C22,30,AMBULATOR
+Chirurgie orala si maxilo-faciala: Evaluare psihologica clinica si psihodiagnostic,C21,30,AMBULATOR
+Chirurgie pediatrica: Consiliere psihologica clinica,C31.2,30,AMBULATOR
+Chirurgie pediatrica: Evaluare psihologica clinica si psihodiagnostic,C31.1,30,AMBULATOR
+Chirurgie pediatrica: Kineto pe aparate speciale: dispoz mecan/dispoz electromec/disp. robotizate,C32.3,10,AMBULATOR
+Chirurgie pediatrica: Kinetoterapie de grup,C32.2,10,AMBULATOR
+Chirurgie pediatrica: Kinetoterapie individuala,C32.1,20,AMBULATOR
+Colposcopia,3.08,40,AMBULATOR
+Consiliere psihiatrică nespecifică individuala si familiala,10.01,30,AMBULATOR
+Consiliere psihologica clinica,O.02,30,AMBULATOR
+Consiliere psihologica clinica pentru copii/adult,J.02,30,AMBULATOR
+Consiliere psihologica clinica pentru copii/adult,S.02,30,AMBULATOR
+Consult copil 0...3 ani,1A,16.2,AMBULATOR
+Consult peste 4 ani,1C,10.8,AMBULATOR
+Consult psihiatrie copil 0-3 ani,1B,32.4,AMBULATOR
+Consult psihiatrie peste 4 ani,1D,21.6,AMBULATOR
+Consultatia de neurologie a copilului 0-3,1J,21.6,AMBULATOR
+Consultatia de planificare familiala,1E,10.8,AMBULATOR
+Consultatia pentru ingrijiri paliative,1PAL,21.6,AMBULATOR
+Consultatie de medicina fizica si reabilitare 0-3 ani,1M,21.6,AMBULATOR
+Consultatie de medicina fizica si reabilitare peste 4 ani,1N,14.4,AMBULATOR
+Consultatie de supraveghere evolutiei  sarcinii si lehuziei,1H,11.5,AMBULATOR
+Consultatie neurologie peste 4 ani,1G,14.4,AMBULATOR
+Criocoagularea (crioaplicatia) conjunctivala,4.07,15,AMBULATOR
+Criocoagularea (crioaplicatia) transsclerala,5.13,25,AMBULATOR
+Crioterapia in leziuni cutanate,4.17,15,AMBULATOR
+Depist precoce a cancer de sân cu susp de leziuni infraclinice ale sânului identif mamo și eco,ZI.9A,953,AMBULATOR
+Depist precoce a cancerului de sân cu susp de leziuni infraclinice ale sân identif mamog si/sau eco,ZI.9B,3080,AMBULATOR
+Depistarea precoce a cancerului de sân cu suspiciune identif. Mamografic-incl. u.s.mobile,ZI.8.A,342,AMBULATOR
+Depistarea precoce a cancerului de sân cu suspiciune identificată mamografic-incl u.s.mobile,ZI.8.B,702,AMBULATOR
+Depistarea precoce a cancerului de sân-inclusiv pt unitati sanitare mobile,ZI.7.1,238,AMBULATOR
+Depistarea si diagnost. precoce leziuni displazice col uterin cu examen citologic-incl u.s.mobile,ZI.10,244,AMBULATOR
+Depistarea si diagnosticarea precoce leziuni displazice col uterin-inclusiv unit.sanitare mobile,ZI.9,198,AMBULATOR
+Dermatoscopie,2.07,40,AMBULATOR
+Descarcare si interpretare rapoarte specifice dispozitivelor utilizate in gestionarea diag zaharat,1.21,10,AMBULATOR
+Determinarea fractiunii oxidului de azot din aerul expirat,3.72,20,AMBULATOR
+"Determinarea indicelui de presiune glezna/brat, respectiv deget/brat",1.16,10,AMBULATOR
+"Determinarea potentialelor evocate (vizuale, auditive, somatoestezice)",3.02,40,AMBULATOR
+"Determinarea refractiei (skiascopie, refractometrie, autorefractometrie), astigmometrie",2.01,20,AMBULATOR
+"Diabet zaharat, nutritie si boli metabolice: Consiliere psihologica clinica",E2,30,AMBULATOR
+"Diabet zaharat, nutritie si boli metabolice: Evaluare psihologica clinica si psihodiagnostic",E1,30,AMBULATOR
+Diagnosticarea precoce leziuni displazice col uterin cu biopsie,ZI.11,251,AMBULATOR
+Diatermocoagularea colului uterin,5.07,25,AMBULATOR
+Dilatatia stricturii uretrale,5.12,25,AMBULATOR
+Educatie terapeutica si nutritionala a pacientului cu diabet zaharat,6.04,7,AMBULATOR
+EEG standard,2.11,20,AMBULATOR
+EKG de efort la persoanele fara risc cardiovascular inalt,2.1,20,AMBULATOR
+EKG standard,1.05,10,AMBULATOR
+"Electrocardiografie continua (24 de ore, holter)",2.08,20,AMBULATOR
+Electrochirurgia/electrocauterizarea tumorilor cutanate/leziune,5.08,25,AMBULATOR
+Electromiograma,2.141,40,AMBULATOR
+Endocrinologie: Consiliere psihologica clinica,F12,30,AMBULATOR
+Endocrinologie: Evaluare psihologica clinica si psihodiagnostic,F11,30,AMBULATOR
+"endoscopie digestivă inferioară (rect, sigmoid, colon) cu sau fără biopsie, după caz",3.07,100,AMBULATOR
+"Endoscopie digestivă superioară (esofag, stomac, duoden) cu sau fără biopsie, după caz",3.06,100,AMBULATOR
+"evaluare functionala instrumentala cu dispozitive mecatronice si/sau senzori inertiali,",8.04,14,AMBULATOR
+Evaluare psihologica clinica si psihodiagnostic,J.01,30,AMBULATOR
+Evaluare psihologica clinica si psihodiagnostic,S.01,30,AMBULATOR
+Evaluarea cantitativa a raspunsului galvanic al pielii,2.151,20,AMBULATOR
+Evaluarea psihologica clinica si psihodiagnostic,O.01,30,AMBULATOR
+Examen doppler transcranian al vaselor cerebrale si tehnici derivate,3.05,40,AMBULATOR
+Examen doppler vase extracraniene segment cervical (echotomografic si duplex),3.04,40,AMBULATOR
+Examen electroencefalografic cu probe de stimulare si/sau mapping,3.03,40,AMBULATOR
+Examen electroneuromiografic,3.01,40,AMBULATOR
+Examinare cu lampa wood,1.15,10,AMBULATOR
+"Examinarea ORL cu mijloace optice  (fibroscop, microscop)",2.06,20,AMBULATOR
+Explorarea campului vizual (perimetrie computerizata),1.03,10,AMBULATOR
+"Explorarea functiei binoculare (test worth, maddox, sinoptofor), examen pentru diplopie",2.03,20,AMBULATOR
+"Extractie corpi straini: coduct auditiv extern, nas, faringe",4.1,15,AMBULATOR
+"Extractie de corpi straini  - conjuctiva, cornee, sclera, segment anterior",4.01,15,AMBULATOR
+Extractie dispozitiv intrauterin,4.58,15,AMBULATOR
+Extragere fibroscopica de corpi straini din caile respiratorii superioare,5.04,25,AMBULATOR
+Extragerea endoscopica a stentului ureteral prin uretrocistoscopie flexibila,5.17,25,AMBULATOR
+Foniatrie,2.04,20,AMBULATOR
+Fotochimioterapie (uva) cu oxoralen locala sau generala/sedinta (maxim 4 sedinte),7.01,11,AMBULATOR
+Fotochimioterapie (uvb cu spectru ingust) /sedinta (maxim 4 sedinte),7.02,11,AMBULATOR
+Fotocoagularea cu laser a leziunilor cutanate,4.16,15,AMBULATOR
+Gastroenterologie: Consiliere psihologica clinica,G12,30,AMBULATOR
+Gastroenterologie: Evaluare psihologica clinica si psihodiagnostic,G11,30,AMBULATOR
+Genetica medicala: Consiliere psihologica clinica,H12,30,AMBULATOR
+Genetica medicala: Evaluare psihologica clinica si psihodiagnostic,H11,30,AMBULATOR
+Hematologie: Consiliere psihologica clinica,I2,30,AMBULATOR
+Hematologie: Evaluare psihologica clinica si psihodiagnostic,I1,30,AMBULATOR
+Hematologie-PSIHONC: Serviciu de consiliere psihologică,PO.I2,30,AMBULATOR
+Hematologie-PSIHONC: Serviciu de consultație psihologică,PO.I1,30,AMBULATOR
+Hematologie-PSIHONC: Serviciu de evaluare clinică psihologică,PO.I3,30,AMBULATOR
+Hematologie-PSIHONC: Serviciu de stabilire a planului de intervenție psihologică,PO.I4,30,AMBULATOR
+Imunoterapia specifica cu vaccinuri alergenice standardizate cu administrare subcutanata,5.2,25,AMBULATOR
+Imunoterapie specifica cu vaccinuri alergenice standardizate,7.05,11,AMBULATOR
+Incizia glandei lacrimale si sacului lacrimal,4.02,15,AMBULATOR
+Infiltratii nervoase regionale,7.07,11,AMBULATOR
+Ing paliative-PSIHONC:Serviciu de consiliere psihologică,PO.PAL2,30,AMBULATOR
+Ing paliative-PSIHONC:Serviciu de consultație psihologică,PO.PAL1,30,AMBULATOR
+Ing paliative-PSIHONC:Serviciu de evaluare clinică psihologică,PO.PAL3,30,AMBULATOR
+Ing paliative-PSIHONC:Serviciu de stabilire a planului de intervenție psihologică,PO.PAL4,30,AMBULATOR
+"Ingrijire complicatii stome, fistule tumorale",5.15,25,AMBULATOR
+"Injectare subconjunctivala, retrobulbara de medicamente",4.06,15,AMBULATOR
+Insertia dispozitivului intrauterin,4.15,15,AMBULATOR
+Instalare dispozitiv de administrare a analgeziei controlate de pacient,7.08,11,AMBULATOR
+Instilarea de solutii medicamentoase in vezica urinara prin cateterizare temporara,5.19,25,AMBULATOR
+Instilatia uterotubara terapeutica,8.02,14,AMBULATOR
+"Manevre de mica chirurgie abces si/sau chist vaginal sau bartholin,polipi,vegetatii vulva,vagin,col",5.05,25,AMBULATOR
+Masurarea fortei musculare cu dinamometrul,1.17,10,AMBULATOR
+Mezoterapia - injectare terapeutica paravertebrala si periartriculara,7.03,11,AMBULATOR
+MFR: consiliere/interventie de psihopedagogie speciala-logoped,M2.1,30,AMBULATOR
+MFR: Exercitii pentru tulburari de vorbire( sedinta),M2.2,30,AMBULATOR
+MFR: Kinetoterapie de grup,M3.2,10,AMBULATOR
+MFR: Kinetoterapie individuala,M3.1,20,AMBULATOR
+MFR: Kinetoterapie pe aparate speciale: disp mecanice / disp electromecanice / disp robotizate,M3.3,10,AMBULATOR
+MFR: Masajul limfedemului,M3.4,20,AMBULATOR
+Monitorizare hemodinamica prin metoda bioimpedantei toracice,3.09,40,AMBULATOR
+Montarea/schimbarea cateterului uretro-vezical/cistostomiei/nefrostomiei,5.18,25,AMBULATOR
+Nefrologie si nefrologie pediatrica: Consiliere psihologica clinica,K82,30,AMBULATOR
+"Nefrologie,nefrologie pediatrica: Eval psihologica clinic si psiho diag",K81,30,AMBULATOR
+"Neurologie, neurologie pediatrica: Consiliere/Interventie de psihopedagogie speciala - logoped",J.03,30,AMBULATOR
+"Neurologie, neurologie pediatrica: Kinetoterapie individuala",JK.1,20,AMBULATOR
+"Neurologie, neurologie pediatrica: Kinetoterapie pe aparate speciale",JK.3,10,AMBULATOR
+"Neurologie, neurologie pediatrica: Kinetoterapie pe grup",JK.2,10,AMBULATOR
+"Neurologie, neurologie pediatrica: Psihoterapie pentru copii/adult",J.04,30,AMBULATOR
+Oncologie medicala: Consiliere psihologica clinica,L2,30,AMBULATOR
+Oncologie medicala: Evaluare psihologica clinica si psihodiagnostic,L1,30,AMBULATOR
+Oncologie medicala: Servicii furnizate de fizioterapeut: masajul limfedemului,L3,20,AMBULATOR
+Oncologie medicala-PSIHONC: Serviciu de consiliere psihologică,PO.L2,30,AMBULATOR
+Oncologie medicala-PSIHONC: Serviciu de consultație psihologică,PO.L1,30,AMBULATOR
+Oncologie medicala-PSIHONC: Serviciu de evaluare clinică psihologică,PO.L3,30,AMBULATOR
+Oncologie medicala-PSIHONC: Serviciu de stabilire a planului de intervenție psihologică,PO.L4,30,AMBULATOR
+Oncologie si hematologie pediatrica: Consiliere psihologica clinica,OH2,30,AMBULATOR
+Oncologie si hematologie pediatrica: Ealuare psihologica clinica si psihodiagnostic,OH1,30,AMBULATOR
+Oncologie si hematologie pediatrica-PSIHONC: Serv de stabilire a planului de intervenție psihologică,PO.OH4,30,AMBULATOR
+Oncologie si hematologie pediatrica-PSIHONC: Serviciu de consiliere psihologică,PO.OH2,30,AMBULATOR
+Oncologie si hematologie pediatrica-PSIHONC: Serviciu de consultație psihologică,PO.OH1,30,AMBULATOR
+Oncologie si hematologie pediatrica-PSIHONC: Serviciu de evaluare clinică psihologică,PO.OH3,30,AMBULATOR
+"Oprirea hemoragiei nazale prin crioterapie, cauterizare sau diatermie",4.13,15,AMBULATOR
+ORL: Consiliere /interventie de psihopedagogie speciala â€“ logoped,O.03,30,AMBULATOR
+ORL: Exercitii pentru tulburari de vorbire (sedinta),O.04,30,AMBULATOR
+Ortopedie: Kinetoterapie individuala,PK.1,20,AMBULATOR
+Ortopedie: Kinetoterapie pe aparate speciale,PK.3,10,AMBULATOR
+Ortopedie: Kinetoterapie pe grup,PK.2,10,AMBULATOR
+osteodensitometrie segmentara cu ultrasunete,2.13,20,AMBULATOR
+PAL: Consiliere /interventie psihopedag. spec-logoped,PAL4,30,AMBULATOR
+PAL: Consiliere psihologica clinica copii/ adulti,PAL2,30,AMBULATOR
+PAL: Evaluare psihologica clinica si psihodiagnostic,PAL1,30,AMBULATOR
+PAL: Kinetoterapie de grup,PAL6,10,AMBULATOR
+PAL: Kinetoterapie individuala,PAL5,20,AMBULATOR
+PAL: Kinetoterapie pe aparate speciale,PAL7,10,AMBULATOR
+PAL: Masajul limfedemului,PAL8,20,AMBULATOR
+PAL: Psihoterapie copii/ adult,PAL3,30,AMBULATOR
+peak-flowmetrie,1.06,10,AMBULATOR
+Pediatrie: Consiliere psihologica clinica,Y12,30,AMBULATOR
+Pediatrie: Evaluare psihologica clinica si psihodiagnostic,Y11,30,AMBULATOR
+Penumologie: Evaluare psihologica clinica si psihodiagnostic,R11,30,AMBULATOR
+Pneumologie pediatrica: Consiliere psihologica clinica,Z20.2,30,AMBULATOR
+Pneumologie pediatrica: Evaluare psihologica clinica si psihodiagnostic,Z20.1,30,AMBULATOR
+Pneumologie pediatrica: Kinetoterapie de grup,Z20.4,10,AMBULATOR
+Pneumologie pediatrica: Kinetoterapie individuala,Z20.3,20,AMBULATOR
+Pneumologie pediatrica:Kinetoterapie pe aparate speciale: disp mecanice disp electromec disp robotiz,Z20.5,10,AMBULATOR
+Pneumologie: Consiliere psihologica clinica,R12,30,AMBULATOR
+Pneumologie: Kinetoterapie de grup,R22,10,AMBULATOR
+Pneumologie: Kinetoterapie individuala,R21,20,AMBULATOR
+Pneumologie: kinetoterapie pe aparate speciale: disp mecanice/disp electromecanice/disp robotizate,R23,10,AMBULATOR
+Probe de repozitionare vestibulara,7.04,11,AMBULATOR
+"Psihiatrie, psihiatrie pediatr: Psihoterapia copilului si familiei-pt copii cu TSA si pt alte afect",S.04,30,AMBULATOR
+"Psihiatrie, psihiatrie pediatrica: Consiliere /interventie de psihopedagogie speciala -  logoped",S.05,30,AMBULATOR
+"Psihiatrie, psihiatrie pediatrica: Kinetoterapie de grup",SK.2,10,AMBULATOR
+"Psihiatrie, psihiatrie pediatrica: Kinetoterapie individuala",SK.1,20,AMBULATOR
+"Psihiatrie, psihiatrie pediatrica: Kinetoterapie pe aparate speciale",SK.3,10,AMBULATOR
+"Psihoterapie de grup (psihoze, tulburări obsesiv-compulsive, tulburări fobice etc)",10.02,30,AMBULATOR
+"psihoterapie individuală (psihoze, tulburări obsesiv-compulsive, tulburări fobice,de anxietate ect)",10.03,30,AMBULATOR
+Puncție aspirativă cu ac,2.171,40,AMBULATOR
+Puncție biopsie osteo-medulară,3.74,100,AMBULATOR
+Punctie biposie mamara ghidata ecografic,3.73,100,AMBULATOR
+Punctii si infiltratii intraarticulare,8.01,14,AMBULATOR
+Radioterapie: Consiliere psihologica clinica,T12,30,AMBULATOR
+Radioterapie: Evaluare psihologica clinica si psihodiagnostic,T11,30,AMBULATOR
+Radioterapie-PSIHONC: Serviciu de consiliere psihologică,PO.T2,30,AMBULATOR
+Radioterapie-PSIHONC: Serviciu de consultație psihologică,PO.T1,30,AMBULATOR
+Radioterapie-PSIHONC: Serviciu de evaluare clinică psihologică,PO.T3,30,AMBULATOR
+Radioterapie-PSIHONC: Serviciu de stabilire a planului de intervenție psihologică,PO.T4,30,AMBULATOR
+Recoltare material bioptic,1.2,10,AMBULATOR
+Recoltare material bioptic,1.2,10,AMBULATOR
+Recoltare material celular cervico-vaginal,1.04,10,AMBULATOR
+Reumatologie: Consiliere psihologica clinica,U2,30,AMBULATOR
+Reumatologie: Evaluare psihologica clinica si psihodiagnostic,U1,30,AMBULATOR
+Reumatologie: Kinetoterapie individuala,UK.1,20,AMBULATOR
+Reumatologie: Kinetoterapie pe aparate speciale,UK.3,10,AMBULATOR
+Reumatologie: Kinetoterapie pe grup,UK.2,10,AMBULATOR
+Sfat genetic,11.1,30,AMBULATOR
+Spirograma + test farmacodinamic bronhomotor,2.12,20,AMBULATOR
+Spirometrie,1.07,10,AMBULATOR
+"Sutura unei plagi de pleoapa, conjunctiva",4.05,15,AMBULATOR
+Tamponament posterior si/sau anterior ORL,4.09,15,AMBULATOR
+tensiune arteriala continua (holter TA),2.09,20,AMBULATOR
+"Terapia chirurgicala a abcesului (de parti moi, perianal, pilonidal)",4.25,15,AMBULATOR
+Terapia chirurgicala a afectiunilor mamare superficiale,4.14,15,AMBULATOR
+Terapia chirurgicala a arsurilor termice 10%,4.19,15,AMBULATOR
+Terapia chirurgicala a degeraturilor de grad I si II,4.2,15,AMBULATOR
+Terapia chirurgicala a degeraturilor de grad I si II,4.2,15,AMBULATOR
+Terapia chirurgicala a edemului dur  si seromului posttraumatic,4.28,15,AMBULATOR
+"Terapia chirurgicala a fimozei (decalotarea, debridarea)",4.33,15,AMBULATOR
+Terapia chirurgicala a flebopatiilor varicoase superficiale; ruptura pachet varicos,4.29,15,AMBULATOR
+Terapia chirurgicala a flegmoanelor,5.1,25,AMBULATOR
+"Terapia chirurgicala a furunculului, furunculului antracoid, furunculozei",4.24,15,AMBULATOR
+Terapia chirurgicala a granulomului ombilical,4.3,15,AMBULATOR
+Terapia chirurgicala a granulomului ombilical,4.3,15,AMBULATOR
+Terapia chirurgicala a hematomului,5.11,25,AMBULATOR
+Terapia chirurgicala a hidrosadenitei,4.27,15,AMBULATOR
+Terapia chirurgicala a leziunilor externe prin agenti chimici  10%,4.21,15,AMBULATOR
+Terapia chirurgicala a panaritiului,4.22,15,AMBULATOR
+"Terapia chirurgicala a panaritiului osos, articular, tenosinoval",4.26,15,AMBULATOR
+Terapia chirurgicala a supuratiilor postoperatorii,4.31,15,AMBULATOR
+"Terapia chirurgicala a tumorilor mici, chisturilor dermoide sebacee, lipoamelor neinfectate",4.23,15,AMBULATOR
+"Terapia chirurgicala complexa a panaritiului osos, articular, tenosinoval",5.09,25,AMBULATOR
+Terapia cognitiv-comportamentală,10.04,30,AMBULATOR
+test la ser autolog,1.12,10,AMBULATOR
+testare cutanata la anestezice locale,1.13,10,AMBULATOR
+Testare cutanta alergologica patch (alergia de contact),1.14,10,AMBULATOR
+Teste cutanate (prick sau idr) cu seturi standard de alergeni,1.09,10,AMBULATOR
+teste cutanate cu agenti fizici (maximum 4 teste),1.11,10,AMBULATOR
+"Teste de provocare nazala, oculara, bronsica",1.1,10,AMBULATOR
+Teste de sensibilitate,1.18,10,AMBULATOR
+Toaleta auriculara unilateral (2 proceduri),6.02,7,AMBULATOR
+Tomografie in coerenta optica,3.71,20,AMBULATOR
+Tonometrie; pahimetrie corneeana,2.02,20,AMBULATOR
+tratament chirurgical al traumatismelor ORL,4.12,15,AMBULATOR
+"Tratament chirurgical ORL colectie: sept, flegmon etc",5.03,25,AMBULATOR
+"Tratament cu laser al polului anterior, polului posterior",5.02,25,AMBULATOR
+Tratament in displazia luxanta a soldului in primele 6 luni de viata,9.04,20,AMBULATOR
+tratament intraarticular cu plasma imbogatita cu trombocite (PRP),8.05,14,AMBULATOR
+"Tratament postoperator al plagilor abdominale, al interventiilor chirurgicale dupa cezariana etc",4.34,15,AMBULATOR
+"Tratament tumori exulcerate, suprainfectate",5.14,25,AMBULATOR
+Tratamentul chirurgical al leziunilor cutanate,4.18,15,AMBULATOR
+Tratamentul chirurgical al pingueculei,4.03,15,AMBULATOR
+tratamentul chirurgical al pterigionului,4.04,15,AMBULATOR
+Tratamentul chirurgical al unor afectiuni ale anexelor globului ocular,5.01,25,AMBULATOR
+Tratamentul fracturii amielice fara deplasare a coloanei vertebrale,9.07,20,AMBULATOR
+"Tratamentul la copii cu genu valgum, genu varum, picior plat valg.",9.06,20,AMBULATOR
+Tratamentul limfedemului,5.16,25,AMBULATOR
+"Tratamentul ortopedic al entorsei sau luxatiei patelei, umarului etc",9.02,20,AMBULATOR
+"Tratamentul ortopedic al fracturii femurului; luxatiei, entorsei de genunchi, fracturii de gamba",9.03,20,AMBULATOR
+"Tratamentul ortopedic al luxatiei, entorsei/fracturii antebrat, pumn, gleznei, oaselor carpiene etc",9.01,20,AMBULATOR
+Tratamentul piciorului stramb congenital in primele 3 luni de viata,9.05,20,AMBULATOR
+Tratamentul plagilor,4.32,15,AMBULATOR
+Uroflowmetrie,1.22,10,AMBULATOR

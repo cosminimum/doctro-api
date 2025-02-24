@@ -18,6 +18,7 @@ class HospitalService
     public const LAB_MODE = "LABORATOR";
     public const AMB_MODE = "AMBULATOR";
     public const HOSPITALIZATION_MODE = "SPITALIZARE";
+    public const CONTINUOUS_HOSPITALIZATION_MODE = "SPITALIZARE_CONTINUA";
 
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -31,6 +32,9 @@ class HospitalService
     private string $name;
     #[ORM\Column(type: 'string')]
     private string $description;
+
+    #[ORM\Column(type: 'string')]
+    private string $code;
 
     #[ORM\Column(type: 'string')]
     private string $price;
@@ -83,6 +87,18 @@ class HospitalService
     public function setDescription(string $description): HospitalService
     {
         $this->description = $description;
+
+        return $this;
+    }
+
+    public function getCode(): string
+    {
+        return $this->code;
+    }
+
+    public function setCode(string $code): HospitalService
+    {
+        $this->code = $code;
 
         return $this;
     }

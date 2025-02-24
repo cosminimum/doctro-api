@@ -25,9 +25,10 @@
                                 <div class="modal-body">
                                     <div class="card">
                                         <div class="card-header">
-                                            <h3 class="card-title">Adaugă serviciu</h3>
+                                            <h3 class="card-title">Adaugă medic</h3>
                                         </div>
                                         <div class="modal-body">
+                                            {{ form_start(doctorForm) }}
                                             <div class="flex flex-col gap-1">
                                                 <label class="form-label text-gray-900">Prenume</label>
                                                 {{ form_widget(doctorForm.firstName, {'attr': {'class': 'input'}}) }}
@@ -61,6 +62,7 @@
                                             <div class="flex justify-end pt-2.5">
                                                 <button type="submit" class="btn btn-primary">Salvează</button>
                                             </div>
+                                            {{ form_end(doctorForm) }}
                                         </div>
                                     </div>
                                 </div>
@@ -102,17 +104,26 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr>
-                                <td>
-                                    <div class="flex flex-col gap-2">
-                                        <a class="leading-none font-medium text-sm text-gray-900 hover:text-primary" href="#">Product Management</a>
-                                        <span class="text-2sm text-gray-700 font-normal leading-3">Product development & lifecycle</span>
-                                    </div>
-                                </td>
-                                <td></td>
-                                <td>21 Oct, 2024</td>
-                                <td></td>
-                            </tr>
+                                {% for doctor in doctors %}
+                                    <tr>
+                                        <td>
+                                            <div class="flex flex-col gap-2">
+                                                <a class="leading-none font-medium text-sm text-gray-900 hover:text-primary" href="#">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            {% for specialty in doctor.medicalSpecialties %}
+                                                {{ specialty.name }} |
+                                            {% endfor %}
+                                        </td>
+                                        <td>
+                                            {% for service in doctor.hospitalServices %}
+                                                {{ service.name }} |
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ doctor.created|date('d-m-Y H:i')}}</td>
+                                    </tr>
+                                {% endfor %}
                             </tbody>
                         </table>
                     </div>

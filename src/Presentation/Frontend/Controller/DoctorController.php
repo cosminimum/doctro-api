@@ -37,6 +37,17 @@ class DoctorController extends AbstractController
         $form = $this->createForm(DoctorAppointmentFormType::class);
         $form->handleRequest($request);
 
+        $selectedDateTime = $request->query->get('date');
+        if ($selectedDateTime) {
+            try {
+                $defaultAppointmentStart = new \DateTime($selectedDateTime);
+                $form->get('appointmentStart')->setData($defaultAppointmentStart);
+            } catch (\Exception $e) {
+                //
+            }
+        }
+
+
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
@@ -202,6 +213,28 @@ class DoctorController extends AbstractController
             'appointments' => json_encode($appointments),
             'doctorSchedules' => json_encode($doctorSchedules),
         ]);
+    }
+
+    #[Route('/doctor/appointments/{id}/approve', name: 'doctor_approve_appointment')]
+    public function approveAppointment(
+        int $id,
+        Request $request,
+        AppointmentRepository $appointmentRepo,
+        EntityManagerInterface $em,
+        DoctorScheduleRepository $doctorScheduleRepository
+    ): Response {
+        $appointment = $appointmentRepo->find($id);
+        if (!$appointment) {
+            throw $this->createNotFoundException('Programarea nu a fost găsită.');
+        }
+
+        $appointment->setIsActive(true);
+        $em->persist($appointment);
+        $em->flush();
+
+        $this->addFlash('success', 'Programarea a fost aprobata cu succes!');
+        return $this->redirectToRoute('doctor_appointments');
+
     }
 
     #[Route('/doctor/appointments/{id}/edit', name: 'doctor_edit_appointment')]

@@ -67,6 +67,12 @@
                                         <a class="btn btn-sm btn-icon btn-clear btn-light" href="{{ path('doctor_edit_appointment', {id: appointment.id}) }}">
                                             <i class="ki-filled ki-notepad-edit"></i>
                                         </a>
+                                        <a class="btn btn-sm btn-icon btn-clear btn-light" href="{{ path('doctor_approve_appointment', {id: appointment.id}) }}">
+                                            <i class="ki-filled ki-check"></i>
+                                        </a>
+                                        <a class="btn btn-sm btn-icon btn-clear btn-light" href="{{ path('app_appointment_pdf', {id: appointment.id}) }}">
+                                            <i class="ki-filled ki-eye"></i>
+                                        </a>
                                     </td>
                                 </tr>
                             {% endfor %}

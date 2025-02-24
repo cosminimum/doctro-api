@@ -15,3 +15,9 @@ frontend:
         path: ../src/Presentation/Frontend/
         namespace: App\Presentation\Frontend
     type: attribute
+
+command:
+    resource:
+        path: ../src/Command
+        namespace: App\Command
+    type: attribute

@@ -29,5 +29,16 @@ services:
         resource: '../src/Presentation/Webservice/'
         tags: ['controller.service_arguments']
 
+    App\Command\ImportHospitalServicesCommand:
+        tags: [ 'console.command' ]
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+    App\Command\ImportDoctorsCommand:
+        tags: [ 'console.command' ]
+        arguments:
+            $projectDir: '%kernel.project_dir%'
+
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

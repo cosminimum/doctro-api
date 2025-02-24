@@ -44,7 +44,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             ->setMedicalSpecialty($medicalSpecialty)
             ->setHospitalService($hospitalService)
             ->setTimeSlot($timeSlot)
-            ->setIsActive(true)
+            ->setIsActive(false)
         ;
 
         $this->getEntityManager()->persist($appointment);

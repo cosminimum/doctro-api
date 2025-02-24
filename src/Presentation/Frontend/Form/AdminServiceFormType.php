@@ -32,6 +32,7 @@ class AdminServiceFormType extends AbstractType
                     'Laborator'   => HospitalService::LAB_MODE,
                     'Ambulator'   => HospitalService::AMB_MODE,
                     'Spitalizare de zi' => HospitalService::HOSPITALIZATION_MODE,
+                    'Spitalizare continuă' => HospitalService::CONTINUOUS_HOSPITALIZATION_MODE,
                 ],
             ])
             ->add('isActive', CheckboxType::class, [
