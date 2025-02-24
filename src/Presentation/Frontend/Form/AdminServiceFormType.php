@@ -22,6 +22,7 @@ class AdminServiceFormType extends AbstractType
         $builder
             ->add('name', TextType::class)
             ->add('description', TextareaType::class)
+            ->add('code', TextType::class)
             ->add('price',  NumberType::class)
             ->add('duration', ChoiceType::class, [
                 'choices' => [15 => 15, 30 => 30, 45 => 45, 60 => 60]

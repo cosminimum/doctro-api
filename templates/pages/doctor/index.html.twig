@@ -245,8 +245,8 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
             });
-            const result = await response.json();
-            alert(result.message);
+            await response.json();
+            window.location.reload()
           } catch (error) {
             console.error(error);
           }

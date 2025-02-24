@@ -18,28 +18,28 @@ class DoctorListController extends AbstractController
     ) {
     }
 
-    #[Route('/api/doctors', name: 'api_doctor_list', methods: ['GET'])]
-    public function list(#[MapQueryString] ?DoctorListRequestDto $requestDto): JsonResponse
-    {
-        $response = new ApiResponseDto();
-
-        try {
-            $doctorList = $this->doctorListStory->list($requestDto);
-
-            $response->setData(
-                $doctorList->toArray()
-            );
-        } catch (\Throwable $throwable) {
-            $response->setIsError(true)
-                ->setCode(Response::HTTP_INTERNAL_SERVER_ERROR)
-                ->setErrors(['general_error', $throwable->getMessage(), $throwable->getTrace()]);
-
-            // todo: log error
-        }
-
-        return $this->json(
-            $response->toArray(),
-            $response->getCode()
-        );
-    }
+//    #[Route('/api/doctors', name: 'api_doctor_list', methods: ['GET'])]
+//    public function list(#[MapQueryString] ?DoctorListRequestDto $requestDto): JsonResponse
+//    {
+//        $response = new ApiResponseDto();
+//
+//        try {
+//            $doctorList = $this->doctorListStory->list($requestDto);
+//
+//            $response->setData(
+//                $doctorList->toArray()
+//            );
+//        } catch (\Throwable $throwable) {
+//            $response->setIsError(true)
+//                ->setCode(Response::HTTP_INTERNAL_SERVER_ERROR)
+//                ->setErrors(['general_error', $throwable->getMessage(), $throwable->getTrace()]);
+//
+//            // todo: log error
+//        }
+//
+//        return $this->json(
+//            $response->toArray(),
+//            $response->getCode()
+//        );
+//    }
 }

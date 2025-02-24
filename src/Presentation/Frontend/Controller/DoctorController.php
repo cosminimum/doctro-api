@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Presentation\Frontend\Controller;
 
+use App\Application\Story\PatientRegisterStory;
+use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\Appointment;
 use App\Infrastructure\Entity\DoctorSchedule;
 use App\Infrastructure\Entity\HospitalService;
@@ -32,7 +34,8 @@ class DoctorController extends AbstractController
         Request $request,
         EntityManagerInterface $em,
         PatientRepository $patientRepo,
-        DoctorScheduleRepository $doctorScheduleRepository
+        DoctorScheduleRepository $doctorScheduleRepository,
+        PatientRegisterStory $patientRegisterStory,
     ): Response {
         $form = $this->createForm(DoctorAppointmentFormType::class);
         $form->handleRequest($request);
@@ -58,13 +61,7 @@ class DoctorController extends AbstractController
 
             $patient = $patientRepo->findOneBy(['email' => $data['email']]);
             if (!$patient) {
-                $patient = new Patient();
-                $patient->setFirstName($data['firstName']);
-                $patient->setLastName($data['lastName']);
-                $patient->setEmail($data['email']);
-                $patient->setPhone($data['phone']);
-                $patient->setCnp($data['cnp']);
-                $em->persist($patient);
+                $patient = $patientRegisterStory->register(new UserCreateRequestDto($data['email'], $data['firstName'], $data['lastName'], $data['cnp'], $data['phone'], base64_encode(random_bytes(10))));
             }
 
             $specialty = $data['specialty'];
@@ -551,12 +548,14 @@ class DoctorController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         if (!$data || !isset($data['repeatUntil'], $data['schedules'])) {
+            $this->addFlash('error', 'Payload invalid');
             return new JsonResponse(['success' => false, 'message' => 'Payload invalid'], 400);
         }
 
         $repeatUntil = \DateTime::createFromFormat('d/m/Y', $data['repeatUntil']);
         if (!$repeatUntil) {
-            return new JsonResponse(['success' => false, 'message' => 'Data "repeatUntil" invalidă'], 400);
+            $this->addFlash('error', 'Data "repeta pana la" invalidă');
+            return new JsonResponse(['success' => false, 'message' => 'Data "repeta pana la" invalidă'], 400);
         }
 
         $doctor = $this->getUser();
@@ -605,6 +604,7 @@ class DoctorController extends AbstractController
                 $startTime = \DateTime::createFromFormat('H:i', $scheduleConfig['start']);
                 $endTime   = \DateTime::createFromFormat('H:i', $scheduleConfig['end']);
                 if (!$startTime || !$endTime) {
+                    $this->addFlash('error', 'Format orar invalid');
                     return new JsonResponse(['success' => false, 'message' => 'Format orar invalid'], 400);
                 }
 
@@ -632,6 +632,7 @@ class DoctorController extends AbstractController
         }
 
         $em->flush();
+        $this->addFlash('success', 'Program configurat cu succes.');
         return new JsonResponse(['success' => true, 'message' => 'Program configurat cu succes.']);
     }
 

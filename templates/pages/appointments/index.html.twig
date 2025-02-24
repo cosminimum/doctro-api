@@ -254,7 +254,7 @@
           container.classList.remove('hidden');
           content.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div></div>';
           try {
-            const isDoctorSelected = (value) => value && value !== "Alege medic";
+            const isDoctorSelected = (value) => value && value !== "Alege";
             const params = new URLSearchParams({
               specialty: formElements.specialty.value,
               service: formElements.service.value,
