@@ -32,6 +32,10 @@ class DoctorAppointmentFormType extends AbstractType
             ->add('appointmentStart', DateTimeType::class, [
                 'widget' => 'single_text',
                 'label' => 'Data și ora de start a programării',
+                'minutes' => [0, 15, 30, 45],
+                'attr' => [
+                    'step' => 900
+                ]
             ])
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)

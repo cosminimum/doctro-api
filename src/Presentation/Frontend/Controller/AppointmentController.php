@@ -16,6 +16,7 @@ use App\Infrastructure\Repository\DoctorRepository;
 use App\Infrastructure\Repository\DoctorScheduleRepository;
 use App\Infrastructure\Repository\HospitalServiceRepository;
 use App\Infrastructure\Repository\MedicalSpecialtyRepository;
+use App\Infrastructure\Repository\TimeSlotRepository;
 use App\Presentation\Frontend\Form\AppointmentFormType;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -40,6 +41,8 @@ class AppointmentController extends AbstractController
         DoctorScheduleRepository $doctorScheduleRepository,
         PatientRegisterStory $patientRegisterStory,
         MedicalSpecialtyRepository $medicalSpecialtyRepository,
+        TimeSlotRepository $timeSlotRepository,
+        HospitalServiceRepository $hospitalServiceRepository,
     ): Response {
         $form = $this->createForm(AppointmentFormType::class);
         $form->handleRequest($request);
@@ -70,20 +73,14 @@ class AppointmentController extends AbstractController
                 ]);
             }
 
-            $specialty = $data['specialty'];
-            $service   = $data['service'];
-            $appointmentStart = $data['appointmentStart'];
+            $specialty = $medicalSpecialtyRepository->find($data['specialtyId']);
+            $service   = $hospitalServiceRepository->find($data['serviceId']);
+            $timeSlot = $timeSlotRepository->find($data['slotId']);
 
             $duration = (int)$service->getDuration();
             $requiredSlots = $duration / 15;
 
-            $appointmentDate = $appointmentStart->format('Y-m-d');
-            $appointmentTime = $appointmentStart->format('H:i');
-
-            $schedule = $doctorScheduleRepository->findOneBy([
-                'doctor' => $doctor,
-                'date'   => new \DateTime($appointmentDate),
-            ]);
+            $schedule = $timeSlot->getSchedule();
 
             if (!$schedule) {
                 $this->addFlash('error', 'Nu există program pentru data selectată.');
@@ -111,7 +108,7 @@ class AppointmentController extends AbstractController
                 $slotStart = $slot->getStartTime()->format('H:i');
 
                 if (empty($block)) {
-                    if ($slotStart === $appointmentTime) {
+                    if ($slotStart === $slot->getStartTime()) {
                         $block[] = $slot;
                     }
                 } else {

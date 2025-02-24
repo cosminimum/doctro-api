@@ -65,8 +65,6 @@ class ImportDoctorsCommand extends Command
             $cnp = $row['cnp'] ?? str_pad((string)$counter, 13, '0', STR_PAD_LEFT);
             $phone = $row['phone'] ?? sprintf('070000%04d', $counter);
 
-            $password = password_hash('defaultpassword', PASSWORD_BCRYPT);
-
             $doctor = new Doctor();
             $doctor->setEmail($email);
             $doctor->setFirstName($firstName);

@@ -210,6 +210,16 @@
         slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
         businessHours: businessHours,
         events: allEvents,
+        eventContent: function(arg) {
+          // Only show the title (patient name) for regular events
+          if (arg.event.display !== 'background') {
+            return {
+              html: '<div class="fc-event-title">' + arg.event.title + '</div>'
+            };
+          }
+          // Return null for background events (blocked slots)
+          return null;
+        },
         eventClick: function(info) {
           if (info.event.display !== "background") {
             window.location.href = '/doctor/appointments/' + info.event.id + '/edit';
