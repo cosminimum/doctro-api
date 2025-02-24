@@ -37,6 +37,8 @@ security:
         - { path: ^/login, roles: [ ] }
         - { path: ^/register, roles: [ ] }
         - { path: ^/logout, roles: [ ] }
+        - { path: ^/admin, roles: [ IS_AUTHENTICATED_FULLY ] }
+        - { path: ^/doctor, roles: [ IS_AUTHENTICATED_FULLY ] }
 #        - { path: ^/, roles: [ IS_AUTHENTICATED_FULLY ] }
 #        - { path: ^/api/, roles: [ IS_AUTHENTICATED_FULLY ] }
 
