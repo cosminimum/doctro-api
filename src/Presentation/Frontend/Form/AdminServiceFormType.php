@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace App\Presentation\Frontend\Form;
 
 use App\Infrastructure\Entity\HospitalService;
+use App\Infrastructure\Entity\MedicalSpecialty;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
@@ -35,6 +37,11 @@ class AdminServiceFormType extends AbstractType
                     'Spitalizare de zi' => HospitalService::HOSPITALIZATION_MODE,
                     'Spitalizare continuă' => HospitalService::CONTINUOUS_HOSPITALIZATION_MODE,
                 ],
+            ])
+            ->add('medicalSpecialty', EntityType::class, [
+                'class' => MedicalSpecialty::class,
+                'choice_label' => 'name',
+                'placeholder' => 'Selectează o specialitate',
             ])
             ->add('isActive', CheckboxType::class, [
                 'required' => false,

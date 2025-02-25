@@ -8,12 +8,15 @@ use App\Application\Story\DoctorRegisterStory;
 use App\Domain\Dto\UserCreateRequestDto;
 use App\Infrastructure\Entity\HospitalService;
 use App\Infrastructure\Entity\HospitalSettings;
+use App\Infrastructure\Entity\MedicalSpecialty;
 use App\Infrastructure\Entity\User;
 use App\Infrastructure\Repository\DoctorRepository;
 use App\Infrastructure\Repository\HospitalServiceRepository;
 use App\Infrastructure\Repository\HospitalSettingsRepository;
+use App\Infrastructure\Repository\MedicalSpecialtyRepository;
 use App\Presentation\Frontend\Form\AdminDoctorFormType;
 use App\Presentation\Frontend\Form\AdminServiceFormType;
+use App\Presentation\Frontend\Form\AdminSpecialtyFormType;
 use App\Presentation\Frontend\Form\HospitalSettingsFormType;
 use App\Presentation\Frontend\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
@@ -122,6 +125,56 @@ class AdminController extends AbstractController
         return $this->render('pages/admin/services/edit.html.twig', [
             'serviceForm' => $form->createView(),
             'service'     => $service,
+        ]);
+    }
+
+    #[Route('/admin/specialties', name: 'admin_specialties', methods: ['GET', 'POST'])]
+    public function adminSpecialties(
+        Request $request,
+        MedicalSpecialtyRepository $medicalSpecialtyRepository,
+        EntityManagerInterface $em
+    ): Response {
+        $form = $this->createForm(AdminSpecialtyFormType::class);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            /** @var MedicalSpecialty $service */
+            $specialty = $form->getData();
+            $em->persist($specialty);
+            $em->flush();
+            $this->addFlash('success', 'Specialitatea a fost creat cu succes.');
+            return $this->redirectToRoute('admin_specialties');
+        }
+
+        return $this->render('pages/admin/specialties/index.html.twig', [
+            'specialties'    => $medicalSpecialtyRepository->findAll(),
+            'specialtyForm' => $form->createView(),
+        ]);
+    }
+
+    #[Route('/admin/specialties/{id}/edit', name: 'admin_edit_specialty', methods: ['GET', 'POST'])]
+    public function editSpecialty(
+        Request $request,
+        MedicalSpecialtyRepository $medicalSpecialtyRepository,
+        int $id,
+        EntityManagerInterface $em
+    ): Response {
+        $specialty = $medicalSpecialtyRepository->find($id);
+        if (!$specialty) {
+            throw $this->createNotFoundException('Specialitatea nu a fost găsită.');
+        }
+        $form = $this->createForm(AdminSpecialtyFormType::class, $specialty);
+        $form->handleRequest($request);
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            $em->flush();
+            $this->addFlash('success', 'Specialitatea a fost actualizat cu succes.');
+            return $this->redirectToRoute('admin_specialties');
+        }
+
+        return $this->render('pages/admin/specialties/edit.html.twig', [
+            'specialtyForm' => $form->createView(),
+            'specialty'     => $specialty,
         ]);
     }
 

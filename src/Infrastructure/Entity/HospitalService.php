@@ -48,6 +48,21 @@ class HospitalService
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private string $isActive;
 
+    #[ORM\ManyToOne(targetEntity: MedicalSpecialty::class, inversedBy: 'hospitalServices')]
+    #[ORM\JoinColumn(nullable: false)]
+    private MedicalSpecialty $medicalSpecialty;
+
+    public function getMedicalSpecialty(): MedicalSpecialty
+    {
+        return $this->medicalSpecialty;
+    }
+
+    public function setMedicalSpecialty(MedicalSpecialty $medicalSpecialty): self
+    {
+        $this->medicalSpecialty = $medicalSpecialty;
+        return $this;
+    }
+
     public function getId(): int
     {
         return $this->id;

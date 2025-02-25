@@ -45,14 +45,27 @@
                             </div>
 
                         {{ form_end(form) }}
-                        <form method="post" action="{{ path('doctor_delete_appointment', {'id': appointment.id}) }}"
-                              onsubmit="return confirm('Sigur doriți să ștergeți această programare?');"
-                              class="mt-3">
-                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ appointment.id) }}">
-                            <div class="text-right">
-                                <button type="submit" class="btn btn-sm btn-outline btn-danger">Anulează</button>
-                            </div>
-                        </form>
+                        <div class="flex gap-2 items-center justify-center mt-4">
+
+                            <a href="{{ path('app_appointment_pdf', {id: appointment.id}) }}" class="btn btn-sm btn-light">Printează tipizat</a>
+                            {% if appointment.isActive == false %}
+                            <form method="post" action="{{ path('doctor_approve_appointment', {'id': appointment.id}) }}"
+                                  onsubmit="return confirm('Sigur doriți să aprobați această programare?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('approve' ~ appointment.id) }}">
+                                <div class="text-right">
+                                    <button type="submit" class="btn btn-sm btn-outline btn-light">Aprobă</button>
+                                </div>
+                            </form>
+                            {% else %}
+                                <form method="post" action="{{ path('doctor_delete_appointment', {'id': appointment.id}) }}"
+                                      onsubmit="return confirm('Sigur doriți să ștergeți această programare?');">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ appointment.id) }}">
+                                    <div class="text-right">
+                                        <button type="submit" class="btn btn-sm btn-outline btn-danger">Anulează</button>
+                                    </div>
+                                </form>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>

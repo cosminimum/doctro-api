@@ -26,13 +26,47 @@ class MedicalSpecialty
     #[ORM\Column(type: 'string')]
     private string $name;
 
-    #[ORM\ManyToMany(targetEntity: Doctor::class, mappedBy: 'medicalSpecialties')]
-    private Collection $doctors;
+    #[ORM\Column(type: 'boolean')]
+    private bool $isActive;
+
+    #[ORM\OneToMany(mappedBy: 'medicalSpecialty', targetEntity: HospitalService::class)]
+    private Collection $hospitalServices;
 
     public function __construct()
     {
         $this->doctors = new ArrayCollection();
+        $this->hospitalServices = new ArrayCollection();
     }
+
+    public function getHospitalServices(): Collection
+    {
+        return $this->hospitalServices;
+    }
+
+    public function addHospitalService(HospitalService $hospitalService): self
+    {
+        if (!$this->hospitalServices->contains($hospitalService)) {
+            $this->hospitalServices->add($hospitalService);
+            $hospitalService->setMedicalSpecialty($this);
+        }
+
+        return $this;
+    }
+
+    public function removeHospitalService(HospitalService $hospitalService): self
+    {
+        if ($this->hospitalServices->removeElement($hospitalService)) {
+            if ($hospitalService->getMedicalSpecialty() === $this) {
+                // This would create an invalid state since the relationship is required
+                // You might want to handle this differently based on your application logic
+            }
+        }
+
+        return $this;
+    }
+
+    #[ORM\ManyToMany(targetEntity: Doctor::class, mappedBy: 'medicalSpecialties')]
+    private Collection $doctors;
 
     public function getId(): int
     {
@@ -64,5 +98,17 @@ class MedicalSpecialty
     public function getDoctors(): Collection
     {
         return $this->doctors;
+    }
+
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): MedicalSpecialty
+    {
+        $this->isActive = $isActive;
+
+        return $this;
     }
 }

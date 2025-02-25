@@ -1,0 +1,33 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="card">
+        <div class="card-header">
+            <h3 class="card-title">Editează Specialitate</h3>
+        </div>
+        <div class="card-body">
+            {{ form_start(specialtyForm) }}
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Nume</label>
+                {{ form_widget(specialtyForm.name, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Cod</label>
+                {{ form_widget(specialtyForm.code, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="switch switch-sm">
+                    Serviciu activ
+                    {{ form_widget(specialtyForm.isActive) }}
+                </label>
+            </div>
+
+            <div class="flex justify-end pt-2.5">
+                <button type="submit" class="btn btn-primary">Salvează</button>
+            </div>
+            {{ form_end(specialtyForm) }}
+        </div>
+    </div>
+{% endblock %}
