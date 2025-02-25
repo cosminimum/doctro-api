@@ -18,6 +18,11 @@
                             <span class="menu-title text-nowrap text-sm text-gray-800 {{ app.request.attributes.get('_route') == 'doctor_appointments' ? 'menu-item-active:text-gray-900 menu-item-active:font-medium menu-item-here:text-gray-900 menu-item-here:font-medium menu-item-show:text-gray-900 menu-link-hover:text-gray-900' : '' }}">Programări</span>
                         </a>
                     </div>
+                    <div class="menu-item border-b-2 border-b-transparent {{ app.request.attributes.get('_route') == 'doctor_manage_schedules' ? 'menu-item-active:border-b-gray-900 menu-item-here:border-b-gray-900 active' : '' }}">
+                        <a class="menu-link gap-2.5 pb-2 lg:pb-4" href="{{ path('doctor_manage_schedules') }}" tabindex="0">
+                            <span class="menu-title text-nowrap text-sm text-gray-800 {{ app.request.attributes.get('_route') == 'doctor_manage_schedules' ? 'menu-item-active:text-gray-900 menu-item-active:font-medium menu-item-here:text-gray-900 menu-item-here:font-medium menu-item-show:text-gray-900 menu-link-hover:text-gray-900' : '' }}">Gestionare Program</span>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

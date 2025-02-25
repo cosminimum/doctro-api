@@ -75,7 +75,19 @@
                         <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 mb-7">
                           <label class="form-label max-w-56">Repetă până la</label>
                           <div class="flex flex-col items-start grow gap-3 w-full">
-                            <input id="input-repeat-slots" class="input" type="text" placeholder="YYYY-MM-DD">
+                            <input id="input-repeat-slots" class="input" type="text" placeholder="23-02-2025">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="w-full">
+                        <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 mb-7">
+                          <label class="form-label max-w-56">Repetă pentru</label>
+                          <div class="flex flex-col items-start grow gap-3 w-full">
+                            <select id="repeat-week-type" class="select">
+                              <option value="all">Toate săptămânile</option>
+                              <option value="even">Săptămâni pare</option>
+                              <option value="odd">Săptămâni impare</option>
+                            </select>
                           </div>
                         </div>
                       </div>
@@ -140,13 +152,16 @@
 {% block javascripts %}
   {{ parent() }}
   <script src="{{ asset('theme/vendors/fullcalendar/dist/index.global.js') }}"></script>
-  <script src="{{ asset('theme/vendors/datepicker/dist/datepicker.js') }}"></script>
   <script>
     document.addEventListener('DOMContentLoaded', function() {
       var calendarEl = document.getElementById('calendar');
       const appointments = {{ appointments|default('[]')|raw }};
       const doctorSchedules = {{ doctorSchedules|default('[]')|raw }};
+
       var businessHoursArray = {};
+      var earliestStart = "23:59:59";
+      var latestEnd = "00:00:00";
+
       doctorSchedules.forEach(schedule => {
         var scheduleDate = new Date(schedule.date);
         var day = scheduleDate.getDay();
@@ -154,6 +169,13 @@
 
         schedule.slots.forEach(slot => {
           if (!slot.isBooked) {
+            if (slot.startTime < earliestStart) {
+              earliestStart = slot.startTime;
+            }
+            if (slot.endTime > latestEnd) {
+              latestEnd = slot.endTime;
+            }
+
             if (!businessHoursArray[day]) {
               businessHoursArray[day] = {
                 startTime: slot.startTime,
@@ -170,6 +192,21 @@
           }
         });
       });
+
+      if (earliestStart === "23:59:59") earliestStart = "07:00:00";
+      if (latestEnd === "00:00:00") latestEnd = "19:00:00";
+
+      const earliestHour = earliestStart.split(':')[0];
+      const earliestMinute = earliestStart.split(':')[1];
+      let bufferStartTime = earliestStart;
+
+      if (earliestMinute >= "30") {
+        bufferStartTime = `${earliestHour}:${parseInt(earliestMinute) - 30}:00`;
+      } else if (earliestHour > "00") {
+        const newHour = parseInt(earliestHour) - 1;
+        const newMinute = parseInt(earliestMinute) + 30;
+        bufferStartTime = `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}:00`;
+      }
 
       var businessHours = [];
       for (var day in businessHoursArray) {
@@ -195,7 +232,6 @@
       });
 
       var allEvents = appointments.concat(blockedEvents);
-      console.log(blockedEvents)
 
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
@@ -203,8 +239,8 @@
         headerToolbar: { left: 'prev,next', center: 'title', right: '' },
         locale: 'ro',
         slotDuration: '00:15:00',
-        slotMinTime: '07:00:00',
-        slotMaxTime: '19:00:00',
+        slotMinTime: bufferStartTime, // Dynamic start time with buffer
+        slotMaxTime: latestEnd,       // Dynamic end time based on actual schedule
         snapDuration: '00:15:00',
         slotLabelInterval: '00:15',
         slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
@@ -217,7 +253,6 @@
               html: '<div class="fc-event-title">' + arg.event.title + '</div>'
             };
           }
-          // Return null for background events (blocked slots)
           return null;
         },
         eventClick: function(info) {
@@ -231,9 +266,17 @@
       });
       calendar.render();
 
-
-      new Datepicker('#input-repeat-slots', { time: false });
-      // new Datepicker('#input-block-slots', { time: true, ranged: true });
+      flatpickr('#input-repeat-slots', {
+        dateFormat: "d-m-Y",
+        allowInput: true
+      });
+      flatpickr('#input-block-slots', {
+        mode: "range",
+        enableTime: true,
+        dateFormat: "d-m-Y H:i",
+        time_24hr: true,
+        minuteIncrement: 15
+      });
 
       const saveScheduleBtn = document.getElementById('save-schedule-btn');
       if(saveScheduleBtn) {
@@ -247,7 +290,12 @@
             schedules[day] = { active: active, start: start, end: end };
           });
           const repeatUntil = document.getElementById('input-repeat-slots').value;
-          const payload = { repeatUntil: repeatUntil, schedules: schedules };
+          const repeatWeekType = document.getElementById('repeat-week-type').value;
+          const payload = {
+            repeatUntil: repeatUntil,
+            schedules: schedules,
+            repeatWeekType: repeatWeekType
+          };
 
           try {
             const response = await fetch('{{ path("doctor_configure_schedule") }}', {
@@ -255,35 +303,15 @@
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(payload)
             });
-            await response.json();
-            window.location.reload()
-          } catch (error) {
-            console.error(error);
-          }
-        });
-      }
-
-      const saveBlockBtn = document.getElementById('save-block-btn');
-      if(saveBlockBtn) {
-        saveBlockBtn.addEventListener('click', async function() {
-          const rangeValue = document.getElementById('input-block-slots').value;
-          const parts = rangeValue.split(' - ');
-          if(parts.length !== 2) {
-            alert('Formatul intervalului este invalid.');
-            return;
-          }
-          const payload = { start: parts[0], end: parts[1] };
-
-          try {
-            const response = await fetch('{{ path("doctor_block_slots") }}', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify(payload)
-            });
             const result = await response.json();
-            alert(result.message);
+            if (result.success) {
+              window.location.reload();
+            } else {
+              alert(result.message || 'A apărut o eroare la salvarea programului');
+            }
           } catch (error) {
             console.error(error);
+            alert('A apărut o eroare la salvarea programului');
           }
         });
       }

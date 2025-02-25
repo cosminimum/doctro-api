@@ -59,6 +59,16 @@
                                                 {{ form_widget(doctorForm.plainPassword, {'attr': {'class': 'input'}}) }}
                                             </div>
 
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">Specialități</label>
+                                                {{ form_widget(doctorForm.medicalSpecialties, {'attr': {'class': 'select select2-multiple'}}) }}
+                                            </div>
+
+                                            <div class="flex flex-col gap-1">
+                                                <label class="form-label text-gray-900">Servicii</label>
+                                                {{ form_widget(doctorForm.hospitalServices, {'attr': {'class': 'select select2-multiple'}}) }}
+                                            </div>
+
                                             <div class="flex justify-end pt-2.5">
                                                 <button type="submit" class="btn btn-primary">Salvează</button>
                                             </div>
@@ -101,30 +111,38 @@
                                             <span class="sort-icon"></span>
                                         </span>
                                 </th>
+                                <th class="min-w-[100px]">
+                                    <span class="sort-label">Acțiuni</span>
+                                </th>
                             </tr>
                             </thead>
                             <tbody>
-                                {% for doctor in doctors %}
-                                    <tr>
-                                        <td>
-                                            <div class="flex flex-col gap-2">
-                                                <a class="leading-none font-medium text-sm text-gray-900 hover:text-primary" href="#">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</a>
-                                                <span>{{ doctor.email }}</span>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            {% for specialty in doctor.medicalSpecialties %}
-                                                {{ specialty.name }} |
-                                            {% endfor %}
-                                        </td>
-                                        <td>
-                                            {% for service in doctor.hospitalServices %}
-                                                {{ service.name }} |
-                                            {% endfor %}
-                                        </td>
-                                        <td>{{ doctor.created|date('d-m-Y H:i')}}</td>
-                                    </tr>
-                                {% endfor %}
+                            {% for doctor in doctors %}
+                                <tr>
+                                    <td>
+                                        <div class="flex flex-col gap-2">
+                                            <a class="leading-none font-medium text-sm text-gray-900 hover:text-primary" href="#">Dr. {{ doctor.firstName }} {{ doctor.lastName }}</a>
+                                            <span>{{ doctor.email }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        {% for specialty in doctor.medicalSpecialties %}
+                                            <span class="badge badge-sm badge-light-primary mb-1 me-1">{{ specialty.name }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>
+                                        {% for service in doctor.hospitalServices %}
+                                            <span class="badge badge-sm badge-light-info mb-1 me-1">{{ service.name }}</span>
+                                        {% endfor %}
+                                    </td>
+                                    <td>{{ doctor.created|date('d-m-Y H:i')}}</td>
+                                    <td>
+                                        <a href="{{ path('admin_edit_doctor', {'id': doctor.id}) }}" class="btn btn-sm btn-icon btn-light">
+                                            <i class="ki-filled ki-notepad-edit"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
                             </tbody>
                         </table>
                     </div>
@@ -143,4 +161,33 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        $('.select2-multiple').select2({
+          placeholder: 'Selectează opțiuni',
+          allowClear: true,
+          width: '100%',
+          tags: false,
+          language: {
+            noResults: function() {
+              return "Nu au fost găsite rezultate";
+            }
+          }
+        });
+
+        $('[data-modal-toggle="#add-doctor"]').on('click', function() {
+          setTimeout(function() {
+            $('.select2-multiple').select2('destroy').select2({
+              placeholder: 'Selectează opțiuni',
+              allowClear: true,
+              width: '100%'
+            });
+          }, 100);
+        });
+      });
+    </script>
 {% endblock %}

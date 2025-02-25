@@ -17,11 +17,16 @@
             <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
             <link rel="stylesheet" href="{{ asset('theme/vendors/datepicker/dist/css/datepicker.minimal.css') }}">
             <link rel="stylesheet" href="{{ asset('theme/vendors/butterup/butterup.css') }}">
+            <link rel="stylesheet" href="{{ asset('theme/vendors/select2/dist/css/select2.css') }}">
+            <link rel="stylesheet" href="{{ asset('theme/vendors/flatpickr/flatpickr.css') }}">
         {% endblock %}
 
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
             <script src="{{ asset('theme/vendors/butterup/butterup.js') }}"></script>
+            <script src="{{ asset('theme/vendors/jquery/jquery.js') }}"></script>
+            <script src="{{ asset('theme/vendors/select2/dist/js/select2.full.js') }}"></script>
+            <script src="{{ asset('theme/vendors/flatpickr/flatpickr.js') }}"></script>
             <script>
               document.addEventListener("DOMContentLoaded", function() {
                   {% for type, messages in app.flashes %}
@@ -36,6 +41,42 @@
                         });
                     {% endfor %}
                   {% endfor %}
+
+                flatpickr('input[type="date"]', {
+                  dateFormat: "d-m-Y",
+                  allowInput: true
+                });
+
+                flatpickr('input[type="time"]', {
+                  enableTime: true,
+                  noCalendar: true,
+                  dateFormat: "H:i",
+                  time_24hr: true,
+                  allowInput: true,
+                  minuteIncrement: 15
+                });
+
+                flatpickr('input[type="datetime-local"]', {
+                  enableTime: true,
+                  dateFormat: "d-m-Y H:i",
+                  time_24hr: true,
+                  allowInput: true,
+                  minuteIncrement: 15
+                });
+
+                flatpickr('.flatpickr-datetime', {
+                  enableTime: true,
+                  dateFormat: "d-m-Y H:i",
+                  time_24hr: true,
+                  allowInput: true,
+                  minuteIncrement: 15
+                });
+
+                flatpickr('.flatpickr-range', {
+                  mode: "range",
+                  dateFormat: "d-m-Y",
+                  allowInput: true
+                });
               });
             </script>
         {% endblock %}

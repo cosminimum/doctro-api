@@ -122,6 +122,17 @@
     {{ parent() }}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
+        $('#services-select').select2({
+          placeholder: 'Selectează serviciu',
+          allowClear: true,
+          width: '100%',
+          language: {
+            noResults: function() {
+              return "Nu au fost găsite rezultate";
+            }
+          }
+        });
+
         document.getElementById('link-service-btn').addEventListener('click', function() {
           const select = document.getElementById('services-select');
 

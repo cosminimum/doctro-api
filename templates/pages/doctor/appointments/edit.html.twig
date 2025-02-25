@@ -22,7 +22,7 @@
                             {{ form_widget(form.service, {'attr': {'class': 'select'}}) }}
 
                             <label class="form-label font-normal text-gray-900">Data și ora de start a programării</label>
-                            {{ form_widget(form.appointmentStart, {'attr': {'class': 'input'}}) }}
+                            {{ form_widget(form.appointmentStart, {'attr': {'class': 'flatpickr-datetime input'}}) }}
 
                             <label class="form-label font-normal text-gray-900">Prenume</label>
                             {{ form_widget(form.firstName, {'attr': {'class': 'input'}}) }}
@@ -82,7 +82,11 @@
         var calendarEl = document.getElementById('calendar');
         const appointments = {{ appointments|default('[]')|raw }};
         const doctorSchedules = {{ doctorSchedules|default('[]')|raw }};
+
         var businessHoursArray = {};
+        var earliestStart = "23:59:59";
+        var latestEnd = "00:00:00";
+
         doctorSchedules.forEach(schedule => {
           var scheduleDate = new Date(schedule.date);
           var day = scheduleDate.getDay();
@@ -90,6 +94,13 @@
 
           schedule.slots.forEach(slot => {
             if (!slot.isBooked) {
+              if (slot.startTime < earliestStart) {
+                earliestStart = slot.startTime;
+              }
+              if (slot.endTime > latestEnd) {
+                latestEnd = slot.endTime;
+              }
+
               if (!businessHoursArray[day]) {
                 businessHoursArray[day] = {
                   startTime: slot.startTime,
@@ -106,6 +117,21 @@
             }
           });
         });
+
+        if (earliestStart === "23:59:59") earliestStart = "07:00:00";
+        if (latestEnd === "00:00:00") latestEnd = "19:00:00";
+
+        const earliestHour = earliestStart.split(':')[0];
+        const earliestMinute = earliestStart.split(':')[1];
+        let bufferStartTime = earliestStart;
+
+        if (earliestMinute >= "30") {
+          bufferStartTime = `${earliestHour}:${parseInt(earliestMinute) - 30}:00`;
+        } else if (earliestHour > "00") {
+          const newHour = parseInt(earliestHour) - 1;
+          const newMinute = parseInt(earliestMinute) + 30;
+          bufferStartTime = `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}:00`;
+        }
 
         var businessHours = [];
         for (var day in businessHoursArray) {
@@ -131,7 +157,6 @@
         });
 
         var allEvents = appointments.concat(blockedEvents);
-        console.log(blockedEvents)
 
         var calendar = new FullCalendar.Calendar(calendarEl, {
           initialView: 'timeGridWeek',
@@ -139,16 +164,97 @@
           headerToolbar: { left: 'prev,next', center: 'title', right: '' },
           locale: 'ro',
           slotDuration: '00:15:00',
-          slotMinTime: '07:00:00',
-          slotMaxTime: '19:00:00',
+          slotMinTime: bufferStartTime, // Dynamic start time with buffer
+          slotMaxTime: latestEnd,       // Dynamic end time based on actual schedule
           snapDuration: '00:15:00',
           slotLabelInterval: '00:15',
           slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
-
           businessHours: businessHours,
-          events: allEvents
+          events: allEvents,
+          eventContent: function(arg) {
+            // Only show the title (patient name) for regular events
+            if (arg.event.display !== 'background') {
+              return {
+                html: '<div class="fc-event-title">' + arg.event.title + '</div>'
+              };
+            }
+            return null;
+          },
+          eventClick: function(info) {
+            if (info.event.display !== "background") {
+              window.location.href = '/doctor/appointments/' + info.event.id + '/edit';
+            }
+          },
+          dateClick: function(info) {
+            window.location.href = '{{ path("doctor_add_appointment") }}?date=' + encodeURIComponent(info.dateStr);
+          }
         });
         calendar.render();
+
+        flatpickr('#input-repeat-slots', {
+          dateFormat: "d-m-Y",
+          allowInput: true
+        });
+        flatpickr('#input-block-slots', {
+          mode: "range",
+          enableTime: true,
+          dateFormat: "d-m-Y H:i",
+          time_24hr: true,
+          minuteIncrement: 15
+        });
+
+        const saveScheduleBtn = document.getElementById('save-schedule-btn');
+        if(saveScheduleBtn) {
+          saveScheduleBtn.addEventListener('click', async function() {
+            let schedules = {};
+            document.querySelectorAll('.schedule-row').forEach(function(row) {
+              const day = row.getAttribute('data-day');
+              const active = row.querySelector('.active-checkbox').checked;
+              const start = row.querySelector('.start-time').value;
+              const end = row.querySelector('.end-time').value;
+              schedules[day] = { active: active, start: start, end: end };
+            });
+            const repeatUntil = document.getElementById('input-repeat-slots').value;
+            const payload = { repeatUntil: repeatUntil, schedules: schedules };
+
+            try {
+              const response = await fetch('{{ path("doctor_configure_schedule") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              await response.json();
+              window.location.reload()
+            } catch (error) {
+              console.error(error);
+            }
+          });
+        }
+
+        const saveBlockBtn = document.getElementById('save-block-btn');
+        if(saveBlockBtn) {
+          saveBlockBtn.addEventListener('click', async function() {
+            const rangeValue = document.getElementById('input-block-slots').value;
+            const parts = rangeValue.split(' - ');
+            if(parts.length !== 2) {
+              alert('Formatul intervalului este invalid.');
+              return;
+            }
+            const payload = { start: parts[0], end: parts[1] };
+
+            try {
+              const response = await fetch('{{ path("doctor_block_slots") }}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+              });
+              const result = await response.json();
+              alert(result.message);
+            } catch (error) {
+              console.error(error);
+            }
+          });
+        }
       });
     </script>
 {% endblock %}

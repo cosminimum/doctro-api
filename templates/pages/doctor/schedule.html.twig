@@ -1,0 +1,148 @@
+{% extends 'states/doctor-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="card card-grid min-w-full">
+        <div class="card-header flex-wrap py-5">
+            <h3 class="card-title">Gestionare Program</h3>
+            <div class="flex gap-6">
+                <div class="relative">
+                    <i class="ki-filled ki-magnifier leading-none text-md text-gray-500 absolute top-1/2 start-0 -translate-y-1/2 ms-3"></i>
+                    <input class="input input-md ps-8" data-datatable-search="#schedules_table" placeholder="Caută după dată" type="text"/>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div data-datatable="true" data-datatable-page-size="10" id="schedules_table">
+                <div class="scrollable-x-auto">
+                    <table class="table table-fixed table-border" data-datatable-table="true">
+                        <thead>
+                        <tr>
+                            <th class="w-[200px]">
+                              <span class="sort asc">
+                                  <span class="sort-label text-gray-700 font-normal">Data</span>
+                                  <span class="sort-icon"></span>
+                              </span>
+                            </th>
+                            <th class="w-[200px]">
+                              <span class="sort">
+                                  <span class="sort-label text-gray-700 font-normal">Interval Orar</span>
+                                  <span class="sort-icon"></span>
+                              </span>
+                            </th>
+                            <th class="w-[150px]">
+                              <span class="sort">
+                                  <span class="sort-label text-gray-700 font-normal">Status</span>
+                                  <span class="sort-icon"></span>
+                              </span>
+                            </th>
+                            <th class="w-[100px]"></th>
+                        </tr>
+                        </thead>
+                        <tbody id="schedules-table-body">
+                        {% for schedule in schedules %}
+                            {% for slot in schedule.timeSlots %}
+                                <tr id="schedule-row-{{ slot.id }}">
+                                    <td>
+                                        <div class="flex flex-col gap-1.5">
+                                            <span class="leading-none font-medium text-sm text-gray-900">{{ schedule.date|date('d-m-Y') }}</span>
+                                        </div>
+                                    </td>
+                                    <td class="text-sm text-gray-800 font-normal">
+                                        {{ slot.startTime|date('H:i') }} - {{ slot.endTime|date('H:i') }}
+                                    </td>
+                                    <td>
+                                        {% if slot.isBooked %}
+                                            <span class="badge badge-xs badge-outline badge-danger text-2xs -mr-2.5">Rezervat</span>
+                                        {% else %}
+                                            <span class="badge badge-xs badge-outline badge-success text-2xs -mr-2.5">Disponibil</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="text-center">
+                                        {% if not slot.isBooked %}
+                                            <a class="btn btn-sm btn-icon btn-clear btn-light delete-slot"
+                                               data-slot-id="{{ slot.id }}"
+                                               data-url="{{ path('doctor_delete_slot', {'id': slot.id}) }}"
+                                               href="javascript:void(0);">
+                                                <i class="ki-filled ki-trash"></i>
+                                            </a>
+                                        {% else %}
+                                            <span class="text-sm text-gray-500">Nu se poate șterge</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                    <div class="flex items-center gap-2 order-2 md:order-1">Arată
+                        <select class="select select-sm w-16" data-datatable-size="true" name="perpage"></select>
+                        pe pagină
+                    </div>
+                    <div class="flex items-center gap-4 order-1 md:order-2">
+                        <span data-datatable-info="true"></span>
+                        <div class="pagination" data-datatable-pagination="true"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Handler pentru ștergerea intervalelor orare
+        document.getElementById('schedules_table').addEventListener('click', function(e) {
+          const deleteBtn = e.target.closest('.delete-slot');
+          if (deleteBtn) {
+            e.preventDefault();
+            const slotId = deleteBtn.getAttribute('data-slot-id');
+            const url = deleteBtn.getAttribute('data-url');
+
+            if (confirm('Sigur doriți să ștergeți acest interval orar?')) {
+              fetch(url, {
+                method: 'POST',
+                headers: {
+                  'X-Requested-With': 'XMLHttpRequest'
+                }
+              })
+                .then(response => response.json())
+                .then(result => {
+                  if (result.success) {
+                    const row = document.getElementById('schedule-row-' + slotId);
+                    if (row) {
+                      row.remove();
+                    }
+                    butterup.toast({
+                      title: 'Succes',
+                      message: 'Intervalul orar a fost șters cu succes.',
+                      location: 'top-right',
+                      type: 'success'
+                    });
+                  } else {
+                    butterup.toast({
+                      title: 'Eroare',
+                      message: result.message || 'A apărut o eroare la ștergerea intervalului orar.',
+                      location: 'top-right',
+                      type: 'error'
+                    });
+                  }
+                })
+                .catch(error => {
+                  console.error('Error:', error);
+                  butterup.toast({
+                    title: 'Eroare',
+                    message: 'A apărut o eroare la ștergerea intervalului orar.',
+                    location: 'top-right',
+                    type: 'error'
+                  });
+                });
+            }
+          }
+        });
+      });
+    </script>
+{% endblock %}

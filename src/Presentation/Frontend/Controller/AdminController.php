@@ -6,6 +6,7 @@ namespace App\Presentation\Frontend\Controller;
 
 use App\Application\Story\DoctorRegisterStory;
 use App\Domain\Dto\UserCreateRequestDto;
+use App\Infrastructure\Entity\Doctor;
 use App\Infrastructure\Entity\HospitalService;
 use App\Infrastructure\Entity\HospitalSettings;
 use App\Infrastructure\Entity\MedicalSpecialty;
@@ -23,6 +24,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 class AdminController extends AbstractController
@@ -31,18 +33,29 @@ class AdminController extends AbstractController
     public function doctorList(
         Request $request,
         DoctorRepository $doctorRepository,
-        DoctorRegisterStory $doctorRegisterStory
+        UserPasswordHasherInterface $passwordHasher,
+        EntityManagerInterface $em
     ): Response {
-        $form = $this->createForm(RegistrationFormType::class);
+        $form = $this->createForm(AdminDoctorFormType::class);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            /** @var User $user */
-            $user = $form->getData();
+            /** @var Doctor $doctor */
+            $doctor = $form->getData();
 
             /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
-            $doctorRegisterStory->register($user, $plainPassword);
+
+            $hashedPassword = $passwordHasher->hashPassword(
+                $doctor,
+                $plainPassword
+            );
+
+            $doctor->setPassword($hashedPassword);
+            $doctor->setRoles([Doctor::BASE_ROLE]);
+
+            $em->persist($doctor);
+            $em->flush();
 
             $this->addFlash('success', 'Doctorul a fost creat cu succes.');
             return $this->redirectToRoute('admin_doctors');
@@ -58,6 +71,7 @@ class AdminController extends AbstractController
     public function editDoctor(
         Request $request,
         DoctorRepository $doctorRepository,
+        UserPasswordHasherInterface $passwordHasher,
         int $id,
         EntityManagerInterface $em
     ): Response {
@@ -66,10 +80,19 @@ class AdminController extends AbstractController
             throw $this->createNotFoundException('Doctorul nu a fost găsit.');
         }
 
-        $form = $this->createForm(RegistrationFormType::class, $doctor);
+        $form = $this->createForm(AdminDoctorFormType::class, $doctor);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('plainPassword')->getData();
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword(
+                    $doctor,
+                    $plainPassword
+                );
+                $doctor->setPassword($hashedPassword);
+            }
+
             $em->flush();
             $this->addFlash('success', 'Doctorul a fost actualizat cu succes.');
             return $this->redirectToRoute('admin_doctors');

@@ -38,6 +38,20 @@
                         <option selected disabled>Alege medic</option>
                     </select>
                 </div>
+                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <label class="form-label">De la:</label>
+                        <input id="date-from" class="input input-lg" type="text" placeholder="Selectează data de început">
+                    </div>
+                </div>
+
+                <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2">
+                    <div class="flex items-center gap-2.5">
+                        <label class="form-label">Până la:</label>
+                        <input id="date-to" class="input input-lg" type="text" placeholder="Selectează data de sfârșit">
+                    </div>
+                </div>
+
             </div>
         </div>
         <div id="slots-container" class="flex flex-col grow">
@@ -124,6 +138,22 @@
     {{ parent() }}
     <script>
       document.addEventListener('DOMContentLoaded', function() {
+        flatpickr('#date-from', {
+          dateFormat: "d-m-Y",
+          allowInput: true
+        });
+
+        flatpickr('#date-to', {
+          dateFormat: "d-m-Y",
+          allowInput: true
+        });
+
+        const dateFrom = document.getElementById('date-from');
+        const dateTo = document.getElementById('date-to');
+
+        dateFrom.addEventListener('change', searchAvailableSlots);
+        dateTo.addEventListener('change', searchAvailableSlots);
+
         const formElements = {
           specialty: document.getElementById('select-specialty'),
           service: document.getElementById('select-service'),
@@ -242,15 +272,20 @@
           const container = document.getElementById('slots-container');
           const content = document.getElementById('slots-content');
           if (!formElements.service.value) return;
+
           container.classList.remove('hidden');
           content.innerHTML = '<div class="text-center"><div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div></div>';
+
           try {
             const isDoctorSelected = (value) => value && value !== "Alege";
             const params = new URLSearchParams({
               specialty: formElements.specialty.value,
               service: formElements.service.value,
-              ...(isDoctorSelected(formElements.doctor.value) && { doctor: formElements.doctor.value })
+              ...(isDoctorSelected(formElements.doctor.value) && { doctor: formElements.doctor.value }),
+              ...(dateFrom.value && { dateFrom: dateFrom.value }),
+              ...(dateTo.value && { dateTo: dateTo.value })
             });
+
             const response = await fetch(`/api/slots?${params}`);
             if (!response.ok) throw new Error('Network response was not ok');
             const html = await response.text();

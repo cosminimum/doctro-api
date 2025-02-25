@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\Length;
 
 class DoctorAppointmentFormType extends AbstractType
 {
@@ -30,18 +31,27 @@ class DoctorAppointmentFormType extends AbstractType
                 'placeholder' => 'Selectează un serviciu',
             ])
             ->add('appointmentStart', DateTimeType::class, [
+                'format' => 'dd-MM-yyyy HH:mm',
                 'widget' => 'single_text',
-                'label' => 'Data și ora de start a programării',
-                'minutes' => [0, 15, 30, 45],
+                'html5' => false, // Set to false to prevent native HTML5 date picker
                 'attr' => [
-                    'step' => 900
+                    'class' => 'flatpickr-datetime',
+                    'placeholder' => 'Selectează dată'
                 ]
             ])
             ->add('firstName', TextType::class)
             ->add('lastName', TextType::class)
             ->add('email', EmailType::class)
             ->add('phone', TextType::class)
-            ->add('cnp', TextType::class)
+            ->add('cnp', TextType::class, [
+                'constraints' => [
+                    new Length([
+                        'min' => 13,
+                        'max' => 13,
+                        'exactMessage' => 'Câmpul trebuie să aibă exact 13 caractere.'
+                    ])
+                ]
+            ])
         ;
     }
 

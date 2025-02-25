@@ -7,16 +7,68 @@
         </div>
         <div class="card-body">
             {{ form_start(doctorForm) }}
-            {{ form_row(doctorForm.firstName) }}
-            {{ form_row(doctorForm.lastName) }}
-            {{ form_row(doctorForm.email) }}
-            {{ form_row(doctorForm.cnp) }}
-            {{ form_row(doctorForm.phone) }}
-            {{ form_row(doctorForm.plainPassword) }}
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Prenume</label>
+                {{ form_widget(doctorForm.firstName, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Nume</label>
+                {{ form_widget(doctorForm.lastName, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Email</label>
+                {{ form_widget(doctorForm.email, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">CNP</label>
+                {{ form_widget(doctorForm.cnp, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Telefon</label>
+                {{ form_widget(doctorForm.phone, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Parolă</label>
+                {{ form_widget(doctorForm.plainPassword, {'attr': {'class': 'input'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Specialități</label>
+                {{ form_widget(doctorForm.medicalSpecialties, {'attr': {'class': 'input select select2-multiple'}}) }}
+            </div>
+
+            <div class="flex flex-col gap-1">
+                <label class="form-label text-gray-900">Servicii</label>
+                {{ form_widget(doctorForm.hospitalServices, {'attr': {'class': 'input select select2-multiple'}}) }}
+            </div>
+
             <div class="flex justify-end pt-2.5">
                 <button type="submit" class="btn btn-primary">Actualizează</button>
             </div>
             {{ form_end(doctorForm) }}
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        $('.select2-multiple').select2({
+          placeholder: 'Selectează opțiuni',
+          allowClear: true,
+          width: '100%',
+          language: {
+            noResults: function() {
+              return "Nu au fost găsite rezultate";
+            }
+          }
+        });
+      });
+    </script>
 {% endblock %}

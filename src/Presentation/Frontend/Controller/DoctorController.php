@@ -548,15 +548,15 @@ class DoctorController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         if (!$data || !isset($data['repeatUntil'], $data['schedules'])) {
-            $this->addFlash('error', 'Payload invalid');
             return new JsonResponse(['success' => false, 'message' => 'Payload invalid'], 400);
         }
 
         $repeatUntil = \DateTime::createFromFormat('d/m/Y', $data['repeatUntil']);
         if (!$repeatUntil) {
-            $this->addFlash('error', 'Data "repeta pana la" invalidă');
             return new JsonResponse(['success' => false, 'message' => 'Data "repeta pana la" invalidă'], 400);
         }
+
+        $repeatWeekType = $data['repeatWeekType'] ?? 'all';
 
         $doctor = $this->getUser();
         $today = new \DateTime();
@@ -577,6 +577,19 @@ class DoctorController extends AbstractController
 
         foreach ($period as $date) {
             $dayNumber = (int)$date->format('N'); // 1-7
+
+            // Verifică dacă săptămâna curentă corespunde cu tipul de repetiție selectat
+            $weekNumber = (int)$date->format('W');
+            $isEvenWeek = $weekNumber % 2 === 0;
+
+            if ($repeatWeekType === 'even' && !$isEvenWeek) {
+                continue; // Sărim dacă e săptămână impară și utilizatorul a selectat doar săptămâni pare
+            }
+
+            if ($repeatWeekType === 'odd' && $isEvenWeek) {
+                continue; // Sărim dacă e săptămână pară și utilizatorul a selectat doar săptămâni impare
+            }
+
             $scheduleConfig = null;
             foreach ($data['schedules'] as $dayName => $config) {
                 if (isset($dayNameToNumber[$dayName]) && $dayNameToNumber[$dayName] === $dayNumber && !empty($config['active'])) {
@@ -584,6 +597,7 @@ class DoctorController extends AbstractController
                     break;
                 }
             }
+
             if ($scheduleConfig) {
                 $existingSchedule = $em->getRepository(DoctorSchedule::class)->findOneBy([
                     'doctor' => $doctor,
@@ -592,7 +606,13 @@ class DoctorController extends AbstractController
 
                 if ($existingSchedule) {
                     foreach ($existingSchedule->getTimeSlots() as $slot) {
-                        $em->remove($slot);
+                        // Verifică dacă slotul este liber înainte de a-l șterge
+                        if (!$slot->isBooked()) {
+                            $em->remove($slot);
+                        } else {
+                            // Skip creating new slots for this day if there are booked slots
+                            continue 2;
+                        }
                     }
                 } else {
                     $existingSchedule = new DoctorSchedule();
@@ -604,7 +624,6 @@ class DoctorController extends AbstractController
                 $startTime = \DateTime::createFromFormat('H:i', $scheduleConfig['start']);
                 $endTime   = \DateTime::createFromFormat('H:i', $scheduleConfig['end']);
                 if (!$startTime || !$endTime) {
-                    $this->addFlash('error', 'Format orar invalid');
                     return new JsonResponse(['success' => false, 'message' => 'Format orar invalid'], 400);
                 }
 
@@ -632,7 +651,6 @@ class DoctorController extends AbstractController
         }
 
         $em->flush();
-        $this->addFlash('success', 'Program configurat cu succes.');
         return new JsonResponse(['success' => true, 'message' => 'Program configurat cu succes.']);
     }
 
@@ -724,5 +742,82 @@ class DoctorController extends AbstractController
             200,
             ['Content-Type' => 'application/pdf']
         );
+    }
+
+    #[Route('/doctor/schedules', name: 'doctor_manage_schedules')]
+    public function manageSchedules(EntityManagerInterface $em): Response
+    {
+        $doctor = $this->getUser();
+
+        $schedules = $em->getRepository(DoctorSchedule::class)
+            ->createQueryBuilder('ds')
+            ->where('ds.doctor = :doctor')
+            ->setParameter('doctor', $doctor)
+            ->orderBy('ds.date', 'DESC')
+            ->getQuery()
+            ->getResult();
+
+        return $this->render('pages/doctor/schedule.html.twig', [
+            'schedules' => $schedules
+        ]);
+    }
+
+    #[Route('/doctor/slot/{id}/delete', name: 'doctor_delete_slot', methods: ['POST'])]
+    public function deleteSlot(
+        int $id,
+        Request $request,
+        EntityManagerInterface $em
+    ): JsonResponse {
+        $slot = $em->getRepository(TimeSlot::class)->find($id);
+
+        if (!$slot) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Intervalul orar nu a fost găsit'
+            ], 404);
+        }
+
+        if ($slot->getSchedule()->getDoctor()->getId() !== $this->getUser()->getId()) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Nu aveți permisiunea de a șterge acest interval orar'
+            ], 403);
+        }
+
+        if ($slot->isBooked()) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Nu puteți șterge un interval orar rezervat'
+            ], 400);
+        }
+
+        $appointments = $em->getRepository(Appointment::class)
+            ->createQueryBuilder('a')
+            ->where('a.timeSlot = :timeSlot')
+            ->setParameter('timeSlot', $slot)
+            ->getQuery()
+            ->getResult();
+
+        if (count($appointments) > 0) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Nu puteți șterge un interval orar care are programări'
+            ], 400);
+        }
+
+        try {
+            $em->remove($slot);
+            $em->flush();
+
+            return new JsonResponse([
+                'success' => true,
+                'message' => 'Intervalul orar a fost șters cu succes'
+            ]);
+        } catch (\Exception $e) {
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'A apărut o eroare la ștergerea intervalului orar: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }

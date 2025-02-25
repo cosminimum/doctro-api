@@ -62,80 +62,112 @@ class AppointmentController extends AbstractController
 
             $patient = $this->getUser();
             if (!$patient) {
-                $patient = $patientRegisterStory->register(new UserCreateRequestDto($data['email'], $data['firstName'], $data['lastName'], $data['cnp'], $data['phone'], base64_encode(random_bytes(10))));
+                try {
+                    $patient = $patientRegisterStory->register(new UserCreateRequestDto(
+                        $data['email'],
+                        $data['firstName'],
+                        $data['lastName'],
+                        $data['cnp'],
+                        $data['phone'],
+                        base64_encode(random_bytes(10))
+                    ));
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Nu s-a putut crea contul: ' . $e->getMessage());
+                    return $this->render('pages/appointments/index.html.twig', [
+                        'form' => $form->createView(),
+                        'specialties' => $medicalSpecialtyRepository->findAll(),
+                        'isEdit' => false
+                    ]);
+                }
             }
 
             $doctor = $doctorRepository->find($data['doctorId']);
             if (!$doctor) {
                 $this->addFlash('error', 'Doctorul selectat nu există.');
-                return $this->render('pages/patient/appointments/new.html.twig', [
-                    'form' => $form->createView()
+                return $this->render('pages/appointments/index.html.twig', [
+                    'form' => $form->createView(),
+                    'specialties' => $medicalSpecialtyRepository->findAll(),
+                    'isEdit' => false
                 ]);
             }
 
             $specialty = $medicalSpecialtyRepository->find($data['specialtyId']);
-            $service   = $hospitalServiceRepository->find($data['serviceId']);
+            $service = $hospitalServiceRepository->find($data['serviceId']);
             $timeSlot = $timeSlotRepository->find($data['slotId']);
 
-            $duration = (int)$service->getDuration();
-            $requiredSlots = $duration / 15;
+            if (!$timeSlot) {
+                $this->addFlash('error', 'Intervalul orar selectat nu există.');
+                return $this->render('pages/appointments/index.html.twig', [
+                    'form' => $form->createView(),
+                    'specialties' => $medicalSpecialtyRepository->findAll(),
+                    'isEdit' => false
+                ]);
+            }
 
             $schedule = $timeSlot->getSchedule();
 
             if (!$schedule) {
                 $this->addFlash('error', 'Nu există program pentru data selectată.');
-                if ($this->getUser()) {
-                    return $this->render('pages/appointments/identified.html.twig', [
-                        'form' => $form->createView()
-                    ]);
-                } else {
-                    return $this->render('pages/appointments/anonymous.html.twig', [
-                        'form' => $form->createView()
-                    ]);
-                }
+                return $this->render('pages/appointments/index.html.twig', [
+                    'form' => $form->createView(),
+                    'specialties' => $medicalSpecialtyRepository->findAll(),
+                    'isEdit' => false
+                ]);
             }
+
+            $duration = (int)$service->getDuration();
+            $requiredSlots = ceil($duration / 15);
 
             $timeslots = $schedule->getTimeSlots()->toArray();
             usort($timeslots, function($a, $b) {
                 return $a->getStartTime() <=> $b->getStartTime();
             });
 
-            $block = [];
-            foreach ($timeslots as $slot) {
-                if ($slot->isBooked()) {
-                    continue;
-                }
-                $slotStart = $slot->getStartTime()->format('H:i');
-
-                if (empty($block)) {
-                    if ($slotStart === $slot->getStartTime()) {
-                        $block[] = $slot;
-                    }
-                } else {
-                    $prevSlot = end($block);
-                    $expectedStart = $prevSlot->getEndTime()->format('H:i');
-                    if ($slotStart === $expectedStart) {
-                        $block[] = $slot;
-                    } else {
-                        break;
-                    }
-                }
-                if (count($block) == $requiredSlots) {
+            $selectedSlotIndex = -1;
+            foreach ($timeslots as $index => $slot) {
+                if ($slot->getId() === $timeSlot->getId()) {
+                    $selectedSlotIndex = $index;
                     break;
                 }
             }
 
+            if ($selectedSlotIndex === -1) {
+                $this->addFlash('error', 'Intervalul orar selectat nu a fost găsit în programul medicului.');
+                return $this->render('pages/appointments/index.html.twig', [
+                    'form' => $form->createView(),
+                    'specialties' => $medicalSpecialtyRepository->findAll(),
+                    'isEdit' => false
+                ]);
+            }
+
+            $block = [];
+            for ($i = $selectedSlotIndex; $i < count($timeslots) && count($block) < $requiredSlots; $i++) {
+                $slot = $timeslots[$i];
+
+                if ($slot->isBooked()) {
+                    break;
+                }
+
+                if (!empty($block)) {
+                    $prevSlot = end($block);
+                    $expectedStart = $prevSlot->getEndTime()->format('H:i');
+                    $currentStart = $slot->getStartTime()->format('H:i');
+
+                    if ($expectedStart !== $currentStart) {
+                        break;
+                    }
+                }
+
+                $block[] = $slot;
+            }
+
             if (count($block) < $requiredSlots) {
                 $this->addFlash('error', 'Nu există suficiente intervale orare consecutive disponibile pentru serviciul selectat.');
-                if ($this->getUser()) {
-                    return $this->render('pages/appointments/identified.html.twig', [
-                        'form' => $form->createView()
-                    ]);
-                } else {
-                    return $this->render('pages/appointments/anonymous.html.twig', [
-                        'form' => $form->createView()
-                    ]);
-                }
+                return $this->render('pages/appointments/index.html.twig', [
+                    'form' => $form->createView(),
+                    'specialties' => $medicalSpecialtyRepository->findAll(),
+                    'isEdit' => false
+                ]);
             }
 
             foreach ($block as $slot) {
@@ -149,7 +181,7 @@ class AppointmentController extends AbstractController
             $appointment->setMedicalSpecialty($specialty);
             $appointment->setHospitalService($service);
             $appointment->setTimeSlot($block[0]);
-            $appointment->setIsActive(false);
+            $appointment->setIsActive(true);
 
             $em->persist($appointment);
             $em->flush();
@@ -158,11 +190,10 @@ class AppointmentController extends AbstractController
             return $this->redirectToRoute('homepage');
         }
 
-
         return $this->render('pages/appointments/index.html.twig', [
             'form' => $form->createView(),
             'isEdit' => false,
-            'specialties' => $medicalSpecialtyRepository->findAll([])
+            'specialties' => $medicalSpecialtyRepository->findAll()
         ]);
     }
 
@@ -355,18 +386,28 @@ class AppointmentController extends AbstractController
     #[Route('/api/slots', name: 'api_slots', methods: ['GET'])]
     public function getSlots(Request $request): Response
     {
+        $specialty = $request->query->getInt('specialty');
+        $service = $request->query->getInt('service');
+        $doctor = $request->query->get('doctor');
+
+        $dateFrom = $request->query->get('dateFrom');
+        $startDate = $dateFrom ? new \DateTime($dateFrom) : new \DateTime();
+
+        $dateTo = $request->query->get('dateTo');
+        $endDate = $dateTo ? new \DateTime($dateTo) : (new \DateTime())->modify('+3 months');
+
         $slots = $this->appointmentStory->findAvailableSlots([
-            'specialty' => $request->query->getInt('specialty'),
-            'service' => $request->query->getInt('service'),
-            'doctor' => $request->query->get('doctor'),
-            'startDate' => new \DateTime(),
-            'endDate' => (new \DateTime())->modify('+3 months'),
+            'specialty' => $specialty,
+            'service' => $service,
+            'doctor' => $doctor,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
         ]);
 
         return $this->render('pages/appointments/components/slots.html.twig', [
             'slots' => $slots,
-            'specialty' => $this->medicalSpecialtyRepository->find($request->query->getInt('specialty')),
-            'service' => $this->hospitalServiceRepository->find($request->query->getInt('service')),
+            'specialty' => $this->medicalSpecialtyRepository->find($specialty),
+            'service' => $this->hospitalServiceRepository->find($service),
             'user' => $this->getUser(),
         ]);
     }
