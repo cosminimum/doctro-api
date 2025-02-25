@@ -10,7 +10,7 @@ use App\Infrastructure\Entity\User;
 
 interface DoctorRepositoryInterface
 {
-    public function addDoctor(User $user): int;
+    public function addDoctor(User $user, string $plainPassword): int;
 
     /** @return DoctorDto[] */
     public function getDoctorListByFilters(?DoctorListRequestDto $requestDto): array;

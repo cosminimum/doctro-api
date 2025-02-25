@@ -39,7 +39,10 @@ class AdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $form->getData();
-            $doctorRegisterStory->register($user);
+
+            /** @var string $plainPassword */
+            $plainPassword = $form->get('plainPassword')->getData();
+            $doctorRegisterStory->register($user, $plainPassword);
 
             $this->addFlash('success', 'Doctorul a fost creat cu succes.');
             return $this->redirectToRoute('admin_doctors');

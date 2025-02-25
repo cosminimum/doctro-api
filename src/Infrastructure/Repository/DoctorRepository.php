@@ -25,7 +25,7 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
         parent::__construct($registry, Doctor::class);
     }
 
-    public function addDoctor(User $user): int
+    public function addDoctor(User $user, string $plainPassword): int
     {
         $doctor = (new Doctor())
             ->setEmail($user->getEmail())
@@ -37,7 +37,7 @@ class DoctorRepository extends ServiceEntityRepository implements DoctorReposito
 
         $newPassword = $this->passwordHasher->hashPassword(
             $doctor,
-            $user->getPassword()
+            $plainPassword
         );
 
         $doctor->setPassword($newPassword);

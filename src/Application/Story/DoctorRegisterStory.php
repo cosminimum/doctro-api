@@ -13,9 +13,9 @@ class DoctorRegisterStory
     ) {
     }
 
-    public function register(User $user): int
+    public function register(User $user, string $plainPassword): int
     {
-        $userId = $this->patientRepository->addDoctor($user);
+        $userId = $this->patientRepository->addDoctor($user, $plainPassword);
 
         // todo: additional stuff after register action
 
