@@ -55,7 +55,7 @@
                 <div class="flex gap-2">
                     <div class="input input-sm max-w-48">
                         <i class="ki-filled ki-magnifier"></i>
-                        <input placeholder="Caută programări" type="text"/>
+                        <input placeholder="Caută programări" type="text" data-datatable-search="#appointment_table"/>
                     </div>
                     <div>
                         <a href="#" class="btn btn-sm btn-light">Descarcă</a>
@@ -63,7 +63,7 @@
                 </div>
             </div>
             <div class="card-body">
-                <div data-datatable="true" data-datatable-page-size="5">
+                <div data-datatable="true" data-datatable-page-size="5" id="appointment_table">
                     <div class="scrollable-x-auto">
                         <table class="table table-border" data-datatable-table="true">
                             <thead>
