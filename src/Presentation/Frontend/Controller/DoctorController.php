@@ -551,7 +551,7 @@ class DoctorController extends AbstractController
             return new JsonResponse(['success' => false, 'message' => 'Payload invalid'], 400);
         }
 
-        $repeatUntil = \DateTime::createFromFormat('d/m/Y', $data['repeatUntil']);
+        $repeatUntil = \DateTime::createFromFormat('d-m-Y', $data['repeatUntil']);
         if (!$repeatUntil) {
             return new JsonResponse(['success' => false, 'message' => 'Data "repeta pana la" invalidă'], 400);
         }
