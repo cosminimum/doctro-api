@@ -548,11 +548,13 @@ class DoctorController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         if (!$data || !isset($data['repeatUntil'], $data['schedules'])) {
+            $this->addFlash('error', 'Payload invalid');
             return new JsonResponse(['success' => false, 'message' => 'Payload invalid'], 400);
         }
 
         $repeatUntil = \DateTime::createFromFormat('d-m-Y', $data['repeatUntil']);
         if (!$repeatUntil) {
+            $this->addFlash('error', 'Data "repeta pana la" invalidă');
             return new JsonResponse(['success' => false, 'message' => 'Data "repeta pana la" invalidă'], 400);
         }
 
@@ -578,16 +580,15 @@ class DoctorController extends AbstractController
         foreach ($period as $date) {
             $dayNumber = (int)$date->format('N'); // 1-7
 
-            // Verifică dacă săptămâna curentă corespunde cu tipul de repetiție selectat
             $weekNumber = (int)$date->format('W');
             $isEvenWeek = $weekNumber % 2 === 0;
 
             if ($repeatWeekType === 'even' && !$isEvenWeek) {
-                continue; // Sărim dacă e săptămână impară și utilizatorul a selectat doar săptămâni pare
+                continue;
             }
 
             if ($repeatWeekType === 'odd' && $isEvenWeek) {
-                continue; // Sărim dacă e săptămână pară și utilizatorul a selectat doar săptămâni impare
+                continue;
             }
 
             $scheduleConfig = null;
@@ -606,11 +607,9 @@ class DoctorController extends AbstractController
 
                 if ($existingSchedule) {
                     foreach ($existingSchedule->getTimeSlots() as $slot) {
-                        // Verifică dacă slotul este liber înainte de a-l șterge
                         if (!$slot->isBooked()) {
                             $em->remove($slot);
                         } else {
-                            // Skip creating new slots for this day if there are booked slots
                             continue 2;
                         }
                     }
@@ -624,6 +623,7 @@ class DoctorController extends AbstractController
                 $startTime = \DateTime::createFromFormat('H:i', $scheduleConfig['start']);
                 $endTime   = \DateTime::createFromFormat('H:i', $scheduleConfig['end']);
                 if (!$startTime || !$endTime) {
+                    $this->addFlash('error', 'Format orar invalid');
                     return new JsonResponse(['success' => false, 'message' => 'Format orar invalid'], 400);
                 }
 
@@ -651,6 +651,7 @@ class DoctorController extends AbstractController
         }
 
         $em->flush();
+        $this->addFlash('success', 'Program configurat cu succes.');
         return new JsonResponse(['success' => true, 'message' => 'Program configurat cu succes.']);
     }
 
