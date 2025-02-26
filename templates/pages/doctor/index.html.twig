@@ -201,7 +201,8 @@
       let bufferStartTime = earliestStart;
 
       if (earliestMinute >= "30") {
-        bufferStartTime = `${earliestHour}:${parseInt(earliestMinute) - 30}:00`;
+        const adjustedMinutes = parseInt(earliestMinute) - 30;
+        bufferStartTime = `${earliestHour}:${adjustedMinutes.toString().padStart(2, '0')}:00`;
       } else if (earliestHour > "00") {
         const newHour = parseInt(earliestHour) - 1;
         const newMinute = parseInt(earliestMinute) + 30;
@@ -240,7 +241,7 @@
         headerToolbar: { left: 'prev,next', center: 'title', right: '' },
         locale: 'ro',
         slotDuration: '00:15:00',
-        slotMinTime: "09:00:00",
+        slotMinTime: bufferStartTime,
         slotMaxTime: latestEnd,
         snapDuration: '00:15:00',
         slotLabelInterval: '00:15',
