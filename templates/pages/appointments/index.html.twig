@@ -39,17 +39,17 @@
                     </select>
                 </div>
                 <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2">
-                    <div class="flex items-center gap-2.5">
-                        <label class="form-label">De la:</label>
-                        <input id="date-from" class="input input-lg" type="text" placeholder="Selectează data de început">
-                    </div>
+                    <div class="flex items-center gap-2.5"><label class="form-label">De la:</label></div>
+                    <div class="flex items-center gap-2.5"><input id="date-from" class="input" type="text" placeholder="Selectează data de început"></div>
                 </div>
 
                 <div class="flex flex-col grow relative before:absolute before:left-[11px] before:top-0 before:bottom-0 mb-2">
-                    <div class="flex items-center gap-2.5">
-                        <label class="form-label">Până la:</label>
-                        <input id="date-to" class="input input-lg" type="text" placeholder="Selectează data de sfârșit">
-                    </div>
+                    <div class="flex items-center gap-2.5"><label class="form-label">Până la:</label></div>
+                    <div class="flex items-center gap-2.5"><input id="date-to" class="input" type="text" placeholder="Selectează data de sfârșit"></div>
+                </div>
+
+                <div class="flex">
+                    <button id="reset-filters" class="btn btn-light">Resetează</button>
                 </div>
 
             </div>
@@ -348,6 +348,28 @@
               openAppointmentPopup(data);
             }, 500);
           }, 500);
+        }
+
+        const resetButton = document.getElementById('reset-filters');
+
+        if (resetButton) {
+          resetButton.addEventListener('click', function() {
+            formElements.specialty.selectedIndex = 0;
+
+            formElements.service.innerHTML = '<option selected disabled>Alege serviciul</option>';
+            formElements.service.disabled = true;
+
+            formElements.doctor.innerHTML = '<option selected disabled>Alege medic</option>';
+            formElements.doctor.disabled = true;
+
+            const dateFromPicker = dateFrom._flatpickr;
+            const dateToPicker = dateTo._flatpickr;
+            if (dateFromPicker) dateFromPicker.clear();
+            if (dateToPicker) dateToPicker.clear();
+
+            const slotsContent = document.getElementById('slots-content');
+            if (slotsContent) slotsContent.innerHTML = '';
+          });
         }
       });
     </script>

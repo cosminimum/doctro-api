@@ -73,6 +73,25 @@
                       </div>
                       <div class="w-full">
                         <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 mb-7">
+                          <label class="form-label max-w-56">Serviciul</label>
+                          <div class="flex flex-col items-start grow gap-3 w-full">
+                            <select id="service-select" class="select">
+                              <option value="" disabled selected>Selectați un serviciu</option>
+                              {% for service in services %}
+                                <option
+                                        value="{{ service.id }}"
+                                        data-color="{{ service.color|default('#3788d8') }}"
+                                        data-duration="{{ service.duration }}"
+                                >
+                                  {{ service.name }}
+                                </option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="w-full">
+                        <div class="flex items-baseline flex-wrap lg:flex-nowrap gap-2.5 mb-7">
                           <label class="form-label max-w-56">Repetă până la</label>
                           <div class="flex flex-col items-start grow gap-3 w-full">
                             <input id="input-repeat-slots" class="input" type="text" placeholder="23-02-2025">
@@ -138,6 +157,42 @@
           </div>
           <div class="card-group flex items-center justify-between py-4 gap-2.5">
             <div class="flex flex-col justify-center gap-1.5">
+              <span class="leading-none font-medium text-sm text-gray-900">Stergeți intervale de timp</span>
+              <span class="text-2sm text-gray-700">Stergeți intervale specifice setate anterior.</span>
+            </div>
+            <button class="btn btn-sm btn-light btn-outline" data-modal-toggle="#remove-slots">Stergeți</button>
+            <div class="modal" data-modal="true" id="remove-slots">
+              <div class="modal-content modal-center max-w-[600px] w-full">
+                <div class="modal-header justify-end border-0 pt-5">
+                  <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                    <i class="ki-filled ki-cross"></i>
+                  </button>
+                </div>
+                <div class="modal-body">
+                  <div class="card">
+                    <div class="card-header">
+                      <h3 class="card-title">Stergeți intervalele de timp</h3>
+                    </div>
+                    <div class="card-body">
+                      <div class="grid gap-5 mb-7">
+                        <div class="flex items-center justify-between flex-wrap border border-gray-200 rounded-xl gap-2 px-3.5 py-2.5">
+                          <div class="flex flex-col gap-px w-full">
+                            <label for="input-remove-slots" class="mb-2">Interval (ex.: 2025-02-01 18:00 - 2025-03-01 18:00)</label>
+                            <input id="input-remove-slots" class="input w-100" type="text" placeholder="YYYY-MM-DD HH:mm - YYYY-MM-DD HH:mm">
+                          </div>
+                        </div>
+                      </div>
+                      <div class="flex justify-end pt-2.5">
+                        <button class="btn btn-primary" id="save-remove-btn">Salvează</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-group flex items-center justify-between py-4 gap-2.5">
+            <div class="flex flex-col justify-center gap-1.5">
               <span class="leading-none font-medium text-sm text-gray-900">Printați programările de astăzi</span>
               <span class="text-2sm text-gray-700">Generați rapid o listă imprimabilă cu întâlnirile și evenimentele programate pentru ziua curentă.</span>
             </div>
@@ -157,8 +212,17 @@
       var calendarEl = document.getElementById('calendar');
       const appointments = {{ appointments|default('[]')|raw }};
       const doctorSchedules = {{ doctorSchedules|default('[]')|raw }};
+      const services = {{ services|json_encode()|raw }}; // Make sure to pass services to the template
 
-      var businessHoursArray = {};
+      // Create a map of service colors by ID for quick lookup
+      const serviceColors = {};
+      services.forEach(service => {
+        serviceColors[service.id] = service.color || '#3788d8';
+      });
+
+      // Instead of using businessHours (which only takes one color),
+      // we'll create background events for each slot with the appropriate service color
+      var businessHourEvents = [];
       var earliestStart = "23:59:59";
       var latestEnd = "00:00:00";
 
@@ -176,19 +240,23 @@
               latestEnd = slot.endTime;
             }
 
-            if (!businessHoursArray[day]) {
-              businessHoursArray[day] = {
-                startTime: slot.startTime,
-                endTime: slot.endTime
-              };
-            } else {
-              if (slot.startTime < businessHoursArray[day].startTime) {
-                businessHoursArray[day].startTime = slot.startTime;
-              }
-              if (slot.endTime > businessHoursArray[day].endTime) {
-                businessHoursArray[day].endTime = slot.endTime;
-              }
-            }
+            // Get the service color for this slot
+            const serviceColor = slot.serviceId && serviceColors[slot.serviceId]
+                    ? serviceColors[slot.serviceId]
+                    : '#3788d8';
+
+            // Create a recurring business hours event for this slot with the service color
+            businessHourEvents.push({
+              daysOfWeek: [day],
+              startTime: slot.startTime,
+              endTime: slot.endTime,
+              display: 'background',
+              backgroundColor: serviceColor,
+              // Make these non-interactive
+              interactive: false,
+              // Add a custom property to identify these as business hours
+              businessHour: true
+            });
           }
         });
       });
@@ -209,15 +277,6 @@
         bufferStartTime = `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}:00`;
       }
 
-      var businessHours = [];
-      for (var day in businessHoursArray) {
-        businessHours.push({
-          daysOfWeek: [parseInt(day)],
-          startTime: businessHoursArray[day].startTime,
-          endTime: businessHoursArray[day].endTime
-        });
-      }
-
       var blockedEvents = [];
       doctorSchedules.forEach(schedule => {
         schedule.slots.forEach(slot => {
@@ -232,24 +291,24 @@
         });
       });
 
-      var allEvents = appointments.concat(blockedEvents);
+      // Combine all events: appointments, blocked slots, and business hour events
+      var allEvents = [...appointments, ...blockedEvents, ...businessHourEvents];
 
-      console.log(bufferStartTime,latestEnd)
       var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'timeGridWeek',
         allDaySlot: false,
-        headerToolbar: { left: 'prev,next', center: 'title', right: '' },
+        headerToolbar: {left: 'prev,next', center: 'title', right: ''},
         locale: 'ro',
         slotDuration: '00:15:00',
         slotMinTime: bufferStartTime,
         slotMaxTime: '23:59:59',
         snapDuration: '00:15:00',
         slotLabelInterval: '00:15',
-        slotLabelFormat: { hour: '2-digit', minute: '2-digit', hour12: false },
-        businessHours: businessHours,
+        slotLabelFormat: {hour: '2-digit', minute: '2-digit', hour12: false},
+        // Remove the businessHours property since we're using events with display: 'background'
         events: allEvents,
-        eventContent: function(arg) {
-          // Only show the title (patient name) for regular events
+        eventContent: function (arg) {
+          // Only show content for actual appointments, not background events
           if (arg.event.display !== 'background') {
             return {
               html: '<div class="fc-event-title">' + arg.event.title + '</div>'
@@ -257,12 +316,13 @@
           }
           return null;
         },
-        eventClick: function(info) {
+        eventClick: function (info) {
+          // Only navigate to appointment edit for actual appointments, not background events
           if (info.event.display !== "background") {
             window.location.href = '/doctor/appointments/' + info.event.id + '/edit';
           }
         },
-        dateClick: function(info) {
+        dateClick: function (info) {
           window.location.href = '{{ path("doctor_add_appointment") }}?date=' + encodeURIComponent(info.dateStr);
         }
       });
@@ -277,32 +337,48 @@
         enableTime: true,
         dateFormat: "d-m-Y H:i",
         time_24hr: true,
-        minuteIncrement: 15
+        minuteIncrement: 15,
+        locale: {
+          rangeSeparator: ' - '
+        }
+      });
+
+      flatpickr('#input-remove-slots', {
+        mode: "range",
+        enableTime: true,
+        dateFormat: "d-m-Y H:i",
+        time_24hr: true,
+        minuteIncrement: 15,
+        locale: {
+          rangeSeparator: ' - '
+        }
       });
 
       const saveScheduleBtn = document.getElementById('save-schedule-btn');
-      if(saveScheduleBtn) {
-        saveScheduleBtn.addEventListener('click', async function() {
+      if (saveScheduleBtn) {
+        saveScheduleBtn.addEventListener('click', async function () {
           let schedules = {};
-          document.querySelectorAll('.schedule-row').forEach(function(row) {
+          document.querySelectorAll('.schedule-row').forEach(function (row) {
             const day = row.getAttribute('data-day');
             const active = row.querySelector('.active-checkbox').checked;
             const start = row.querySelector('.start-time').value;
             const end = row.querySelector('.end-time').value;
-            schedules[day] = { active: active, start: start, end: end };
+            schedules[day] = {active: active, start: start, end: end};
           });
           const repeatUntil = document.getElementById('input-repeat-slots').value;
           const repeatWeekType = document.getElementById('repeat-week-type').value;
+          const serviceId = document.getElementById('service-select').value;
           const payload = {
             repeatUntil: repeatUntil,
             schedules: schedules,
-            repeatWeekType: repeatWeekType
+            repeatWeekType: repeatWeekType,
+            serviceId: serviceId
           };
 
           try {
             const response = await fetch('{{ path("doctor_configure_schedule") }}', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: {'Content-Type': 'application/json'},
               body: JSON.stringify(payload)
             });
             const result = await response.json();
@@ -317,6 +393,89 @@
           }
         });
       }
+
+      const saveBlockBtn = document.getElementById('save-block-btn');
+      if (saveBlockBtn) {
+        saveBlockBtn.addEventListener('click', async function () {
+          const blockSlotsInput = document.getElementById('input-block-slots').value;
+
+          if (!blockSlotsInput) {
+            alert('Introduceți intervalul de timp pentru blocare');
+            return;
+          }
+
+          const dateRangeArray = blockSlotsInput.split(' - ');
+          if (dateRangeArray.length !== 2) {
+            alert('Format interval invalid. Folosiți formatul corect');
+            return;
+          }
+
+          const payload = {
+            start: dateRangeArray[0],
+            end: dateRangeArray[1]
+          };
+
+          try {
+            const response = await fetch('{{ path("doctor_block_slots") }}', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (result.success) {
+              window.location.reload();
+            } else {
+              alert(result.message || 'A apărut o eroare la blocarea intervalelor');
+            }
+          } catch (error) {
+            console.error(error);
+            alert('A apărut o eroare la blocarea intervalelor');
+          }
+        });
+      }
+
+      const saveRemoveBtn = document.getElementById('save-remove-btn');
+      if (saveRemoveBtn) {
+        saveRemoveBtn.addEventListener('click', async function () {
+          const removeSlotsInput = document.getElementById('input-remove-slots').value;
+
+          if (!removeSlotsInput) {
+            alert('Introduceți intervalul de timp pentru ștergere');
+            return;
+          }
+
+          const dateRangeArray = removeSlotsInput.split(' - ');
+          if (dateRangeArray.length !== 2) {
+            alert('Format interval invalid. Folosiți formatul corect');
+            return;
+          }
+
+          const payload = {
+            start: dateRangeArray[0],
+            end: dateRangeArray[1]
+          };
+
+          try {
+            const response = await fetch('{{ path("doctor_remove_slots") }}', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify(payload)
+            });
+            const result = await response.json();
+
+            if (result.success) {
+              window.location.reload();
+            } else {
+              alert(result.message || 'A apărut o eroare la ștergerea intervalelor');
+            }
+          } catch (error) {
+            console.error(error);
+            alert('A apărut o eroare la ștergerea intervalelor');
+          }
+        });
+      }
     });
+
   </script>
 {% endblock %}

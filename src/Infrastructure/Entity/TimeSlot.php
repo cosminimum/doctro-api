@@ -3,7 +3,6 @@
 namespace App\Infrastructure\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'time_slots')]
@@ -26,6 +25,13 @@ class TimeSlot
 
     #[ORM\Column(type: 'boolean')]
     private bool $isBooked = false;
+
+    #[ORM\ManyToOne(targetEntity: HospitalService::class)]
+    #[ORM\JoinColumn(name: 'hospital_service_id', referencedColumnName: 'id', nullable: true)]
+    private ?HospitalService $hospitalService = null;
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $status = null;
 
     public function getId(): int
     {
@@ -83,6 +89,30 @@ class TimeSlot
     public function setIsBooked(bool $isBooked): TimeSlot
     {
         $this->isBooked = $isBooked;
+
+        return $this;
+    }
+
+    public function getHospitalService(): ?HospitalService
+    {
+        return $this->hospitalService;
+    }
+
+    public function setHospitalService(?HospitalService $hospitalService): self
+    {
+        $this->hospitalService = $hospitalService;
+
+        return $this;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?string $status): self
+    {
+        $this->status = $status;
 
         return $this;
     }

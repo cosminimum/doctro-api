@@ -29,6 +29,7 @@
                                         </div>
                                         <div class="modal-body">
                                             {{ form_start(doctorForm) }}
+                                            {{ form_errors(doctorForm) }}
                                             <div class="flex flex-col gap-1">
                                                 <label class="form-label text-gray-900">Prenume</label>
                                                 {{ form_widget(doctorForm.firstName, {'attr': {'class': 'input'}}) }}

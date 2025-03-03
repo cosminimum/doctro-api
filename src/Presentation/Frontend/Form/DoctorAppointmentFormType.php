@@ -10,6 +10,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TelType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -39,20 +40,40 @@ class DoctorAppointmentFormType extends AbstractType
                     'placeholder' => 'Selectează dată'
                 ]
             ])
-            ->add('firstName', TextType::class)
-            ->add('lastName', TextType::class)
-            ->add('email', EmailType::class)
-            ->add('phone', TextType::class)
+            ->add('firstName', TextType::class, [
+                'attr' => [
+                    'placeholder' => 'Prenume pacient'
+                ]
+            ])
+            ->add('lastName', TextType::class, [
+                'attr' => [
+                    'placeholder' => 'Nume pacient'
+                ]
+            ])
+            ->add('email', EmailType::class, [
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Email (opțional)'
+                ]
+            ])
+            ->add('phone', TelType::class, [
+                'attr' => [
+                    'placeholder' => 'Telefon'
+                ]
+            ])
             ->add('cnp', TextType::class, [
+                'required' => false,
                 'constraints' => [
                     new Length([
                         'min' => 13,
                         'max' => 13,
                         'exactMessage' => 'Câmpul trebuie să aibă exact 13 caractere.'
                     ])
+                ],
+                'attr' => [
+                    'placeholder' => 'CNP (opțional)'
                 ]
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void

@@ -20,15 +20,12 @@ class AdminDoctorFormType extends RegistrationFormType
     {
         parent::buildForm($builder, $options);
 
-        // Make password field not required when editing
         $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
             $doctor = $event->getData();
             $form = $event->getForm();
 
-            // Remove the plainPassword field from parent class
             $form->remove('plainPassword');
 
-            // Add it back with appropriate required setting based on whether we're editing
             $isEdit = $doctor && $doctor->getId();
             $form->add('plainPassword', PasswordType::class, [
                 'mapped' => false,

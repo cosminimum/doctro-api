@@ -28,6 +28,7 @@
                                     </div>
                                     <div class="modal-body">
                                         {{ form_start(serviceForm) }}
+                                        {{ form_errors(serviceForm) }}
                                         <div class="flex flex-col gap-1">
                                             <label class="form-label text-gray-900">Nume</label>
                                             {{ form_widget(serviceForm.name, {'attr': {'class': 'input'}}) }}
@@ -61,6 +62,11 @@
                                         <div class="flex flex-col gap-1">
                                             <label class="form-label text-gray-900">Mod</label>
                                             {{ form_widget(serviceForm.mode, {'attr': {'class': 'select'}}) }}
+                                        </div>
+
+                                        <div class="flex flex-col gap-1">
+                                            <label class="form-label text-gray-900">Culoare calendar</label>
+                                            {{ form_widget(serviceForm.color, {'attr': {'class': 'select'}}) }}
                                         </div>
 
                                         <div class="flex flex-col gap-1">

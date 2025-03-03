@@ -5,6 +5,7 @@ namespace App\Presentation\Frontend\Controller;
 use App\Infrastructure\Entity\Appointment;
 use App\Infrastructure\Entity\Doctor;
 use App\Infrastructure\Entity\DoctorSchedule;
+use App\Infrastructure\Entity\HospitalService;
 use App\Infrastructure\Entity\Patient;
 use App\Infrastructure\Entity\User;
 use App\Infrastructure\Repository\AppointmentRepository;
@@ -24,11 +25,12 @@ class HomeController extends AbstractController
         HospitalServiceRepository $hospitalServiceRepository,
         EntityManagerInterface $em
     ): Response {
+        $services = $hospitalServiceRepository->findServicesByDoctor($this->getUser());
         if ($this->getUser() && in_array(Patient::BASE_ROLE, $this->getUser()->getRoles())) {
             return $this->render('pages/appointments/identified.html.twig', [
                 'appointments' => $appointmentRepository->findBy(['patient' => $this->getUser()]),
                 'specialties' => $medicalSpecialtyRepository->findAll(),
-                'services' => $hospitalServiceRepository->findAll(),
+                'services' => $services,
             ]);
         }
 
@@ -87,8 +89,7 @@ class HomeController extends AbstractController
                 $appointments[] = [
                     'id'    => $appointment->getId(),
                     'title' => $appointment->getPatient()->getFirstName() . ' ' .
-                        $appointment->getPatient()->getLastName() . ' - ' .
-                        $appointment->getMedicalSpecialty()->getName(),
+                        $appointment->getPatient()->getLastName(),
                     'start' => $schedule->getDate()->format('Y-m-d') . 'T' .
                         $timeSlot->getStartTime()->format('H:i:s'),
                     'end'   => $schedule->getDate()->format('Y-m-d') . 'T' .
@@ -99,6 +100,7 @@ class HomeController extends AbstractController
             return $this->render('pages/doctor/index.html.twig', [
                 'appointments'     => json_encode($appointments),
                 'doctorSchedules'  => json_encode($doctorSchedules),
+                'services' => $services,
             ]);
         }
 

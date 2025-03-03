@@ -15,7 +15,9 @@
                     </div>
                     <div class="card-body">
                         {{ form_start(form) }}
+                        {{ form_errors(form) }}
                             <label class="form-label font-normal text-gray-900">Specialitate</label>
+                            {{ form_errors(form.specialty) }}
                             {{ form_widget(form.specialty, {'attr': {'class': 'select'}}) }}
 
                             <label class="form-label font-normal text-gray-900">Serviciu</label>

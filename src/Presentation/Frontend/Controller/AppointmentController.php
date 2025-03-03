@@ -43,6 +43,7 @@ class AppointmentController extends AbstractController
         MedicalSpecialtyRepository $medicalSpecialtyRepository,
         TimeSlotRepository $timeSlotRepository,
         HospitalServiceRepository $hospitalServiceRepository,
+        AppointmentRepository $appointmentRepository,
     ): Response {
         $form = $this->createForm(AppointmentFormType::class);
         $form->handleRequest($request);
@@ -72,7 +73,7 @@ class AppointmentController extends AbstractController
                         base64_encode(random_bytes(10))
                     ));
                 } catch (\Exception $e) {
-                    $this->addFlash('error', 'Nu s-a putut crea contul: ' . $e->getMessage());
+                    $this->addFlash('error', 'Nu s-a putut crea contul');
                     return $this->render('pages/appointments/index.html.twig', [
                         'form' => $form->createView(),
                         'specialties' => $medicalSpecialtyRepository->findAll(),
@@ -113,6 +114,48 @@ class AppointmentController extends AbstractController
                     'specialties' => $medicalSpecialtyRepository->findAll(),
                     'isEdit' => false
                 ]);
+            }
+
+            $now = new \DateTime();
+            $appointmentDate = $schedule->getDate();
+            $appointmentStartTime = $timeSlot->getStartTime();
+
+            $appointmentDateTime = clone $appointmentDate;
+            $appointmentDateTime->setTime(
+                (int)$appointmentStartTime->format('H'),
+                (int)$appointmentStartTime->format('i')
+            );
+
+            if ($appointmentDateTime < $now) {
+                $this->addFlash('error', 'Nu puteți crea o programare în trecut.');
+                return $this->render('pages/appointments/index.html.twig', [
+                    'form' => $form->createView(),
+                    'specialties' => $medicalSpecialtyRepository->findAll(),
+                    'isEdit' => false
+                ]);
+            }
+
+            $existingAppointment = $appointmentRepository->findOneBy([
+                'doctor' => $doctor,
+                'hospitalService' => $service,
+                'isActive' => true,
+            ]);
+
+            if ($existingAppointment) {
+                $existingSlot = $existingAppointment->getTimeSlot();
+                $existingSchedule = $existingSlot->getSchedule();
+                $existingPatient = $existingAppointment->getPatient();
+
+                // Check if it's the same day and same CNP
+                if ($existingSchedule->getDate()->format('Y-m-d') === $appointmentDate->format('Y-m-d')
+                    && $existingPatient->getCnp() === $patient->getCnp()) {
+                    $this->addFlash('error', 'Aveți deja o programare pentru același serviciu, la același medic, în aceeași zi.');
+                    return $this->render('pages/appointments/index.html.twig', [
+                        'form' => $form->createView(),
+                        'specialties' => $medicalSpecialtyRepository->findAll(),
+                        'isEdit' => false
+                    ]);
+                }
             }
 
             $duration = (int)$service->getDuration();
@@ -288,7 +331,7 @@ class AppointmentController extends AbstractController
                     'id' => $appointment->getId()
                 ]);
             } catch (\Exception $e) {
-                $this->addFlash('error', $e->getMessage());
+                $this->addFlash('error', 'Ne pare rău. Vă rugăm să reîncercați');
             }
         }
 

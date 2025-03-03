@@ -1,6 +1,7 @@
 <?php
 namespace App\Infrastructure\Repository;
 
+use App\Infrastructure\Entity\Doctor;
 use App\Infrastructure\Entity\DoctorSchedule;
 use App\Infrastructure\Entity\TimeSlot;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -13,6 +14,8 @@ class DoctorScheduleRepository extends ServiceEntityRepository
         parent::__construct($registry, DoctorSchedule::class);
     }
 
+    // src/Infrastructure/Repository/DoctorScheduleRepository.php
+
     /**
      * Find all available slots based on search criteria
      */
@@ -21,17 +24,20 @@ class DoctorScheduleRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('ds')
             ->leftJoin('ds.doctor', 'd')
             ->leftJoin('ds.timeSlots', 'ts')
+            ->leftJoin('ts.hospitalService', 'hs')
             ->leftJoin('d.medicalSpecialties', 'ms')
-            ->leftJoin('d.hospitalServices', 'hs')
             ->andWhere('ds.date BETWEEN :startDate AND :endDate')
             ->andWhere('ts.isBooked = :isBooked')
             ->andWhere('ms.id = :specialtyId')
-            ->andWhere('hs.id = :serviceId')
             ->setParameter('startDate', $criteria['startDate'])
             ->setParameter('endDate', $criteria['endDate'])
             ->setParameter('isBooked', false)
-            ->setParameter('specialtyId', $criteria['specialty'])
-            ->setParameter('serviceId', $criteria['service']);
+            ->setParameter('specialtyId', $criteria['specialty']);
+
+        if (!empty($criteria['service'])) {
+            $qb->andWhere('hs.id = :serviceId')
+                ->setParameter('serviceId', $criteria['service']);
+        }
 
         if (!empty($criteria['doctor'])) {
             $qb->andWhere('d.id = :doctorId')
@@ -44,7 +50,7 @@ class DoctorScheduleRepository extends ServiceEntityRepository
     /**
      * Check for scheduling conflicts
      */
-    public function hasConflictingSlots(Doctor $doctor, \DateTimeInterface $date, \DateTimeInterface $startTime, \DateTimeInterface $endTime): bool
+    public function hasConflictingSlots(Doctor $doctor, \DateTimeInterface $date, \DateTimeInterface $startTime, \DateTimeInterface $endTime, ?int $serviceId = null): bool
     {
         $qb = $this->createQueryBuilder('ds')
             ->leftJoin('ds.timeSlots', 'ts')
@@ -57,23 +63,34 @@ class DoctorScheduleRepository extends ServiceEntityRepository
             ->setParameter('startTime', $startTime)
             ->setParameter('endTime', $endTime);
 
+        // If a service is specified, only check for conflicts with slots for that service
+        if ($serviceId) {
+            $qb->leftJoin('ts.hospitalService', 'hs')
+                ->andWhere('hs.id = :serviceId OR hs.id IS NULL')
+                ->setParameter('serviceId', $serviceId);
+        }
+
         return count($qb->getQuery()->getResult()) > 0;
     }
 
     /**
-     * Get schedule with all slots for a specific date range
+     * Find slots available for a specific service
      */
-    public function findScheduleByDateRange(Doctor $doctor, \DateTimeInterface $startDate, \DateTimeInterface $endDate): array
-    {
+    public function findAvailableSlotsByService(
+        int $serviceId,
+        \DateTimeInterface $startDate,
+        \DateTimeInterface $endDate
+    ): array {
         return $this->createQueryBuilder('ds')
             ->leftJoin('ds.timeSlots', 'ts')
-            ->where('ds.doctor = :doctor')
+            ->leftJoin('ts.hospitalService', 'hs')
+            ->where('hs.id = :serviceId')
             ->andWhere('ds.date BETWEEN :startDate AND :endDate')
-            ->setParameter('doctor', $doctor)
+            ->andWhere('ts.isBooked = :isBooked')
+            ->setParameter('serviceId', $serviceId)
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
-            ->orderBy('ds.date', 'ASC')
-            ->addOrderBy('ts.startTime', 'ASC')
+            ->setParameter('isBooked', false)
             ->getQuery()
             ->getResult();
     }

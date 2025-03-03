@@ -6,7 +6,6 @@ use App\Infrastructure\Repository\HospitalServiceRepository;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: HospitalServiceRepository::class)]
 #[ORM\Table(name: 'hospital_services')]
@@ -30,6 +29,7 @@ class HospitalService
 
     #[ORM\Column(type: 'string')]
     private string $name;
+
     #[ORM\Column(type: 'string')]
     private string $description;
 
@@ -47,6 +47,9 @@ class HospitalService
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private string $isActive;
+
+    #[ORM\Column(type: 'string', length: 20, nullable: true)]
+    private ?string $color = '#3788d8';
 
     #[ORM\ManyToOne(targetEntity: MedicalSpecialty::class, inversedBy: 'hospitalServices')]
     #[ORM\JoinColumn(nullable: false)]
@@ -162,6 +165,18 @@ class HospitalService
     public function setMode($mode)
     {
         $this->mode = $mode;
+
+        return $this;
+    }
+
+    public function getColor(): ?string
+    {
+        return $this->color;
+    }
+
+    public function setColor(?string $color): self
+    {
+        $this->color = $color;
 
         return $this;
     }

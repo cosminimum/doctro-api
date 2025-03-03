@@ -50,7 +50,6 @@ class DoctorController extends AbstractController
             }
         }
 
-
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
@@ -59,9 +58,30 @@ class DoctorController extends AbstractController
                 throw $this->createAccessDeniedException('Nu sunteți autentificat ca medic.');
             }
 
-            $patient = $patientRepo->findOneBy(['email' => $data['email']]);
+            $email = !empty($data['email']) ? $data['email'] : $this->generateUniqueEmail($data['firstName'], $data['lastName'], $patientRepo);
+            $cnp = !empty($data['cnp']) ? $data['cnp'] : $this->generateUniquePlaceholderCNP($patientRepo);
+
+            // Look for patient by email or by phone if email is auto-generated
+            $patient = null;
+            if (!empty($data['email'])) {
+                $patient = $patientRepo->findOneBy(['email' => $email]);
+            }
+
+            if (!$patient && !empty($data['phone'])) {
+                $patient = $patientRepo->findOneBy(['phone' => $data['phone']]);
+            }
+
             if (!$patient) {
-                $patient = $patientRegisterStory->register(new UserCreateRequestDto($data['email'], $data['firstName'], $data['lastName'], $data['cnp'], $data['phone'], base64_encode(random_bytes(10))));
+                $patient = $patientRegisterStory->register(
+                    new UserCreateRequestDto(
+                        $email,
+                        $data['firstName'],
+                        $data['lastName'],
+                        $cnp,
+                        $data['phone'],
+                        base64_encode(random_bytes(10))
+                    )
+                );
             }
 
             $specialty = $data['specialty'];
@@ -210,6 +230,52 @@ class DoctorController extends AbstractController
             'appointments' => json_encode($appointments),
             'doctorSchedules' => json_encode($doctorSchedules),
         ]);
+    }
+
+    /**
+     * Generate a unique placeholder email based on patient names
+     * @TODO Move this into a service
+     */
+    private function generateUniqueEmail(string $firstName, string $lastName, PatientRepository $patientRepo): string
+    {
+        $hash = substr(md5(uniqid() . $firstName . $lastName), 0, 12);
+        $baseEmail = $hash . '@generatedaccount.com';
+
+        $counter = 0;
+        $email = $baseEmail;
+
+        while ($patientRepo->findOneBy(['email' => $email]) !== null && $counter < 10) {
+            $counter++;
+            $hash = substr(md5(uniqid() . $firstName . $lastName . $counter), 0, 12);
+            $email = $hash . '@generatedaccount.com';
+        }
+
+        return $email;
+    }
+
+    /**
+     * Generate a unique placeholder CNP
+     * @TODO Move this into a service
+     */
+    private function generateUniquePlaceholderCNP(PatientRepository $patientRepo): string
+    {
+        $chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        $cnp = '';
+
+        for ($i = 0; $i < 13; $i++) {
+            $cnp .= $chars[rand(0, strlen($chars) - 1)];
+        }
+
+        $counter = 0;
+        while ($patientRepo->findOneBy(['cnp' => $cnp]) !== null && $counter < 10) {
+            $counter++;
+            $cnp = '';
+            for ($i = 0; $i < 13; $i++) {
+                $cnp .= $chars[rand(0, strlen($chars) - 1)];
+            }
+        }
+
+        return $cnp;
     }
 
     #[Route('/doctor/appointments/{id}/approve', name: 'doctor_approve_appointment')]
@@ -514,9 +580,9 @@ class DoctorController extends AbstractController
             $entityManager->persist($service);
             $entityManager->flush();
 
-            $this->addFlash('success', 'Service successfully linked.');
+            $this->addFlash('success', 'Serviciul a fost alocat cu succes.');
         } else {
-            $this->addFlash('warning', 'You are already linked to this service.');
+            $this->addFlash('warning', 'Acest serviciu este deja alocat');
         }
 
         return $this->json(["success" => true], 200);
@@ -535,21 +601,29 @@ class DoctorController extends AbstractController
 
             $entityManager->flush();
 
-            $this->addFlash('success', 'Service successfully unlinked.');
+            $this->addFlash('success', 'Serviciul a fost dealocat');
         } else {
-            $this->addFlash('warning', 'You are not linked to this service.');
+            $this->addFlash('warning', 'Serviciul nu a fost alocat');
         }
 
         return $this->json(["success" => true], 200);
     }
 
     #[Route('/doctor/schedule/configure', name: 'doctor_configure_schedule', methods: ['POST'])]
-    public function configureSchedule(Request $request, EntityManagerInterface $em): JsonResponse
+    public function configureSchedule(Request $request, EntityManagerInterface $em, HospitalServiceRepository $hospitalServiceRepository): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
-        if (!$data || !isset($data['repeatUntil'], $data['schedules'])) {
+
+        if (!$data || !isset($data['repeatUntil'], $data['schedules'], $data['serviceId'])) {
             $this->addFlash('error', 'Payload invalid');
             return new JsonResponse(['success' => false, 'message' => 'Payload invalid'], 400);
+        }
+
+        $serviceId = $data['serviceId'];
+        $service = $hospitalServiceRepository->find($serviceId);
+        if (!$service) {
+            $this->addFlash('error', 'Serviciul selectat nu a fost gasit');
+            return new JsonResponse(['success' => false, 'message' => 'Serviciul selectat nu a fost găsit'], 400);
         }
 
         $repeatUntil = \DateTime::createFromFormat('d-m-Y', $data['repeatUntil']);
@@ -641,6 +715,7 @@ class DoctorController extends AbstractController
                     $timeSlot->setStartTime(clone $currentSlotStart);
                     $timeSlot->setEndTime(clone $currentSlotEnd);
                     $timeSlot->setIsBooked(false);
+                    $timeSlot->setHospitalService($service);
 
                     $em->persist($timeSlot);
                     $existingSchedule->getTimeSlots()->add($timeSlot);
@@ -660,15 +735,18 @@ class DoctorController extends AbstractController
     {
         $data = json_decode($request->getContent(), true);
         if (!$data || !isset($data['start'], $data['end'])) {
+            $this->addFlash('error', 'Eroare generică');
             return new JsonResponse(['success' => false, 'message' => 'Payload invalid'], 400);
         }
 
-        $startDateTime = \DateTime::createFromFormat('Y-m-d H:i', $data['start']);
-        $endDateTime   = \DateTime::createFromFormat('Y-m-d H:i', $data['end']);
+        $startDateTime = \DateTime::createFromFormat('d-m-Y H:i', $data['start']);
+        $endDateTime   = \DateTime::createFromFormat('d-m-Y H:i', $data['end']);
         if (!$startDateTime || !$endDateTime) {
-            return new JsonResponse(['success' => false, 'message' => 'Format dată/oră invalid'], 400);
+            $this->addFlash('error', 'Format dată/oră invalid');
+            return new JsonResponse(['success' => false, 'message' => ''], 400);
         }
         if ($startDateTime >= $endDateTime) {
+            $this->addFlash('error', 'Data de început trebuie să fie înaintea datei de sfârșit');
             return new JsonResponse(['success' => false, 'message' => 'Data de început trebuie să fie înaintea datei de sfârșit'], 400);
         }
 
@@ -693,6 +771,7 @@ class DoctorController extends AbstractController
                 );
                 if ($slotDateTime >= $startDateTime && $slotDateTime < $endDateTime) {
                     if ($slot->isBooked()) {
+                        $this->addFlash('error', 'Nu puteți bloca sloturi care au deja o programare.');
                         return new JsonResponse([
                             'success' => false,
                             'message' => 'Nu puteți bloca sloturi care au deja o programare.'
@@ -709,7 +788,69 @@ class DoctorController extends AbstractController
         }
 
         $em->flush();
+        $this->addFlash('error', 'Sloturile au fost blocate cu succes.');
         return new JsonResponse(['success' => true, 'message' => 'Sloturile au fost blocate cu succes.']);
+    }
+
+    #[Route('/doctor/schedule/remove', name: 'doctor_remove_slots', methods: ['POST'])]
+    public function removeSlots(Request $request, EntityManagerInterface $em): JsonResponse
+    {
+        $data = json_decode($request->getContent(), true);
+        if (!$data || !isset($data['start'], $data['end'])) {
+            $this->addFlash('error', 'Eroare generică');
+            return new JsonResponse(['success' => false, 'message' => 'Payload invalid'], 400);
+        }
+
+        $startDateTime = \DateTime::createFromFormat('d-m-Y H:i', $data['start']);
+        $endDateTime   = \DateTime::createFromFormat('d-m-Y H:i', $data['end']);
+        if (!$startDateTime || !$endDateTime) {
+            $this->addFlash('error', 'Format dată/oră invalid');
+            return new JsonResponse(['success' => false, 'message' => 'Format dată/oră invalid'], 400);
+        }
+        if ($startDateTime >= $endDateTime) {
+            $this->addFlash('error', 'Data de început trebuie să fie înaintea datei de sfârșit');
+            return new JsonResponse(['success' => false, 'message' => 'Data de început trebuie să fie înaintea datei de sfârșit'], 400);
+        }
+
+        $doctor = $this->getUser();
+
+        $schedules = $em->getRepository(DoctorSchedule::class)
+            ->createQueryBuilder('ds')
+            ->where('ds.doctor = :doctor')
+            ->andWhere('ds.date BETWEEN :startDate AND :endDate')
+            ->setParameter('doctor', $doctor)
+            ->setParameter('startDate', $startDateTime->format('Y-m-d'))
+            ->setParameter('endDate', $endDateTime->format('Y-m-d'))
+            ->getQuery()
+            ->getResult();
+
+        $slotsToRemove = [];
+        foreach ($schedules as $schedule) {
+            foreach ($schedule->getTimeSlots() as $slot) {
+                $slotDateTime = \DateTime::createFromFormat(
+                    'Y-m-d H:i:s',
+                    $schedule->getDate()->format('Y-m-d') . ' ' . $slot->getStartTime()->format('H:i:s')
+                );
+                if ($slotDateTime >= $startDateTime && $slotDateTime < $endDateTime) {
+                    if ($slot->isBooked()) {
+                        $this->addFlash('error', 'Nu puteți șterge sloturi care au deja o programare.');
+                        return new JsonResponse([
+                            'success' => false,
+                            'message' => 'Nu puteți șterge sloturi care au deja o programare.'
+                        ], 400);
+                    }
+                    $slotsToRemove[] = $slot;
+                }
+            }
+        }
+
+        foreach ($slotsToRemove as $slot) {
+            $em->remove($slot);
+        }
+
+        $em->flush();
+        $this->addFlash('success', 'Sloturile au fost șterse cu succes.');
+        return new JsonResponse(['success' => true, 'message' => 'Sloturile au fost șterse cu succes.']);
     }
 
     #[Route('/doctor/appointments/today/pdf', name: 'doctor_appointments_today_pdf', methods: ['GET'])]
