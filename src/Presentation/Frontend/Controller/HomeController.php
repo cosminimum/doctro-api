@@ -25,12 +25,11 @@ class HomeController extends AbstractController
         HospitalServiceRepository $hospitalServiceRepository,
         EntityManagerInterface $em
     ): Response {
-        $services = $hospitalServiceRepository->findServicesByDoctor($this->getUser());
         if ($this->getUser() && in_array(Patient::BASE_ROLE, $this->getUser()->getRoles())) {
             return $this->render('pages/appointments/identified.html.twig', [
                 'appointments' => $appointmentRepository->findBy(['patient' => $this->getUser()]),
                 'specialties' => $medicalSpecialtyRepository->findAll(),
-                'services' => $services,
+                'services' => $hospitalServiceRepository->findAll(),
             ]);
         }
 
@@ -97,6 +96,7 @@ class HomeController extends AbstractController
                 ];
             }
 
+            $services = $hospitalServiceRepository->findServicesByDoctor($this->getUser());
             return $this->render('pages/doctor/index.html.twig', [
                 'appointments'     => json_encode($appointments),
                 'doctorSchedules'  => json_encode($doctorSchedules),
