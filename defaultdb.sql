@@ -264,9 +264,9 @@ INSERT INTO `time_slots` (`id`, `schedule_id`, `start_time`, `end_time`, `is_boo
 (1881, 358, '15:45:00', '16:00:00', 0, 1971, NULL);
 
 INSERT INTO `users` (`id`, `email`, `first_name`, `last_name`, `cnp`, `phone`, `photo`, `roles`, `password`, `is_active`, `created`, `updated`, `user_type`) VALUES
-(77, 'medic@test.com', 'Medic', 'Test', '1920530440044', 'test', NULL, '[\`ROLE_DOCTOR\`]', '$2y$13$RcoY5qBkbJUSz7/ZisCiN.JLXq.N7bbM8GOIy3YaoZi4BRfUesK4m', 1, '2025-02-24 19:29:01', '2025-03-03 16:04:36', 'doctor'),
-(78, 'pacient@test.com', 'Pacient', 'Test', 'test', 'test', NULL, '[\`ROLE_PATIENT\`]', '$2y$13$fhq9wgEIyCxUmEotDLoCZO4GcfPicUvLpIQ5mYIbIwhiTJ50e9SkG', 1, '2025-02-24 19:47:06', '2025-02-24 19:47:06', 'patient'),
-(79, 'admin@test.com', 'Admin', 'Test', 'test', 'test', NULL, '[\`ROLE_ADMIN\`]', '$2y$13$8auW/hlTZclNXjM/E9btJOCcXTxJeVGUOM4UiR47Nf3yjUDJbTW.q', 1, '2025-02-24 19:47:27', '2025-02-24 17:47:44', 'manager');
+(77, 'medic@test.com', 'Medic', 'Test', '1920530440044', 'test', NULL, '[\"ROLE_DOCTOR\"]', '$2y$13$RcoY5qBkbJUSz7/ZisCiN.JLXq.N7bbM8GOIy3YaoZi4BRfUesK4m', 1, '2025-02-24 19:29:01', '2025-03-03 16:04:36', 'doctor'),
+(78, 'pacient@test.com', 'Pacient', 'Test', 'test', 'test', NULL, '[\"ROLE_PATIENT\"]', '$2y$13$fhq9wgEIyCxUmEotDLoCZO4GcfPicUvLpIQ5mYIbIwhiTJ50e9SkG', 1, '2025-02-24 19:47:06', '2025-02-24 19:47:06', 'patient'),
+(79, 'admin@test.com', 'Admin', 'Test', 'test', 'test', NULL, '[\"ROLE_ADMIN\"]', '$2y$13$8auW/hlTZclNXjM/E9btJOCcXTxJeVGUOM4UiR47Nf3yjUDJbTW.q', 1, '2025-02-24 19:47:27', '2025-02-24 17:47:44', 'manager');
 
 
 
