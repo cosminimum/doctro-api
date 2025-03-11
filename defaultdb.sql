@@ -18,156 +18,156 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 
-CREATE TABLE "access_tokens" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "user_identifier" varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "token" varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "valid_until" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "created" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id")
+CREATE TABLE `access_tokens` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `user_identifier` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `token` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `valid_until` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE "appointments" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "patient_id" int NOT NULL,
-  "doctor_id" int NOT NULL,
-  "medical_specialty_id" int NOT NULL,
-  "hospital_service_id" int NOT NULL,
-  "created" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  "time_slot_id" int NOT NULL,
-  "is_active" tinyint(1) NOT NULL DEFAULT '0',
-  PRIMARY KEY ("id"),
-  KEY "IDX_6A41727A6B899279" ("patient_id"),
-  KEY "IDX_6A41727A87F4FB17" ("doctor_id"),
-  KEY "IDX_6A41727ABFC81879" ("medical_specialty_id"),
-  KEY "IDX_6A41727A9DFBA0F2" ("hospital_service_id"),
-  KEY "IDX_6A41727AD62B0FA" ("time_slot_id"),
-  CONSTRAINT "FK_6A41727A6B899279" FOREIGN KEY ("patient_id") REFERENCES "users" ("id"),
-  CONSTRAINT "FK_6A41727A87F4FB17" FOREIGN KEY ("doctor_id") REFERENCES "users" ("id"),
-  CONSTRAINT "FK_6A41727A9DFBA0F2" FOREIGN KEY ("hospital_service_id") REFERENCES "hospital_services" ("id"),
-  CONSTRAINT "FK_6A41727ABFC81879" FOREIGN KEY ("medical_specialty_id") REFERENCES "medical_specialties" ("id"),
-  CONSTRAINT "FK_6A41727AD62B0FA" FOREIGN KEY ("time_slot_id") REFERENCES "time_slots" ("id")
+CREATE TABLE `appointments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `patient_id` int NOT NULL,
+  `doctor_id` int NOT NULL,
+  `medical_specialty_id` int NOT NULL,
+  `hospital_service_id` int NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `time_slot_id` int NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  KEY `IDX_6A41727A6B899279` (`patient_id`),
+  KEY `IDX_6A41727A87F4FB17` (`doctor_id`),
+  KEY `IDX_6A41727ABFC81879` (`medical_specialty_id`),
+  KEY `IDX_6A41727A9DFBA0F2` (`hospital_service_id`),
+  KEY `IDX_6A41727AD62B0FA` (`time_slot_id`),
+  CONSTRAINT `FK_6A41727A6B899279` FOREIGN KEY (`patient_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `FK_6A41727A87F4FB17` FOREIGN KEY (`doctor_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `FK_6A41727A9DFBA0F2` FOREIGN KEY (`hospital_service_id`) REFERENCES `hospital_services` (`id`),
+  CONSTRAINT `FK_6A41727ABFC81879` FOREIGN KEY (`medical_specialty_id`) REFERENCES `medical_specialties` (`id`),
+  CONSTRAINT `FK_6A41727AD62B0FA` FOREIGN KEY (`time_slot_id`) REFERENCES `time_slots` (`id`)
 );
 
-CREATE TABLE "doctor_details" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "doctor_id" int NOT NULL,
-  "stamp" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "created" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY ("id"),
-  UNIQUE KEY "UNIQ_E18B682787F4FB17" ("doctor_id"),
-  CONSTRAINT "FK_E18B682787F4FB17" FOREIGN KEY ("doctor_id") REFERENCES "users" ("id")
+CREATE TABLE `doctor_details` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `doctor_id` int NOT NULL,
+  `stamp` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQ_E18B682787F4FB17` (`doctor_id`),
+  CONSTRAINT `FK_E18B682787F4FB17` FOREIGN KEY (`doctor_id`) REFERENCES `users` (`id`)
 );
 
-CREATE TABLE "doctor_schedules" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "doctor_id" int NOT NULL,
-  "date" date NOT NULL,
-  PRIMARY KEY ("id"),
-  KEY "IDX_FE29BD6587F4FB17" ("doctor_id"),
-  CONSTRAINT "FK_FE29BD6587F4FB17" FOREIGN KEY ("doctor_id") REFERENCES "users" ("id")
+CREATE TABLE `doctor_schedules` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `doctor_id` int NOT NULL,
+  `date` date NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_FE29BD6587F4FB17` (`doctor_id`),
+  CONSTRAINT `FK_FE29BD6587F4FB17` FOREIGN KEY (`doctor_id`) REFERENCES `users` (`id`)
 );
 
-CREATE TABLE "doctor_to_hospital_service" (
-  "doctor_id" int NOT NULL,
-  "hospital_service_id" int NOT NULL,
-  PRIMARY KEY ("doctor_id","hospital_service_id"),
-  KEY "IDX_A9C5CCF687F4FB17" ("doctor_id"),
-  KEY "IDX_A9C5CCF69DFBA0F2" ("hospital_service_id"),
-  CONSTRAINT "FK_A9C5CCF687F4FB17" FOREIGN KEY ("doctor_id") REFERENCES "users" ("id") ON DELETE CASCADE,
-  CONSTRAINT "FK_A9C5CCF69DFBA0F2" FOREIGN KEY ("hospital_service_id") REFERENCES "hospital_services" ("id") ON DELETE CASCADE
+CREATE TABLE `doctor_to_hospital_service` (
+  `doctor_id` int NOT NULL,
+  `hospital_service_id` int NOT NULL,
+  PRIMARY KEY (`doctor_id`,`hospital_service_id`),
+  KEY `IDX_A9C5CCF687F4FB17` (`doctor_id`),
+  KEY `IDX_A9C5CCF69DFBA0F2` (`hospital_service_id`),
+  CONSTRAINT `FK_A9C5CCF687F4FB17` FOREIGN KEY (`doctor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_A9C5CCF69DFBA0F2` FOREIGN KEY (`hospital_service_id`) REFERENCES `hospital_services` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE "doctor_to_medical_specialty" (
-  "doctor_id" int NOT NULL,
-  "medical_specialty_id" int NOT NULL,
-  PRIMARY KEY ("doctor_id","medical_specialty_id"),
-  KEY "IDX_3C3D22487F4FB17" ("doctor_id"),
-  KEY "IDX_3C3D224BFC81879" ("medical_specialty_id"),
-  CONSTRAINT "FK_3C3D22487F4FB17" FOREIGN KEY ("doctor_id") REFERENCES "users" ("id") ON DELETE CASCADE,
-  CONSTRAINT "FK_3C3D224BFC81879" FOREIGN KEY ("medical_specialty_id") REFERENCES "medical_specialties" ("id") ON DELETE CASCADE
+CREATE TABLE `doctor_to_medical_specialty` (
+  `doctor_id` int NOT NULL,
+  `medical_specialty_id` int NOT NULL,
+  PRIMARY KEY (`doctor_id`,`medical_specialty_id`),
+  KEY `IDX_3C3D22487F4FB17` (`doctor_id`),
+  KEY `IDX_3C3D224BFC81879` (`medical_specialty_id`),
+  CONSTRAINT `FK_3C3D22487F4FB17` FOREIGN KEY (`doctor_id`) REFERENCES `users` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `FK_3C3D224BFC81879` FOREIGN KEY (`medical_specialty_id`) REFERENCES `medical_specialties` (`id`) ON DELETE CASCADE
 );
 
-CREATE TABLE "doctrine_migration_versions" (
-  "version" varchar(191) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  "executed_at" datetime DEFAULT NULL,
-  "execution_time" int DEFAULT NULL,
-  PRIMARY KEY ("version")
+CREATE TABLE `doctrine_migration_versions` (
+  `version` varchar(191) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
+  `executed_at` datetime DEFAULT NULL,
+  `execution_time` int DEFAULT NULL,
+  PRIMARY KEY (`version`)
 );
 
-CREATE TABLE "hospital_services" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "name" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "created" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  "description" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "price" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "is_active" tinyint(1) NOT NULL DEFAULT '0',
-  "duration" int NOT NULL,
-  "mode" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "code" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "medical_specialty_id" int NOT NULL,
-  "color" varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY ("id"),
-  KEY "IDX_59AF779CBFC81879" ("medical_specialty_id"),
-  CONSTRAINT "FK_59AF779CBFC81879" FOREIGN KEY ("medical_specialty_id") REFERENCES "medical_specialties" ("id")
+CREATE TABLE `hospital_services` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `description` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `price` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_active` tinyint(1) NOT NULL DEFAULT '0',
+  `duration` int NOT NULL,
+  `mode` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `medical_specialty_id` int NOT NULL,
+  `color` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_59AF779CBFC81879` (`medical_specialty_id`),
+  CONSTRAINT `FK_59AF779CBFC81879` FOREIGN KEY (`medical_specialty_id`) REFERENCES `medical_specialties` (`id`)
 );
 
-CREATE TABLE "hospital_settings" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "reminder_enabled" tinyint(1) NOT NULL,
-  "reminder_sms_message" longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  "reminder_email_message" longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  "confirmation_enabled" tinyint(1) NOT NULL,
-  "confirmation_sms_message" longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  "confirmation_email_message" longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
-  PRIMARY KEY ("id")
+CREATE TABLE `hospital_settings` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `reminder_enabled` tinyint(1) NOT NULL,
+  `reminder_sms_message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `reminder_email_message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `confirmation_enabled` tinyint(1) NOT NULL,
+  `confirmation_sms_message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  `confirmation_email_message` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE "medical_specialties" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "code" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "name" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "created" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  "is_active" tinyint(1) NOT NULL,
-  PRIMARY KEY ("id")
+CREATE TABLE `medical_specialties` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `code` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `is_active` tinyint(1) NOT NULL,
+  PRIMARY KEY (`id`)
 );
 
-CREATE TABLE "time_slots" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "schedule_id" int NOT NULL,
-  "start_time" time NOT NULL,
-  "end_time" time NOT NULL,
-  "is_booked" tinyint(1) NOT NULL,
-  "hospital_service_id" int DEFAULT NULL,
-  "status" varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  PRIMARY KEY ("id"),
-  KEY "IDX_8D06D4ACA40BC2D5" ("schedule_id"),
-  KEY "IDX_8D06D4AC9DFBA0F2" ("hospital_service_id"),
-  CONSTRAINT "FK_8D06D4AC9DFBA0F2" FOREIGN KEY ("hospital_service_id") REFERENCES "hospital_services" ("id"),
-  CONSTRAINT "FK_8D06D4ACA40BC2D5" FOREIGN KEY ("schedule_id") REFERENCES "doctor_schedules" ("id")
+CREATE TABLE `time_slots` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `schedule_id` int NOT NULL,
+  `start_time` time NOT NULL,
+  `end_time` time NOT NULL,
+  `is_booked` tinyint(1) NOT NULL,
+  `hospital_service_id` int DEFAULT NULL,
+  `status` varchar(20) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `IDX_8D06D4ACA40BC2D5` (`schedule_id`),
+  KEY `IDX_8D06D4AC9DFBA0F2` (`hospital_service_id`),
+  CONSTRAINT `FK_8D06D4AC9DFBA0F2` FOREIGN KEY (`hospital_service_id`) REFERENCES `hospital_services` (`id`),
+  CONSTRAINT `FK_8D06D4ACA40BC2D5` FOREIGN KEY (`schedule_id`) REFERENCES `doctor_schedules` (`id`)
 );
 
-CREATE TABLE "users" (
-  "id" int NOT NULL AUTO_INCREMENT,
-  "email" varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "first_name" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "last_name" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "cnp" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "phone" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "photo" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  "roles" json NOT NULL,
-  "password" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  "is_active" tinyint(1) NOT NULL,
-  "created" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  "updated" timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  "user_type" varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
-  PRIMARY KEY ("id"),
-  UNIQUE KEY "UNIQ_1483A5E9E7927C74" ("email")
+CREATE TABLE `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(180) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `first_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `last_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `cnp` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `phone` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `photo` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `roles` json NOT NULL,
+  `password` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `is_active` tinyint(1) NOT NULL,
+  `created` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `user_type` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `UNIQ_1483A5E9E7927C74` (`email`)
 );
 
 INSERT INTO `doctor_schedules` (`id`, `doctor_id`, `date`) VALUES
@@ -264,9 +264,9 @@ INSERT INTO `time_slots` (`id`, `schedule_id`, `start_time`, `end_time`, `is_boo
 (1881, 358, '15:45:00', '16:00:00', 0, 1971, NULL);
 
 INSERT INTO `users` (`id`, `email`, `first_name`, `last_name`, `cnp`, `phone`, `photo`, `roles`, `password`, `is_active`, `created`, `updated`, `user_type`) VALUES
-(77, 'medic@test.com', 'Medic', 'Test', '1920530440044', 'test', NULL, '[\"ROLE_DOCTOR\"]', '$2y$13$RcoY5qBkbJUSz7/ZisCiN.JLXq.N7bbM8GOIy3YaoZi4BRfUesK4m', 1, '2025-02-24 19:29:01', '2025-03-03 16:04:36', 'doctor'),
-(78, 'pacient@test.com', 'Pacient', 'Test', 'test', 'test', NULL, '[\"ROLE_PATIENT\"]', '$2y$13$fhq9wgEIyCxUmEotDLoCZO4GcfPicUvLpIQ5mYIbIwhiTJ50e9SkG', 1, '2025-02-24 19:47:06', '2025-02-24 19:47:06', 'patient'),
-(79, 'admin@test.com', 'Admin', 'Test', 'test', 'test', NULL, '[\"ROLE_ADMIN\"]', '$2y$13$8auW/hlTZclNXjM/E9btJOCcXTxJeVGUOM4UiR47Nf3yjUDJbTW.q', 1, '2025-02-24 19:47:27', '2025-02-24 17:47:44', 'manager');
+(77, 'medic@test.com', 'Medic', 'Test', '1920530440044', 'test', NULL, '[\`ROLE_DOCTOR\`]', '$2y$13$RcoY5qBkbJUSz7/ZisCiN.JLXq.N7bbM8GOIy3YaoZi4BRfUesK4m', 1, '2025-02-24 19:29:01', '2025-03-03 16:04:36', 'doctor'),
+(78, 'pacient@test.com', 'Pacient', 'Test', 'test', 'test', NULL, '[\`ROLE_PATIENT\`]', '$2y$13$fhq9wgEIyCxUmEotDLoCZO4GcfPicUvLpIQ5mYIbIwhiTJ50e9SkG', 1, '2025-02-24 19:47:06', '2025-02-24 19:47:06', 'patient'),
+(79, 'admin@test.com', 'Admin', 'Test', 'test', 'test', NULL, '[\`ROLE_ADMIN\`]', '$2y$13$8auW/hlTZclNXjM/E9btJOCcXTxJeVGUOM4UiR47Nf3yjUDJbTW.q', 1, '2025-02-24 19:47:27', '2025-02-24 17:47:44', 'manager');
 
 
 
