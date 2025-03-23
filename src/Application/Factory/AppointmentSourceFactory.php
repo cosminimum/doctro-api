@@ -6,11 +6,12 @@ use App\Application\DataSource\AppointmentSourceInterface;
 use App\Infrastructure\DataSource\FhirAppointmentSource;
 use App\Infrastructure\DataSource\LocalAppointmentSource;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\DependencyInjection\ServiceLocator;
 
 class AppointmentSourceFactory
 {
     public function __construct(
-        private readonly ContainerInterface $container,
+        private readonly ServiceLocator $appointmentSourceLocator,
         private readonly bool $useExternalApi
     ) {
     }
@@ -18,9 +19,9 @@ class AppointmentSourceFactory
     public function create(): AppointmentSourceInterface
     {
         if ($this->useExternalApi) {
-            return $this->container->get(FhirAppointmentSource::class);
+            return $this->appointmentSourceLocator->get(FhirAppointmentSource::class);
         }
 
-        return $this->container->get(LocalAppointmentSource::class);
+        return $this->appointmentSourceLocator->get(LocalAppointmentSource::class);
     }
 }
