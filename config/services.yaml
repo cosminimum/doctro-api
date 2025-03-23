@@ -5,6 +5,12 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     timezone: '%env(APP_TIMEZONE)%'
+    use_external_api: '%env(bool:USE_EXTERNAL_API)%'
+    fhir_api.base_url: '%env(FHIR_API_BASE_URL)%'
+    fhir_api.username: '%env(FHIR_API_USERNAME)%'
+    fhir_api.password: '%env(FHIR_API_PASSWORD)%'
+    fhir_api.consumer_key: '%env(FHIR_API_CONSUMER_KEY)%'
+
 
 services:
     # default configuration for services in *this* file
