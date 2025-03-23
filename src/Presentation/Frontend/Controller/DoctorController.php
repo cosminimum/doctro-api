@@ -89,7 +89,7 @@ class DoctorController extends AbstractController
             $appointmentStart = $data['appointmentStart'];
 
             $duration = (int)$service->getDuration();
-            $requiredSlots = $duration / 15;
+            $requiredSlots = $duration / 30;
 
             $appointmentDate = $appointmentStart->format('Y-m-d');
             $appointmentTime = $appointmentStart->format('H:i');
@@ -362,7 +362,7 @@ class DoctorController extends AbstractController
 
             if ($timeChanged || $serviceChanged) {
                 $oldDuration = (int) $appointment->getHospitalService()->getDuration();
-                $oldRequiredSlots = $oldDuration / 15;
+                $oldRequiredSlots = $oldDuration / 30;
 
                 $oldSlots = $oldSchedule->getTimeSlots()->toArray();
                 usort($oldSlots, function ($a, $b) {
@@ -395,7 +395,7 @@ class DoctorController extends AbstractController
                 }
 
                 $newDuration = (int) $newService->getDuration();
-                $newRequiredSlots = $newDuration / 15;
+                $newRequiredSlots = $newDuration / 30;
                 $newDateStr = $newAppointmentStart->format('Y-m-d');
                 $newTimeStr = $newAppointmentStart->format('H:i');
 
@@ -705,7 +705,7 @@ class DoctorController extends AbstractController
                 $slotEndTime = (clone $date)->setTime((int)$endTime->format('H'), (int)$endTime->format('i'));
 
                 while ($currentSlotStart < $slotEndTime) {
-                    $currentSlotEnd = (clone $currentSlotStart)->modify('+15 minutes');
+                    $currentSlotEnd = (clone $currentSlotStart)->modify('+30 minutes');
                     if ($currentSlotEnd > $slotEndTime) {
                         break;
                     }

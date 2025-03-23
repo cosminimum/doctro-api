@@ -27,7 +27,7 @@ class AdminServiceFormType extends AbstractType
             ->add('code', TextType::class)
             ->add('price',  NumberType::class)
             ->add('duration', ChoiceType::class, [
-                'choices' => [15 => 15, 30 => 30, 45 => 45, 60 => 60]
+                'choices' => [30 => 30, 45 => 45, 60 => 60]
             ])
             ->add('mode', ChoiceType::class, [
                 'label'   => 'Mod',

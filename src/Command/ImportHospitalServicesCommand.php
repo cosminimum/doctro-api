@@ -67,7 +67,7 @@ class ImportHospitalServicesCommand extends Command
                 $hospitalService->setDescription($row['description'] ?? '');
                 $hospitalService->setCode($row['code'] ?? '');
                 $hospitalService->setPrice($row['price'] ?? '');
-                $hospitalService->setDuration('15');
+                $hospitalService->setDuration('30');
                 $hospitalService->setMode($row['mode'] ?? '');
 
                 $hospitalService->setIsActive(true);
