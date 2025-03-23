@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Datasource;
 
-use App\Application\DataSource\ServiceSourceInterface;
+use App\Application\Datasource\ServiceSourceInterface;
 use App\Infrastructure\Entity\HospitalService;
 use App\Infrastructure\Service\FhirApiClient;
 use Psr\Log\LoggerInterface;

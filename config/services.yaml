@@ -48,22 +48,22 @@ services:
     App\Application\Factory\AppointmentSourceFactory:
         arguments:
             $appointmentSourceLocator: !service_locator
-                App\Infrastructure\DataSource\FhirAppointmentSource: '@App\Infrastructure\Datasource\FhirAppointmentSource'
-                App\Infrastructure\DataSource\LocalAppointmentSource: '@App\Infrastructure\Datasource\LocalAppointmentSource'
+                App\Infrastructure\Datasource\FhirAppointmentSource: '@App\Infrastructure\Datasource\FhirAppointmentSource'
+                App\Infrastructure\Datasource\LocalAppointmentSource: '@App\Infrastructure\Datasource\LocalAppointmentSource'
             $useExternalApi: '%use_external_api%'
 
     App\Application\Factory\DoctorSourceFactory:
         arguments:
             $appointmentSourceLocator: !service_locator
-                App\Infrastructure\DataSource\FhirAppointmentSource: '@App\Infrastructure\Datasource\FhirDoctorSource'
-                App\Infrastructure\DataSource\LocalAppointmentSource: '@App\Infrastructure\Datasource\LocalDoctorSource'
+                App\Infrastructure\Datasource\FhirAppointmentSource: '@App\Infrastructure\Datasource\FhirDoctorSource'
+                App\Infrastructure\Datasource\LocalAppointmentSource: '@App\Infrastructure\Datasource\LocalDoctorSource'
             $useExternalApi: '%use_external_api%'
 
     App\Application\Factory\ServiceSourceFactory:
         arguments:
             $appointmentSourceLocator: !service_locator
-                App\Infrastructure\DataSource\FhirAppointmentSource: '@App\Infrastructure\Datasource\FhirServiceSource'
-                App\Infrastructure\DataSource\LocalAppointmentSource: '@App\Infrastructure\Datasource\LocalServiceSource'
+                App\Infrastructure\Datasource\FhirAppointmentSource: '@App\Infrastructure\Datasource\FhirServiceSource'
+                App\Infrastructure\Datasource\LocalAppointmentSource: '@App\Infrastructure\Datasource\LocalServiceSource'
             $useExternalApi: '%use_external_api%'
 
     App\Infrastructure\Service\FhirApiClient:

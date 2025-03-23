@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Datasource;
 
-use App\Application\DataSource\DoctorSourceInterface;
+use App\Application\Datasource\DoctorSourceInterface;
 use App\Domain\Dto\DoctorDetailsDto;
 use App\Domain\Dto\DoctorDto;
 use App\Domain\Dto\DoctorListRequestDto;

@@ -2,9 +2,9 @@
 
 namespace App\Application\Factory;
 
-use App\Application\DataSource\AppointmentSourceInterface;
-use App\Infrastructure\DataSource\FhirAppointmentSource;
-use App\Infrastructure\DataSource\LocalAppointmentSource;
+use App\Application\Datasource\AppointmentSourceInterface;
+use App\Infrastructure\Datasource\FhirAppointmentSource;
+use App\Infrastructure\Datasource\LocalAppointmentSource;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 

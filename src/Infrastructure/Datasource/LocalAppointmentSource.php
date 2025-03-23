@@ -2,7 +2,7 @@
 
 namespace App\Infrastructure\Datasource;
 
-use App\Application\DataSource\AppointmentSourceInterface;
+use App\Application\Datasource\AppointmentSourceInterface;
 use App\Domain\Dto\AppointmentAddRequestDto;
 use App\Domain\Dto\AppointmentDto;
 use App\Domain\Dto\AppointmentListRequestDto;

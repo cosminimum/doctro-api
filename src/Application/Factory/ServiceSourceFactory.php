@@ -2,9 +2,9 @@
 
 namespace App\Application\Factory;
 
-use App\Application\DataSource\ServiceSourceInterface;
-use App\Infrastructure\DataSource\FhirServiceSource;
-use App\Infrastructure\DataSource\LocalServiceSource;
+use App\Application\Datasource\ServiceSourceInterface;
+use App\Infrastructure\Datasource\FhirServiceSource;
+use App\Infrastructure\Datasource\LocalServiceSource;
 use Psr\Container\ContainerInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 
