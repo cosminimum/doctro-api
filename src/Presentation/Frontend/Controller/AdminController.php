@@ -104,6 +104,25 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/doctors/{id}/delete', name: 'admin_delete_doctor', methods: ['POST'])]
+    public function deleteDoctor(
+        Request $request,
+        Doctor $doctor,
+        EntityManagerInterface $em
+    ): Response {
+        if ($this->isCsrfTokenValid('delete'.$doctor->getId(), $request->request->get('_token'))) {
+            try {
+                $em->remove($doctor);
+                $em->flush();
+                $this->addFlash('success', 'Doctorul a fost șters cu succes.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Doctorul nu poate fi șters deoarece are programări asociate.');
+            }
+        }
+
+        return $this->redirectToRoute('admin_doctors');
+    }
+
     #[Route('/admin/services', name: 'admin_services', methods: ['GET', 'POST'])]
     public function serviceList(
         Request $request,
@@ -154,6 +173,25 @@ class AdminController extends AbstractController
         ]);
     }
 
+    #[Route('/admin/services/{id}/delete', name: 'admin_delete_service', methods: ['POST'])]
+    public function deleteService(
+        Request $request,
+        HospitalService $service,
+        EntityManagerInterface $em
+    ): Response {
+        if ($this->isCsrfTokenValid('delete'.$service->getId(), $request->request->get('_token'))) {
+            try {
+                $em->remove($service);
+                $em->flush();
+                $this->addFlash('success', 'Serviciul a fost șters cu succes.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Serviciul nu poate fi șters deoarece are programări asociate.');
+            }
+        }
+
+        return $this->redirectToRoute('admin_services');
+    }
+
     #[Route('/admin/specialties', name: 'admin_specialties', methods: ['GET', 'POST'])]
     public function adminSpecialties(
         Request $request,
@@ -202,6 +240,25 @@ class AdminController extends AbstractController
             'specialtyForm' => $form->createView(),
             'specialty'     => $specialty,
         ]);
+    }
+
+    #[Route('/admin/specialties/{id}/delete', name: 'admin_delete_specialty', methods: ['POST'])]
+    public function deleteSpecialty(
+        Request $request,
+        MedicalSpecialty $specialty,
+        EntityManagerInterface $em
+    ): Response {
+        if ($this->isCsrfTokenValid('delete'.$specialty->getId(), $request->request->get('_token'))) {
+            try {
+                $em->remove($specialty);
+                $em->flush();
+                $this->addFlash('success', 'Specialitatea a fost ștearsă cu succes.');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Specialitatea nu poate fi ștearsă deoarece are servicii sau doctori asociați.');
+            }
+        }
+
+        return $this->redirectToRoute('admin_specialties');
     }
 
     #[Route('/admin/settings', name: 'admin_settings')]

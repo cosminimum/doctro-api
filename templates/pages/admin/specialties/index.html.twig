@@ -96,12 +96,40 @@
                                         {% endif %}
                                     </td>
                                     <td>
-                                        <a class="btn btn-sm btn-icon btn-clear btn-light" href="{{ path('admin_edit_specialty', {id: specialty.id}) }}">
-                                            <i class="ki-filled ki-notepad-edit"></i>
-                                        </a>
-                                        <a class="btn btn-sm btn-icon btn-clear btn-light" href="#">
-                                            <i class="ki-filled ki-trash"></i>
-                                        </a>
+                                        <div class="flex gap-2">
+                                            <a class="btn btn-sm btn-icon btn-clear btn-light" href="{{ path('admin_edit_specialty', {id: specialty.id}) }}">
+                                                <i class="ki-filled ki-notepad-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-icon btn-clear btn-light" data-modal-toggle="#delete-specialty-{{ specialty.id }}">
+                                                <i class="ki-filled ki-trash"></i>
+                                            </button>
+
+                                            <div class="modal" data-modal="true" id="delete-specialty-{{ specialty.id }}">
+                                                <div class="modal-content modal-center max-w-[400px] w-full">
+                                                    <div class="modal-header justify-end border-0 pt-5">
+                                                        <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                                                            <i class="ki-filled ki-cross"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body flex flex-col items-center pt-0 pb-10">
+                                                        <div class="mb-5">
+                                                            <div class="relative size-[80px] shrink-0 bg-danger-light rounded-full flex items-center justify-center">
+                                                                <i class="ki-filled ki-trash text-4xl text-danger"></i>
+                                                            </div>
+                                                        </div>
+                                                        <h2 class="text-2xl font-semibold text-gray-900 mb-2">Ești sigur?</h2>
+                                                        <p class="text-center text-gray-700 mb-7">Ești sigur că vrei să ștergi specialitatea <strong>{{ specialty.name }}</strong>?</p>
+                                                        <div class="flex gap-4">
+                                                            <button class="btn btn-light" data-modal-dismiss="true">Anulează</button>
+                                                            <form method="post" action="{{ path('admin_delete_specialty', {'id': specialty.id}) }}">
+                                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ specialty.id) }}">
+                                                                <button type="submit" class="btn btn-danger">Da, șterge!</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

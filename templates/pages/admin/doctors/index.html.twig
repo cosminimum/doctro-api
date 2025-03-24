@@ -138,9 +138,40 @@
                                     </td>
                                     <td>{{ doctor.created|date('d-m-Y H:i')}}</td>
                                     <td>
-                                        <a href="{{ path('admin_edit_doctor', {'id': doctor.id}) }}" class="btn btn-sm btn-icon btn-light">
-                                            <i class="ki-filled ki-notepad-edit"></i>
-                                        </a>
+                                        <div class="flex gap-2">
+                                            <a href="{{ path('admin_edit_doctor', {'id': doctor.id}) }}" class="btn btn-sm btn-icon btn-light">
+                                                <i class="ki-filled ki-notepad-edit"></i>
+                                            </a>
+                                            <button class="btn btn-sm btn-icon btn-light" data-modal-toggle="#delete-doctor-{{ doctor.id }}">
+                                                <i class="ki-filled ki-trash"></i>
+                                            </button>
+
+                                            <div class="modal" data-modal="true" id="delete-doctor-{{ doctor.id }}">
+                                                <div class="modal-content modal-center max-w-[400px] w-full">
+                                                    <div class="modal-header justify-end border-0 pt-5">
+                                                        <button class="btn btn-sm btn-icon btn-light" data-modal-dismiss="true">
+                                                            <i class="ki-filled ki-cross"></i>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body flex flex-col items-center pt-0 pb-10">
+                                                        <div class="mb-5">
+                                                            <div class="relative size-[80px] shrink-0 bg-danger-light rounded-full flex items-center justify-center">
+                                                                <i class="ki-filled ki-trash text-4xl text-danger"></i>
+                                                            </div>
+                                                        </div>
+                                                        <h2 class="text-2xl font-semibold text-gray-900 mb-2">Ești sigur?</h2>
+                                                        <p class="text-center text-gray-700 mb-7">Ești sigur că vrei să ștergi doctorul <strong>{{ doctor.firstName }} {{ doctor.lastName }}</strong>?</p>
+                                                        <div class="flex gap-4">
+                                                            <button class="btn btn-light" data-modal-dismiss="true">Anulează</button>
+                                                            <form method="post" action="{{ path('admin_delete_doctor', {'id': doctor.id}) }}">
+                                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ doctor.id) }}">
+                                                                <button type="submit" class="btn btn-danger">Da, șterge!</button>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </td>
                                 </tr>
                             {% endfor %}

@@ -18,4 +18,5 @@
 /assets/vendor/
 ###< symfony/asset-mapper ###
 .env
+_doctro-db
 doctro-db
