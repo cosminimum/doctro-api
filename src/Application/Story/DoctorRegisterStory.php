@@ -13,6 +13,12 @@ class DoctorRegisterStory
     ) {
     }
 
+    //getpractitioners
+    //getappointments
+    //getpractitionerroles ⟶specialitate + servicii medic
+    //get slots
+    //get schedules
+    //gethealthcareservices ⟶nomenclator de servicii
     public function register(User $user, string $plainPassword): int
     {
         $userId = $this->patientRepository->addDoctor($user, $plainPassword);

@@ -20,6 +20,9 @@ class MedicalSpecialty
     #[ORM\Column(type: 'integer')]
     private int $id;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private string $idHis;
+
     #[ORM\Column(type: 'string')]
     private string $code;
 
@@ -71,6 +74,18 @@ class MedicalSpecialty
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getIsHis(): string
+    {
+        return $this->idHis;
+    }
+
+    public function setIdHis(string $idHis): MedicalSpecialty
+    {
+        $this->idHis = $idHis;
+
+        return $this;
     }
 
     public function getCode(): string

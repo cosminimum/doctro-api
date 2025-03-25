@@ -59,33 +59,6 @@ class FhirApiClient
 
         $this->logger->info('Successfully obtained FHIR API auth token');
         return $this->token;
-
-//        return $this->cache->get(self::TOKEN_CACHE_KEY, function (ItemInterface $item) {
-//            $this->logger->info('Fetching new FHIR API auth token');
-//
-//            $item->expiresAfter(23.5 * 3600);
-//
-//            $response = $this->httpClient->request('POST', $this->baseUrl . '/api/Login/Login', [
-//                'headers' => [
-//                    'Content-Type' => 'application/json',
-//                ],
-//                'json' => [
-//                    'username' => $this->username,
-//                    'password' => $this->password,
-//                    'consumerKey' => $this->consumerKey,
-//                ],
-//            ]);
-//
-//            $data = $response->toArray();
-//            $this->token = $data['token'] ?? '';
-//
-//            if (empty($this->token)) {
-//                throw new \RuntimeException('Failed to obtain authentication token from FHIR API');
-//            }
-//
-//            $this->logger->info('Successfully obtained FHIR API auth token');
-//            return $this->token;
-//        });
     }
 
     public function get(string $endpoint, array $queryParams = []): array

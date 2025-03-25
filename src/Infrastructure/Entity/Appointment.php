@@ -19,6 +19,9 @@ class Appointment
     #[Groups(['appointment'])]
     private int $id;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private string $idHis;
+
     #[ORM\ManyToOne(targetEntity: Patient::class, inversedBy: 'appointments')]
     #[ORM\JoinColumn(name: 'patient_id', referencedColumnName: 'id', nullable: false)]
     private Patient $patient;
@@ -50,6 +53,18 @@ class Appointment
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getIdHis(): string
+    {
+        return $this->idHis;
+    }
+
+    public function setIdHis(string $idHis): Appointment
+    {
+        $this->idHis = $idHis;
+
+        return $this;
     }
 
     public function getPatient(): Patient

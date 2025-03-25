@@ -2,21 +2,20 @@
 
 namespace App\Application\Story;
 
-use App\Application\Factory\AppointmentSourceFactory;
+use App\Application\Repository\AppointmentRepositoryInterface;
 use App\Domain\Dto\AppointmentListRequestDto;
 use App\Domain\Dto\AppointmentListResponseDto;
 
 class AppointmentListStory
 {
     public function __construct(
-        private readonly AppointmentSourceFactory $appointmentSourceFactory
+        private readonly AppointmentRepositoryInterface $appointmentRepository
     ) {
     }
 
     public function list(?AppointmentListRequestDto $requestDto): AppointmentListResponseDto
     {
-        $appointmentSource = $this->appointmentSourceFactory->create();
-        $rows = $appointmentSource->getAppointmentsByFilters($requestDto);
+        $rows = $this->appointmentRepository->getAppointmentListByFilters($requestDto);
 
         return new AppointmentListResponseDto($rows);
     }

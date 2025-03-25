@@ -36,6 +36,9 @@ class User implements
     #[ORM\Column(type: 'integer')]
     private int $id;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private string $idHis;
+
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private string $email;
 
@@ -66,6 +69,18 @@ class User implements
     public function getId(): int
     {
         return $this->id;
+    }
+
+    public function getIdHis(): string
+    {
+        return $this->idHis;
+    }
+
+    public function setIdHis(string $idHis): User
+    {
+        $this->idHis = $idHis;
+
+        return $this;
     }
 
     public function getEmail(): ?string

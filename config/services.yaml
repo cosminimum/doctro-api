@@ -45,33 +45,12 @@ services:
         arguments:
             $projectDir: '%kernel.project_dir%'
 
-    App\Application\Factory\AppointmentSourceFactory:
-        arguments:
-            $appointmentSourceLocator: !service_locator
-                App\Infrastructure\Datasource\FhirAppointmentSource: '@App\Infrastructure\Datasource\FhirAppointmentSource'
-                App\Infrastructure\Datasource\LocalAppointmentSource: '@App\Infrastructure\Datasource\LocalAppointmentSource'
-            $useExternalApi: '%use_external_api%'
-
-    App\Application\Factory\DoctorSourceFactory:
-        arguments:
-            $appointmentSourceLocator: !service_locator
-                App\Infrastructure\Datasource\FhirDoctorSource: '@App\Infrastructure\Datasource\FhirDoctorSource'
-                App\Infrastructure\Datasource\LocalDoctorSource: '@App\Infrastructure\Datasource\LocalDoctorSource'
-            $useExternalApi: '%use_external_api%'
-
-    App\Application\Factory\ServiceSourceFactory:
-        arguments:
-            $appointmentSourceLocator: !service_locator
-                App\Infrastructure\Datasource\FhirServiceSource: '@App\Infrastructure\Datasource\FhirServiceSource'
-                App\Infrastructure\Datasource\LocalServiceSource: '@App\Infrastructure\Datasource\LocalServiceSource'
-            $useExternalApi: '%use_external_api%'
-
     App\Infrastructure\Service\FhirApiClient:
         arguments:
-            $baseUrl: '%fhir_api.base_url%'
-            $username: '%fhir_api.username%'
-            $password: '%fhir_api.password%'
-            $consumerKey: '%fhir_api.consumer_key%'
+            $baseUrl: '%env(FHIR_API_BASE_URL)%'
+            $username: '%env(FHIR_API_USERNAME)%'
+            $password: '%env(FHIR_API_PASSWORD)%'
+            $consumerKey: '%env(FHIR_API_CONSUMER_KEY)%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

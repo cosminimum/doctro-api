@@ -17,6 +17,9 @@ class DoctorSchedule
     #[ORM\Column(type: 'integer')]
     private int $id;
 
+    #[ORM\Column(type: 'string', nullable: true)]
+    private string $idHis;
+
     #[ORM\ManyToOne(targetEntity: Doctor::class, inversedBy: 'schedules')]
     #[ORM\JoinColumn(nullable: false)]
     private Doctor $doctor;
@@ -40,6 +43,18 @@ class DoctorSchedule
     public function setId(int $id): DoctorSchedule
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    public function getIdHis(): string
+    {
+        return $this->idHis;
+    }
+
+    public function setIdHis(string $idHis): DoctorSchedule
+    {
+        $this->idHis = $idHis;
 
         return $this;
     }
