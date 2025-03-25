@@ -81,7 +81,7 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Fetching practitioners from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetPractitioners');
+            $response = $this->apiClient->get('/api/HInterop/GetPractitioners?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No practitioners found or invalid response format');
@@ -204,7 +204,7 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Fetching practitioner roles from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles');
+            $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No practitioner roles found or invalid response format');
@@ -311,7 +311,7 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Fetching healthcare services from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetHealthcareServices');
+            $response = $this->apiClient->get('/api/HInterop/GetHealthcareServices?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No healthcare services found or invalid response format');
@@ -445,7 +445,7 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Fetching schedules from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetSchedules');
+            $response = $this->apiClient->get('/api/HInterop/GetSchedules?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No schedules found or invalid response format');
@@ -548,7 +548,7 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Fetching slots from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetSlots');
+            $response = $this->apiClient->get('/api/HInterop/GetSlots?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No slots found or invalid response format');
@@ -681,7 +681,7 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Fetching appointments from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetAppointments');
+            $response = $this->apiClient->get('/api/HInterop/GetAppointments?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No appointments found or invalid response format');
@@ -904,7 +904,7 @@ class SyncFhirResourcesCommand extends Command
         try {
             // Since medical specialties might be referenced in codes/codings, we'll create a basic set
             // based on the PractitionerRoles response
-            $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles');
+            $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No practitioner roles found or invalid response format');
