@@ -222,19 +222,25 @@ class SyncFhirResourcesCommand extends Command
                 $role = $entry['resource'];
 
                 try {
-                    if (!isset($role['practitioner']['reference'])) {
-                        $this->logger->warning('PractitionerRole without practitioner reference', ['data' => json_encode($role)]);
-                        $errors++;
-                        continue;
-                    }
-
+                    // Extract practitioner ID from the correct field in the FHIR resource
                     $practitionerId = null;
-                    if (preg_match('/Practitioner\/(\w+)/', $role['practitioner']['reference'], $matches)) {
-                        $practitionerId = $matches[1];
+
+                    // Check for the correct practitioner identifier structure based on the JSON example
+                    if (isset($role['practitioner']['identifier']['value'])) {
+                        $practitionerId = $role['practitioner']['identifier']['value'];
+                    }
+                    // Fallback to reference extraction if the identifier structure is different
+                    elseif (isset($role['practitioner']['reference'])) {
+                        if (preg_match('/Practitioner\/(\w+)/', $role['practitioner']['reference'], $matches)) {
+                            $practitionerId = $matches[1];
+                        }
                     }
 
                     if (!$practitionerId) {
-                        $this->logger->warning('Could not extract practitioner ID from reference', ['reference' => $role['practitioner']['reference']]);
+                        $this->logger->warning('Could not extract practitioner ID', [
+                            'roleId' => $role['id'] ?? 'unknown',
+                            'practitionerData' => json_encode($role['practitioner'] ?? [])
+                        ]);
                         $errors++;
                         continue;
                     }
@@ -242,41 +248,60 @@ class SyncFhirResourcesCommand extends Command
                     $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['hisId' => $practitionerId]);
 
                     if (!$doctor) {
-                        $this->logger->warning('Doctor not found for practitioner role', ['hisId' => $practitionerId]);
+                        $this->logger->warning('Doctor not found for practitioner role', [
+                            'hisId' => $practitionerId,
+                            'roleId' => $role['id'] ?? 'unknown'
+                        ]);
                         $errors++;
                         continue;
                     }
 
-                    // Associate specialties
+                    // Associate specialties - improved mapping
                     if (isset($role['specialty']) && is_array($role['specialty'])) {
                         foreach ($role['specialty'] as $specialty) {
-                            if (isset($specialty['coding'][0]['code'])) {
-                                $specialtyCode = $specialty['coding'][0]['code'];
-                                $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->findOneBy(['code' => $specialtyCode]);
+                            $specialtyCode = $this->extractCodeFromCoding($specialty);
+
+                            if ($specialtyCode) {
+                                $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)
+                                    ->findOneBy(['code' => $specialtyCode]);
 
                                 if ($medicalSpecialty && !$doctor->getMedicalSpecialties()->contains($medicalSpecialty)) {
                                     $doctor->addMedicalSpecialty($medicalSpecialty);
                                     $this->logger->info('Added specialty to doctor', [
                                         'doctorId' => $doctor->getId(),
-                                        'specialtyId' => $medicalSpecialty->getId()
+                                        'specialtyId' => $medicalSpecialty->getId(),
+                                        'specialtyCode' => $specialtyCode
+                                    ]);
+                                } elseif (!$medicalSpecialty) {
+                                    $this->logger->warning('Medical specialty not found', [
+                                        'code' => $specialtyCode,
+                                        'doctorId' => $doctor->getId()
                                     ]);
                                 }
                             }
                         }
                     }
 
-                    // Associate services
+                    // Associate services - improved mapping
                     if (isset($role['code']) && is_array($role['code'])) {
                         foreach ($role['code'] as $code) {
-                            if (isset($code['coding'][0]['code'])) {
-                                $serviceCode = $code['coding'][0]['code'];
-                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['code' => $serviceCode]);
+                            $serviceCode = $this->extractCodeFromCoding($code);
+
+                            if ($serviceCode) {
+                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)
+                                    ->findOneBy(['code' => $serviceCode]);
 
                                 if ($hospitalService && !$doctor->getHospitalServices()->contains($hospitalService)) {
                                     $doctor->addHospitalService($hospitalService);
                                     $this->logger->info('Added service to doctor', [
                                         'doctorId' => $doctor->getId(),
-                                        'serviceId' => $hospitalService->getId()
+                                        'serviceId' => $hospitalService->getId(),
+                                        'serviceCode' => $serviceCode
+                                    ]);
+                                } elseif (!$hospitalService) {
+                                    $this->logger->warning('Hospital service not found', [
+                                        'code' => $serviceCode,
+                                        'doctorId' => $doctor->getId()
                                     ]);
                                 }
                             }
@@ -288,11 +313,15 @@ class SyncFhirResourcesCommand extends Command
                 } catch (\Exception $e) {
                     $this->logger->error('Error processing practitioner role', [
                         'roleId' => $role['id'] ?? 'unknown',
-                        'error' => $e->getMessage()
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
                     ]);
                     $errors++;
                 }
             }
+
+            // Flush the entity manager to persist all changes at once
+            $this->entityManager->flush();
 
             $this->output->writeln("Practitioner roles: {$count} processed, {$errors} errors");
             $this->logger->info('Practitioner roles sync completed', [
@@ -300,9 +329,37 @@ class SyncFhirResourcesCommand extends Command
                 'errors' => $errors
             ]);
         } catch (\Exception $e) {
-            $this->logger->error('Failed to sync practitioner roles', ['error' => $e->getMessage()]);
+            $this->logger->error('Failed to sync practitioner roles', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ]);
             throw $e;
         }
+    }
+
+    /**
+     * Helper method to extract code from coding array
+     *
+     * @param array $codingContainer The array containing coding information
+     * @return string|null The extracted code or null if not found
+     */
+    private function extractCodeFromCoding(array $codingContainer): ?string
+    {
+        // Check for the structure in the example JSON
+        if (isset($codingContainer['coding'][0]['code'])) {
+            return $codingContainer['coding'][0]['code'];
+        }
+
+        // Alternative structure check if needed
+        if (isset($codingContainer['coding']) && is_array($codingContainer['coding'])) {
+            foreach ($codingContainer['coding'] as $coding) {
+                if (isset($coding['code'])) {
+                    return $coding['code'];
+                }
+            }
+        }
+
+        return null;
     }
 
     private function syncHealthcareServices(): void

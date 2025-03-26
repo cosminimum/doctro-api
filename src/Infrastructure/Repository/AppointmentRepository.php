@@ -14,16 +14,21 @@ use App\Infrastructure\Entity\Patient;
 use App\Infrastructure\Entity\TimeSlot;
 use App\Infrastructure\Entity\User;
 use App\Infrastructure\Factory\AppointmentDtoFactory;
+use App\Infrastructure\Service\FhirApiClient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
 
 class AppointmentRepository extends ServiceEntityRepository implements AppointmentRepositoryInterface
 {
+    private FhirApiClient $hirApiClient;
     public function __construct(
-        ManagerRegistry $registry
+        ManagerRegistry $registry,
+        FhirApiClient $hirApiClient
     ) {
         parent::__construct($registry, Appointment::class);
+        $this->hirApiClient = $hirApiClient;
+
     }
 
     public function addAppointment(AppointmentAddRequestDto $requestDto, User $user): int
@@ -49,8 +54,76 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
         $this->getEntityManager()->persist($appointment);
         $this->getEntityManager()->flush();
+        $this->createFhirAppointment($appointment);
 
         return $appointment->getId();
+    }
+
+    private function createFhirAppointment(Appointment $appointment): void
+    {
+        $timeSlot = $appointment->getTimeSlot();
+        $schedule = $timeSlot->getSchedule();
+
+        $appointmentDate = $schedule->getDate()->format('Y-m-d');
+        $startTime = $timeSlot->getStartTime()->format('H:i:s');
+        $endTime = $timeSlot->getEndTime()->format('H:i:s');
+
+        $appointmentStart = $appointmentDate . 'T' . $startTime;
+        $appointmentEnd = $appointmentDate . 'T' . $endTime;
+
+        $fhirAppointment = [
+            'resourceType' => 'Appointment',
+            'status' => 'booked',
+            'start' => $appointmentStart,
+            'end' => $appointmentEnd,
+            'participant' => [
+                [
+                    'actor' => [
+                        'reference' => 'Patient/' . ($appointment->getPatient()->getHisId() ?? $appointment->getPatient()->getId())
+                    ],
+                    'status' => 'accepted'
+                ],
+                [
+                    'actor' => [
+                        'reference' => 'Practitioner/' . ($appointment->getDoctor()->getHisId() ?? $appointment->getDoctor()->getId())
+                    ],
+                    'status' => 'accepted'
+                ]
+            ],
+            'serviceCategory' => [
+                [
+                    'coding' => [
+                        [
+                            'system' => 'http://terminology.hl7.org/CodeSystem/service-category',
+                            'code' => 'specialty-' . $appointment->getMedicalSpecialty()->getId(),
+                            'display' => $appointment->getMedicalSpecialty()->getName()
+                        ]
+                    ]
+                ]
+            ],
+            'serviceType' => [
+                [
+                    'coding' => [
+                        [
+                            'system' => 'http://terminology.hl7.org/CodeSystem/service-type',
+                            'code' => 'service-' . $appointment->getHospitalService()->getId(),
+                            'display' => $appointment->getHospitalService()->getName()
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        try {
+            $response = $this->fhirApiClient->post('/api/HInterop/CreateAppointment', $fhirAppointment);
+            if (isset($response['id'])) {
+                $appointment->setHisId($response['id']);
+                $this->entityManager->persist($appointment);
+                $this->entityManager->flush();
+            }
+        } catch (\Exception $e) {
+            error_log('Failed to create appointment in FHIR: ' . $e->getMessage());
+        }
     }
 
     /** @return AppointmentDto[] */
