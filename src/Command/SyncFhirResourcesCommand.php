@@ -7,7 +7,9 @@ use App\Infrastructure\Entity\Doctor;
 use App\Infrastructure\Entity\DoctorSchedule;
 use App\Infrastructure\Entity\HospitalService;
 use App\Infrastructure\Entity\MedicalSpecialty;
+use App\Infrastructure\Entity\Patient;
 use App\Infrastructure\Entity\TimeSlot;
+use App\Infrastructure\Repository\UserRepository;
 use App\Infrastructure\Service\FhirApiClient;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -27,15 +29,19 @@ class SyncFhirResourcesCommand extends Command
     private LoggerInterface $logger;
     private OutputInterface $output;
 
+    private UserRepository $userRepository;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         FhirApiClient $apiClient,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        UserRepository $userRepository,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->apiClient = $apiClient;
         $this->logger = $logger;
+        $this->userRepository = $userRepository;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -47,10 +53,10 @@ class SyncFhirResourcesCommand extends Command
         $output->writeln('Starting FHIR resources synchronization...');
 
         try {
-            $this->syncMedicalSpecialties();
-            $this->syncPractitioners();
-            $this->syncHealthcareServices();
-            $this->syncPractitionerRoles();
+//            $this->syncMedicalSpecialties();
+//            $this->syncPractitioners();
+//            $this->syncHealthcareServices();
+//            $this->syncPractitionerRoles();
             $this->syncSchedules();
             $this->syncSlots();
             $this->syncAppointments();
@@ -100,19 +106,19 @@ class SyncFhirResourcesCommand extends Command
                 $practitioner = $entry['resource'];
 
                 try {
-                    $hisId = $practitioner['id'] ?? null;
-                    if (!$hisId) {
+                    $idHis = $practitioner['id'] ?? null;
+                    if (!$idHis) {
                         $this->logger->warning('Practitioner without ID', ['data' => json_encode($practitioner)]);
                         $errors++;
                         continue;
                     }
 
-                    $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['hisId' => $hisId]);
+                    $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['idHis' => $idHis]);
                     $isNew = false;
 
                     if (!$doctor) {
                         $doctor = new Doctor();
-                        $doctor->setHisId($hisId);
+                        $doctor->setIdHis($idHis);
                         $doctor->setRoles([Doctor::BASE_ROLE]);
                         $doctor->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
                         $isNew = true;
@@ -129,7 +135,7 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     if (empty($email)) {
-                        $email = 'doctor_' . $hisId . '@example.com';
+                        $email = 'doctor_' . $idHis . '@example.com';
                     }
 
                     $phone = '';
@@ -161,7 +167,7 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     if (empty($cnp)) {
-                        $cnp = str_pad((string) $hisId, 13, '0', STR_PAD_LEFT);
+                        $cnp = str_pad((string) $idHis, 13, '0', STR_PAD_LEFT);
                     }
 
                     $doctor->setEmail($email);
@@ -179,7 +185,7 @@ class SyncFhirResourcesCommand extends Command
                     }
                 } catch (\Exception $e) {
                     $this->logger->error('Error processing practitioner', [
-                        'hisId' => $practitioner['id'] ?? 'unknown',
+                        'idHis' => $practitioner['id'] ?? 'unknown',
                         'error' => $e->getMessage()
                     ]);
                     $errors++;
@@ -222,86 +228,61 @@ class SyncFhirResourcesCommand extends Command
                 $role = $entry['resource'];
 
                 try {
-                    // Extract practitioner ID from the correct field in the FHIR resource
-                    $practitionerId = null;
-
-                    // Check for the correct practitioner identifier structure based on the JSON example
-                    if (isset($role['practitioner']['identifier']['value'])) {
-                        $practitionerId = $role['practitioner']['identifier']['value'];
+                    if (!isset($role['practitioner']['reference'])) {
+                        $this->logger->warning('PractitionerRole without practitioner reference', ['data' => json_encode($role)]);
+                        $errors++;
+                        continue;
                     }
-                    // Fallback to reference extraction if the identifier structure is different
-                    elseif (isset($role['practitioner']['reference'])) {
-                        if (preg_match('/Practitioner\/(\w+)/', $role['practitioner']['reference'], $matches)) {
-                            $practitionerId = $matches[1];
-                        }
+
+                    $practitionerId = null;
+                    if (preg_match('/Practitioner\/(\w+)/', $role['practitioner']['reference'], $matches)) {
+                        $practitionerId = $matches[1];
                     }
 
                     if (!$practitionerId) {
-                        $this->logger->warning('Could not extract practitioner ID', [
-                            'roleId' => $role['id'] ?? 'unknown',
-                            'practitionerData' => json_encode($role['practitioner'] ?? [])
-                        ]);
+                        $this->logger->warning('Could not extract practitioner ID from reference', ['reference' => $role['practitioner']['reference']]);
                         $errors++;
                         continue;
                     }
 
-                    $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['hisId' => $practitionerId]);
+                    $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['idHis' => $practitionerId]);
 
                     if (!$doctor) {
-                        $this->logger->warning('Doctor not found for practitioner role', [
-                            'hisId' => $practitionerId,
-                            'roleId' => $role['id'] ?? 'unknown'
-                        ]);
+                        $this->logger->warning('Doctor not found for practitioner role', ['idHis' => $practitionerId]);
                         $errors++;
                         continue;
                     }
 
-                    // Associate specialties - improved mapping
+                    // Associate specialties
                     if (isset($role['specialty']) && is_array($role['specialty'])) {
                         foreach ($role['specialty'] as $specialty) {
-                            $specialtyCode = $this->extractCodeFromCoding($specialty);
-
-                            if ($specialtyCode) {
-                                $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)
-                                    ->findOneBy(['code' => $specialtyCode]);
+                            if (isset($specialty['coding'][0]['code'])) {
+                                $specialtyCode = $specialty['coding'][0]['code'];
+                                $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->findOneBy(['code' => $specialtyCode]);
 
                                 if ($medicalSpecialty && !$doctor->getMedicalSpecialties()->contains($medicalSpecialty)) {
                                     $doctor->addMedicalSpecialty($medicalSpecialty);
                                     $this->logger->info('Added specialty to doctor', [
                                         'doctorId' => $doctor->getId(),
-                                        'specialtyId' => $medicalSpecialty->getId(),
-                                        'specialtyCode' => $specialtyCode
-                                    ]);
-                                } elseif (!$medicalSpecialty) {
-                                    $this->logger->warning('Medical specialty not found', [
-                                        'code' => $specialtyCode,
-                                        'doctorId' => $doctor->getId()
+                                        'specialtyId' => $medicalSpecialty->getId()
                                     ]);
                                 }
                             }
                         }
                     }
 
-                    // Associate services - improved mapping
+                    // Associate services
                     if (isset($role['code']) && is_array($role['code'])) {
                         foreach ($role['code'] as $code) {
-                            $serviceCode = $this->extractCodeFromCoding($code);
-
-                            if ($serviceCode) {
-                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)
-                                    ->findOneBy(['code' => $serviceCode]);
+                            if (isset($code['coding'][0]['code'])) {
+                                $serviceCode = $code['coding'][0]['code'];
+                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['code' => $serviceCode]);
 
                                 if ($hospitalService && !$doctor->getHospitalServices()->contains($hospitalService)) {
                                     $doctor->addHospitalService($hospitalService);
                                     $this->logger->info('Added service to doctor', [
                                         'doctorId' => $doctor->getId(),
-                                        'serviceId' => $hospitalService->getId(),
-                                        'serviceCode' => $serviceCode
-                                    ]);
-                                } elseif (!$hospitalService) {
-                                    $this->logger->warning('Hospital service not found', [
-                                        'code' => $serviceCode,
-                                        'doctorId' => $doctor->getId()
+                                        'serviceId' => $hospitalService->getId()
                                     ]);
                                 }
                             }
@@ -313,15 +294,11 @@ class SyncFhirResourcesCommand extends Command
                 } catch (\Exception $e) {
                     $this->logger->error('Error processing practitioner role', [
                         'roleId' => $role['id'] ?? 'unknown',
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
+                        'error' => $e->getMessage()
                     ]);
                     $errors++;
                 }
             }
-
-            // Flush the entity manager to persist all changes at once
-            $this->entityManager->flush();
 
             $this->output->writeln("Practitioner roles: {$count} processed, {$errors} errors");
             $this->logger->info('Practitioner roles sync completed', [
@@ -329,37 +306,9 @@ class SyncFhirResourcesCommand extends Command
                 'errors' => $errors
             ]);
         } catch (\Exception $e) {
-            $this->logger->error('Failed to sync practitioner roles', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            $this->logger->error('Failed to sync practitioner roles', ['error' => $e->getMessage()]);
             throw $e;
         }
-    }
-
-    /**
-     * Helper method to extract code from coding array
-     *
-     * @param array $codingContainer The array containing coding information
-     * @return string|null The extracted code or null if not found
-     */
-    private function extractCodeFromCoding(array $codingContainer): ?string
-    {
-        // Check for the structure in the example JSON
-        if (isset($codingContainer['coding'][0]['code'])) {
-            return $codingContainer['coding'][0]['code'];
-        }
-
-        // Alternative structure check if needed
-        if (isset($codingContainer['coding']) && is_array($codingContainer['coding'])) {
-            foreach ($codingContainer['coding'] as $coding) {
-                if (isset($coding['code'])) {
-                    return $coding['code'];
-                }
-            }
-        }
-
-        return null;
     }
 
     private function syncHealthcareServices(): void
@@ -387,26 +336,26 @@ class SyncFhirResourcesCommand extends Command
                 $service = $entry['resource'];
 
                 try {
-                    $hisId = $service['id'] ?? null;
-                    if (!$hisId) {
+                    $idHis = $service['id'] ?? null;
+                    if (!$idHis) {
                         $this->logger->warning('HealthcareService without ID', ['data' => json_encode($service)]);
                         $errors++;
                         continue;
                     }
 
-                    $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['hisId' => $hisId]);
+                    $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['idHis' => $idHis]);
                     $isNew = false;
 
                     if (!$hospitalService) {
                         $hospitalService = new HospitalService();
-                        $hospitalService->setHisId($hisId);
+                        $hospitalService->setIdHis($idHis);
                         $hospitalService->setIsActive(true);
                         $hospitalService->setColor('#3788d8');
                         $hospitalService->setMode(HospitalService::AMB_MODE);
                         $isNew = true;
                     }
 
-                    $name = $service['name'] ?? 'Service ' . $hisId;
+                    $name = $service['name'] ?? 'Service ' . $idHis;
                     $description = '';
                     if (isset($service['comment'])) {
                         $description = $service['comment'];
@@ -425,7 +374,7 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     if (empty($code)) {
-                        $code = 'CODE_' . $hisId;
+                        $code = 'CODE_' . $idHis;
                     }
 
                     $duration = 30; // Default duration
@@ -477,7 +426,7 @@ class SyncFhirResourcesCommand extends Command
                     }
                 } catch (\Exception $e) {
                     $this->logger->error('Error processing healthcare service', [
-                        'hisId' => $service['id'] ?? 'unknown',
+                        'idHis' => $service['id'] ?? 'unknown',
                         'error' => $e->getMessage()
                     ]);
                     $errors++;
@@ -509,90 +458,65 @@ class SyncFhirResourcesCommand extends Command
                 return;
             }
 
-            $count = 0;
-            $updated = 0;
-            $errors = 0;
-
             foreach ($response['entry'] as $entry) {
                 if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'Schedule') {
                     continue;
                 }
 
                 $schedule = $entry['resource'];
+                $this->logger->info('New entry');
 
                 try {
-                    $hisId = $schedule['id'] ?? null;
-                    if (!$hisId) {
+                    $idHis = $schedule['id'] ?? null;
+
+                    if (!$idHis) {
                         $this->logger->warning('Schedule without ID', ['data' => json_encode($schedule)]);
-                        $errors++;
                         continue;
                     }
 
-                    $doctorId = null;
                     if (isset($schedule['actor']) && is_array($schedule['actor'])) {
                         foreach ($schedule['actor'] as $actor) {
-                            if (isset($actor['reference']) && strpos($actor['reference'], 'Practitioner/') === 0) {
-                                $practitionerId = substr($actor['reference'], 13);
-                                $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['hisId' => $practitionerId]);
-                                if ($doctor) {
-                                    $doctorId = $doctor->getId();
-                                    break;
-                                }
+                            $practitionerId = $actor['identifier']['value'];
+
+                            $doctor = $this->userRepository->findOneBy(['idHis' => $practitionerId]);
+                            if (!$doctor) {
+                                $this->logger->warning('Schedule without valid doctor reference', ['idHis' => $idHis]);
+                                continue;
                             }
+
+                            $date = new \DateTime('today');
+                            if (isset($schedule['planningHorizon']['start'])) {
+                                $date = new \DateTime($schedule['planningHorizon']['start']);
+                            }
+
+                            $doctorSchedule = $this->entityManager->getRepository(DoctorSchedule::class)
+                                ->findOneBy([
+                                    'doctor' => $doctor,
+                                    'date' => $date,
+                                    'idHis' => $idHis
+                                ]);
+
+                            if (!$doctorSchedule) {
+                                $doctorSchedule = new DoctorSchedule();
+                                $doctorSchedule->setDoctor($doctor);
+                                $doctorSchedule->setDate($date);
+                                $doctorSchedule->setIdHis($idHis);
+                            }
+
+                            $this->entityManager->persist($doctorSchedule);
                         }
                     }
 
-                    if (!$doctorId) {
-                        $this->logger->warning('Schedule without valid doctor reference', ['hisId' => $hisId]);
-                        $errors++;
-                        continue;
-                    }
-
-                    $doctor = $this->entityManager->getRepository(Doctor::class)->find($doctorId);
-
-                    $date = new \DateTime('today');
-                    if (isset($schedule['planningHorizon']['start'])) {
-                        $date = new \DateTime($schedule['planningHorizon']['start']);
-                    }
-
-                    $doctorSchedule = $this->entityManager->getRepository(DoctorSchedule::class)
-                        ->findOneBy([
-                            'doctor' => $doctor,
-                            'date' => $date,
-                            'hisId' => $hisId
-                        ]);
-
-                    $isNew = false;
-                    if (!$doctorSchedule) {
-                        $doctorSchedule = new DoctorSchedule();
-                        $doctorSchedule->setDoctor($doctor);
-                        $doctorSchedule->setDate($date);
-                        $doctorSchedule->setHisId($hisId);
-                        $isNew = true;
-                    }
-
-                    $this->entityManager->persist($doctorSchedule);
-
-                    if ($isNew) {
-                        $count++;
-                    } else {
-                        $updated++;
-                    }
                 } catch (\Exception $e) {
-                    $this->logger->error('Error processing schedule', [
-                        'hisId' => $schedule['id'] ?? 'unknown',
+                    $this->logger->error($e->getMessage(), [
+                        'idHis' => $schedule['id'] ?? 'unknown',
                         'error' => $e->getMessage()
                     ]);
-                    $errors++;
                 }
             }
 
-            $this->output->writeln("Schedules: {$count} new, {$updated} updated, {$errors} errors");
-            $this->logger->info('Schedules sync completed', [
-                'new' => $count,
-                'updated' => $updated,
-                'errors' => $errors
-            ]);
+            $this->entityManager->flush();
+            $this->logger->info('Schedules sync completed');
         } catch (\Exception $e) {
             $this->logger->error('Failed to sync schedules', ['error' => $e->getMessage()]);
             throw $e;
@@ -604,131 +528,224 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Synchronizing slots...');
         $this->logger->info('Fetching slots from FHIR API');
 
-        try {
-            $response = $this->apiClient->get('/api/HInterop/GetSlots?active=true');
+        $response = $this->apiClient->get('/api/HInterop/GetSlots?active=true');
 
-            if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $this->logger->warning('No slots found or invalid response format');
-                return;
-            }
+        $stats = [
+            'total'   => count($response['entry'] ?? []),
+            'created' => 0,
+            'updated' => 0,
+            'skipped' => 0,
+            'errors'  => 0
+        ];
 
-            $count = 0;
-            $updated = 0;
-            $errors = 0;
+        if (!isset($response['entry'])
+            || !is_array($response['entry'])
+        ) {
+            $this->logger->error('Invalid FHIR bundle format: missing entries array');
+        }
 
-            foreach ($response['entry'] as $entry) {
-                if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'Slot') {
+        foreach ($response['entry'] as $entry) {
+            try {
+                // Skip non-Slot resources
+                if (!isset($entry['resource'])
+                    || $entry['resource']['resourceType'] !== 'Slot'
+                ) {
+                    $stats['skipped']++;
                     continue;
                 }
 
-                $slot = $entry['resource'];
+                $slotResource = $entry['resource'];
+                $hisId        = $slotResource['id'] ?? null;
 
-                try {
-                    $hisId = $slot['id'] ?? null;
-                    if (!$hisId) {
-                        $this->logger->warning('Slot without ID', ['data' => json_encode($slot)]);
-                        $errors++;
-                        continue;
-                    }
-
-                    $scheduleId = null;
-                    if (isset($slot['schedule']['reference']) && strpos($slot['schedule']['reference'], 'Schedule/') === 0) {
-                        $scheduleHisId = substr($slot['schedule']['reference'], 9);
-                        $doctorSchedule = $this->entityManager->getRepository(DoctorSchedule::class)->findOneBy(['hisId' => $scheduleHisId]);
-                        if ($doctorSchedule) {
-                            $scheduleId = $doctorSchedule->getId();
-                        }
-                    }
-
-                    if (!$scheduleId) {
-                        $this->logger->warning('Slot without valid schedule reference', ['hisId' => $hisId]);
-                        $errors++;
-                        continue;
-                    }
-
-                    $schedule = $this->entityManager->getRepository(DoctorSchedule::class)->find($scheduleId);
-
-                    $timeSlot = $this->entityManager->getRepository(TimeSlot::class)
-                        ->findOneBy([
-                            'schedule' => $schedule,
-                            'hisId' => $hisId
-                        ]);
-
-                    $isNew = false;
-                    if (!$timeSlot) {
-                        $timeSlot = new TimeSlot();
-                        $timeSlot->setSchedule($schedule);
-                        $timeSlot->setHisId($hisId);
-                        $isNew = true;
-                    }
-
-                    $startTime = new \DateTime('08:00');
-                    if (isset($slot['start'])) {
-                        $startDateTime = new \DateTime($slot['start']);
-                        $startTime = $startDateTime;
-                    }
-
-                    $endTime = new \DateTime('08:30');
-                    if (isset($slot['end'])) {
-                        $endDateTime = new \DateTime($slot['end']);
-                        $endTime = $endDateTime;
-                    }
-
-                    $isBooked = false;
-                    if (isset($slot['status']) && $slot['status'] === 'busy') {
-                        $isBooked = true;
-                    }
-
-                    $serviceId = null;
-                    if (isset($slot['serviceType']) && is_array($slot['serviceType'])) {
-                        foreach ($slot['serviceType'] as $serviceType) {
-                            if (isset($serviceType['coding'][0]['code'])) {
-                                $serviceCode = $serviceType['coding'][0]['code'];
-                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['code' => $serviceCode]);
-                                if ($hospitalService) {
-                                    $serviceId = $hospitalService->getId();
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    $timeSlot->setStartTime($startTime);
-                    $timeSlot->setEndTime($endTime);
-                    $timeSlot->setIsBooked($isBooked);
-
-                    if ($serviceId) {
-                        $hospitalService = $this->entityManager->getRepository(HospitalService::class)->find($serviceId);
-                        if ($hospitalService) {
-                            $timeSlot->setHospitalService($hospitalService);
-                        }
-                    }
-
-                    $this->entityManager->persist($timeSlot);
-
-                    if ($isNew) {
-                        $count++;
-                    } else {
-                        $updated++;
-                    }
-                } catch (\Exception $e) {
-                    $this->logger->error('Error processing slot', [
-                        'hisId' => $slot['id'] ?? 'unknown',
-                        'error' => $e->getMessage()
-                    ]);
-                    $errors++;
+                if (!$hisId) {
+                    $this->logger->warning('Skipping Slot without ID');
+                    $stats['skipped']++;
+                    continue;
                 }
-            }
 
-            $this->output->writeln("Slots: {$count} new, {$updated} updated, {$errors} errors");
-            $this->logger->info('Slots sync completed', [
-                'new' => $count,
-                'updated' => $updated,
-                'errors' => $errors
-            ]);
-        } catch (\Exception $e) {
-            $this->logger->error('Failed to sync slots', ['error' => $e->getMessage()]);
-            throw $e;
+                // Check if we already have this slot
+                $existingSlot
+                    = $this->entityManager->getRepository(TimeSlot::class)
+                    ->findOneBy(['idHis' => $hisId]);
+
+                // Extract basic slot information
+                $isBooked = ($slotResource['status'] ?? '') === 'busy';
+                $status   = $slotResource['status'] ?? null;
+
+                // Extract and parse time information
+                $startDateTime = null;
+                $endDateTime   = null;
+                $slotDate      = null;
+
+                if (isset($slotResource['start'])
+                    && isset($slotResource['end'])
+                ) {
+                    $startDateTime = new \DateTime($slotResource['start']);
+                    $endDateTime   = new \DateTime($slotResource['end']);
+
+                    $slotDate = clone $startDateTime;
+                    $slotDate->setTime(0, 0, 0);
+                } else {
+                    if (!$existingSlot) {
+                        $this->logger->warning('Slot missing start/end times, cannot create new slot',
+                            [
+                                'slotId' => $hisId
+                            ]);
+                        $stats['skipped']++;
+                        continue;
+                    }
+                }
+
+                // Get hospital service if available
+                $hospitalService = null;
+                if (isset($slotResource['serviceType'][0]['reference']['identifier']['value'])) {
+                    $serviceHisId
+                        = $slotResource['serviceType'][0]['reference']['identifier']['value'];
+                    $hospitalService
+                        = $this->entityManager->getRepository(HospitalService::class)
+                        ->findOneBy(['idHis' => $serviceHisId]);
+                }
+
+                if ($existingSlot) {
+                    // Update existing slot
+                    $existingSlot->setIsBooked($isBooked);
+
+                    if ($status) {
+                        $existingSlot->setStatus($status);
+                    }
+
+                    if ($startDateTime && $endDateTime) {
+                        // Create time-only objects
+                        $startTime = new \DateTime();
+                        $startTime->setTime(
+                            (int)$startDateTime->format('H'),
+                            (int)$startDateTime->format('i'),
+                            (int)$startDateTime->format('s')
+                        );
+
+                        $endTime = new \DateTime();
+                        $endTime->setTime(
+                            (int)$endDateTime->format('H'),
+                            (int)$endDateTime->format('i'),
+                            (int)$endDateTime->format('s')
+                        );
+
+                        $existingSlot->setStartTime($startTime);
+                        $existingSlot->setEndTime($endTime);
+                    }
+
+                    if ($hospitalService) {
+                        $existingSlot->setHospitalService($hospitalService);
+                    }
+
+                    $this->entityManager->persist($existingSlot);
+                    $stats['updated']++;
+                } else {
+                    // We need to create a new slot - first find or create the schedule
+                    $scheduleRef
+                        = $slotResource['schedule']['identifier']['value']
+                        ?? null;
+
+                    if (!$scheduleRef) {
+                        $this->logger->warning('Slot missing schedule reference, cannot create new slot',
+                            [
+                                'slotId' => $hisId
+                            ]);
+                        $stats['skipped']++;
+                        continue;
+                    }
+
+                    // Find existing schedule
+                    $schedule
+                        = $this->entityManager->getRepository(DoctorSchedule::class)
+                        ->findOneBy(['idHis' => $scheduleRef]);
+
+                    if (!$schedule) {
+                        // Need to create a new schedule - extract doctor information from reference
+                        // Assuming schedule ID has format like "2__422900000000080__26_03_2025__10:00__11__30"
+                        $identifierParts = explode('__', $scheduleRef);
+
+                        if (count($identifierParts) < 3) {
+                            $this->logger->warning('Cannot parse doctor ID from schedule reference',
+                                [
+                                    'scheduleRef' => $scheduleRef,
+                                    'slotId'      => $hisId
+                                ]);
+                            $stats['skipped']++;
+                            continue;
+                        }
+
+                        $doctorHisId = $identifierParts[1] ?? null;
+
+                        $doctor
+                            = $this->entityManager->getRepository(Doctor::class)
+                            ->findOneBy(['idHis' => $doctorHisId]);
+
+                        if (!$doctor) {
+                            $this->logger->warning('Doctor not found for this slot',
+                                [
+                                    'doctorHisId' => $doctorHisId,
+                                    'slotId'      => $hisId
+                                ]);
+                            $stats['skipped']++;
+                            continue;
+                        }
+
+                        // Create the schedule
+                        $schedule = new DoctorSchedule();
+                        $schedule->setIdHis($scheduleRef);
+                        $schedule->setDoctor($doctor);
+                        $schedule->setDate($slotDate);
+
+                        $this->entityManager->persist($schedule);
+                    }
+
+                    // Now create the time slot
+                    $newSlot = new TimeSlot();
+                    $newSlot->setIdHis($hisId);
+                    $newSlot->setSchedule($schedule);
+                    $newSlot->setIsBooked($isBooked);
+
+                    if ($status) {
+                        $newSlot->setStatus($status);
+                    }
+
+                    // Create time-only objects for the slot
+                    $startTime = new \DateTime();
+                    $startTime->setTime(
+                        (int)$startDateTime->format('H'),
+                        (int)$startDateTime->format('i'),
+                        (int)$startDateTime->format('s')
+                    );
+
+                    $endTime = new \DateTime();
+                    $endTime->setTime(
+                        (int)$endDateTime->format('H'),
+                        (int)$endDateTime->format('i'),
+                        (int)$endDateTime->format('s')
+                    );
+
+                    $newSlot->setStartTime($startTime);
+                    $newSlot->setEndTime($endTime);
+
+                    if ($hospitalService) {
+                        $newSlot->setHospitalService($hospitalService);
+                    }
+
+                    $this->entityManager->persist($newSlot);
+                    $stats['created']++;
+                }
+
+                $this->entityManager->flush();
+
+            } catch (\Exception $e) {
+                $this->logger->error('Error processing FHIR Slot', [
+                    'id'    => $hisId ?? 'unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                $stats['errors']++;
+            }
         }
     }
 
@@ -737,219 +754,236 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Synchronizing appointments...');
         $this->logger->info('Fetching appointments from FHIR API');
 
-        try {
-            $response = $this->apiClient->get('/api/HInterop/GetAppointments?active=true');
+        $stats = [
+            'total' => count($response['entry'] ?? []),
+            'created' => 0,
+            'updated' => 0,
+            'skipped' => 0,
+            'errors' => 0
+        ];
 
-            if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $this->logger->warning('No appointments found or invalid response format');
-                return;
-            }
+        if (!isset($response['entry']) || !is_array($response['entry'])) {
+            $this->logger->error('Invalid FHIR bundle format: missing entries array');
+            return;
+        }
 
-            $count = 0;
-            $updated = 0;
-            $errors = 0;
-
-            foreach ($response['entry'] as $entry) {
+        foreach ($response['entry'] as $entry) {
+            try {
+                // Skip non-Appointment resources
                 if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'Appointment') {
+                    $stats['skipped']++;
                     continue;
                 }
 
-                $appointment = $entry['resource'];
+                $appointmentResource = $entry['resource'];
+                $hisId = $appointmentResource['id'] ?? null;
 
-                try {
-                    $hisId = $appointment['id'] ?? null;
-                    if (!$hisId) {
-                        $this->logger->warning('Appointment without ID', ['data' => json_encode($appointment)]);
-                        $errors++;
-                        continue;
-                    }
+                if (!$hisId) {
+                    $this->logger->warning('Skipping Appointment without ID', ['resource' => json_encode($appointmentResource)]);
+                    $stats['skipped']++;
+                    continue;
+                }
 
-                    $existingAppointment = $this->entityManager->getRepository(Appointment::class)->findOneBy(['hisId' => $hisId]);
-                    $isNew = false;
+                // Check if we already have this appointment
+                $existingAppointment = $this->entityManager->getRepository(Appointment::class)->findOneBy(['idHis' => $hisId]);
 
-                    if (!$existingAppointment) {
-                        $existingAppointment = new Appointment();
-                        $existingAppointment->setHisId($hisId);
-                        $existingAppointment->setIsActive(true);
-                        $isNew = true;
-                    }
+                // Extract appointment information
+                $status = $appointmentResource['status'] ?? 'pending';
+                $isActive = ($status === 'booked' || $status === 'fulfilled' || $status === 'pending');
 
-                    $patientId = null;
-                    $doctorId = null;
+                // Extract patient, doctor and service information
+                $patientHisId = null;
+                $doctorHisId = null;
+                $serviceHisId = null;
 
-                    if (isset($appointment['participant']) && is_array($appointment['participant'])) {
-                        foreach ($appointment['participant'] as $participant) {
-                            if (isset($participant['actor']['reference'])) {
-                                if (strpos($participant['actor']['reference'], 'Patient/') === 0) {
-                                    $patientHisId = substr($participant['actor']['reference'], 8);
-                                    $patient = $this->entityManager->getRepository(Doctor::class)->findOneBy(['hisId' => $patientHisId]);
-                                    if ($patient) {
-                                        $patientId = $patient->getId();
-                                    }
-                                } elseif (strpos($participant['actor']['reference'], 'Practitioner/') === 0) {
-                                    $practitionerHisId = substr($participant['actor']['reference'], 13);
-                                    $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['hisId' => $practitionerHisId]);
-                                    if ($doctor) {
-                                        $doctorId = $doctor->getId();
-                                    }
-                                }
+                // Extract participant information
+                if (isset($appointmentResource['participant']) && is_array($appointmentResource['participant'])) {
+                    foreach ($appointmentResource['participant'] as $participant) {
+                        if (isset($participant['actor']['identifier']['value'])) {
+                            if (isset($participant['type'][0]['coding'][0]['code']) && $participant['type'][0]['coding'][0]['code'] === 'practitioner') {
+                                $doctorHisId = $participant['actor']['identifier']['value'];
                             }
                         }
                     }
+                }
 
-                    if (!$patientId || !$doctorId) {
-                        $this->logger->warning('Appointment without valid patient or doctor reference', ['hisId' => $hisId]);
-                        $errors++;
-                        continue;
+                // Try to get patient information from subject if not found in participants
+                if (isset($appointmentResource['subject']['identifier']['value'])) {
+                    $patientHisId = $appointmentResource['subject']['identifier']['value'];
+                }
+
+                // Get service information
+                if (isset($appointmentResource['serviceType'][0]['reference']['identifier']['value'])) {
+                    $serviceHisId = $appointmentResource['serviceType'][0]['reference']['identifier']['value'];
+                }
+
+                // Check if we have the required information
+                if (!$patientHisId || !$doctorHisId || !$serviceHisId) {
+                    $this->logger->warning('Appointment missing required information', [
+                        'appointmentId' => $hisId,
+                        'patientHisId' => $patientHisId,
+                        'doctorHisId' => $doctorHisId,
+                        'serviceHisId' => $serviceHisId
+                    ]);
+                    $stats['skipped']++;
+                    continue;
+                }
+
+                // Find entities
+                $patient = $this->entityManager->getRepository(Patient::class)->findOneBy(['idHis' => $patientHisId]);
+                $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['idHis' => $doctorHisId]);
+                $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['idHis' => $serviceHisId]);
+
+                // Create patient if not found (simplified version - you may want to expand this)
+                if (!$patient) {
+                    $patient = new Patient();
+                    $patient->setIdHis($patientHisId);
+                    $patient->setEmail('patient_' . $patientHisId . '@example.com');
+                    $patient->setFirstName('Patient');
+                    $patient->setLastName($patientHisId);
+                    $patient->setCnp(str_pad($patientHisId, 13, '0', STR_PAD_LEFT));
+                    $patient->setPhone('0000000000');
+                    $patient->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
+                    $patient->setRoles([Patient::BASE_ROLE]);
+
+                    $this->entityManager->persist($patient);
+                    $this->entityManager->flush();
+                }
+
+                // Skip if doctor or service not found
+                if (!$doctor || !$hospitalService) {
+                    $this->logger->warning('Doctor or hospital service not found for appointment', [
+                        'appointmentId' => $hisId,
+                        'doctorFound' => (bool)$doctor,
+                        'serviceFound' => (bool)$hospitalService
+                    ]);
+                    $stats['skipped']++;
+                    continue;
+                }
+
+                // Find medical specialty through hospital service
+                $medicalSpecialty = $hospitalService->getMedicalSpecialty();
+                if (!$medicalSpecialty) {
+                    $this->logger->warning('Hospital service has no medical specialty', [
+                        'appointmentId' => $hisId,
+                        'serviceId' => $hospitalService->getId()
+                    ]);
+                    $stats['skipped']++;
+                    continue;
+                }
+
+                // Extract time slot information
+                $slotIdentifier = null;
+                if (isset($appointmentResource['slot'][0]['identifier']['value'])) {
+                    $slotIdentifier = $appointmentResource['slot'][0]['identifier']['value'];
+                }
+
+
+
+                // Extract date/time information
+                $startDateTime = null;
+                $endDateTime = null;
+                if (isset($appointmentResource['start']) && isset($appointmentResource['end'])) {
+                    $startDateTime = new \DateTime($appointmentResource['start']);
+                    $endDateTime = new \DateTime($appointmentResource['end']);
+                } else {
+                    $this->logger->warning('Appointment missing start/end times', [
+                        'appointmentId' => $hisId
+                    ]);
+                    $stats['skipped']++;
+                    continue;
+                }
+
+                // Find or create time slot
+                $timeSlot = null;
+                if ($slotIdentifier) {
+                    // Try to find existing slot
+                    $timeSlot = $this->entityManager->getRepository(TimeSlot::class)->findOneBy(['idHis' => $slotIdentifier]);
+                }
+
+                if (!$timeSlot) {
+                    // We need to find or create the schedule and time slot
+                    $date = clone $startDateTime;
+                    $date->setTime(0, 0, 0);
+
+                    // Find or create schedule
+                    $schedule = $this->entityManager->getRepository(DoctorSchedule::class)->findOneBy([
+                        'doctor' => $doctor,
+                        'date' => $date
+                    ]);
+
+                    if (!$schedule) {
+                        $schedule = new DoctorSchedule();
+                        $schedule->setDoctor($doctor);
+                        $schedule->setDate($date);
+                        $schedule->setIdHis('schedule_' . $hisId);
+                        $this->entityManager->persist($schedule);
+                        $this->entityManager->flush();
                     }
 
-                    $patient = $this->entityManager->getRepository(Doctor::class)->find($patientId);
-                    $doctor = $this->entityManager->getRepository(Doctor::class)->find($doctorId);
+                    // Create new time slot
+                    $startTime = new \DateTime();
+                    $startTime->setTime(
+                        (int)$startDateTime->format('H'),
+                        (int)$startDateTime->format('i'),
+                        (int)$startDateTime->format('s')
+                    );
 
-                    $specialtyId = null;
-                    if (isset($appointment['serviceCategory']) && is_array($appointment['serviceCategory'])) {
-                        foreach ($appointment['serviceCategory'] as $category) {
-                            if (isset($category['coding'][0]['code'])) {
-                                $code = $category['coding'][0]['code'];
-                                if (strpos($code, 'specialty-') === 0) {
-                                    $specialtyId = intval(substr($code, 10));
-                                    $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->find($specialtyId);
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    $endTime = new \DateTime();
+                    $endTime->setTime(
+                        (int)$endDateTime->format('H'),
+                        (int)$endDateTime->format('i'),
+                        (int)$endDateTime->format('s')
+                    );
 
-                    $serviceId = null;
-                    if (isset($appointment['serviceType']) && is_array($appointment['serviceType'])) {
-                        foreach ($appointment['serviceType'] as $service) {
-                            if (isset($service['coding'][0]['code'])) {
-                                $code = $service['coding'][0]['code'];
-                                if (strpos($code, 'service-') === 0) {
-                                    $serviceId = intval(substr($code, 8));
-                                    $hospitalService = $this->entityManager->getRepository(HospitalService::class)->find($serviceId);
-                                    break;
-                                }
-                            }
-                        }
-                    }
+                    $timeSlot = new TimeSlot();
+                    $timeSlot->setSchedule($schedule);
+                    $timeSlot->setStartTime($startTime);
+                    $timeSlot->setEndTime($endTime);
+                    $timeSlot->setIsBooked(true); // Since we have an appointment, the slot is booked
+                    $timeSlot->setHospitalService($hospitalService);
+                    $timeSlot->setIdHis($slotIdentifier ?? 'slot_' . $hisId);
 
-                    if (!$specialtyId || !$serviceId) {
-                        $this->logger->warning('Appointment without valid specialty or service reference', ['hisId' => $hisId]);
-                        $errors++;
-                        continue;
-                    }
+                    $this->entityManager->persist($timeSlot);
+                    $this->entityManager->flush();
+                }
 
-                    $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->find($specialtyId);
-                    $hospitalService = $this->entityManager->getRepository(HospitalService::class)->find($serviceId);
-
-                    // Find time slot
-                    $timeSlotId = null;
-                    $appointmentDate = null;
-                    if (isset($appointment['start'])) {
-                        $appointmentDate = new \DateTime($appointment['start']);
-                        $scheduleDate = (clone $appointmentDate)->setTime(0, 0, 0);
-                        $startTime = (clone $appointmentDate)->setDate(1970, 1, 1);
-
-                        $doctorSchedules = $this->entityManager->getRepository(DoctorSchedule::class)
-                            ->findBy([
-                                'doctor' => $doctor,
-                                'date' => $scheduleDate
-                            ]);
-
-                        foreach ($doctorSchedules as $schedule) {
-                            $timeSlot = $this->entityManager->getRepository(TimeSlot::class)
-                                ->findOneBy([
-                                    'schedule' => $schedule,
-                                    'startTime' => $startTime
-                                ]);
-
-                            if ($timeSlot) {
-                                $timeSlotId = $timeSlot->getId();
-                                break;
-                            }
-                        }
-                    }
-
-                    if (!$timeSlotId) {
-                        $this->logger->warning('Appointment without valid time slot', ['hisId' => $hisId]);
-
-                        // Create a schedule and time slot if needed
-                        if ($appointmentDate) {
-                            $scheduleDate = (clone $appointmentDate)->setTime(0, 0, 0);
-                            $startTime = (clone $appointmentDate)->setDate(1970, 1, 1);
-                            $endTime = (clone $startTime)->modify('+30 minutes');
-
-                            $schedule = $this->entityManager->getRepository(DoctorSchedule::class)
-                                ->findOneBy([
-                                    'doctor' => $doctor,
-                                    'date' => $scheduleDate
-                                ]);
-
-                            if (!$schedule) {
-                                $schedule = new DoctorSchedule();
-                                $schedule->setDoctor($doctor);
-                                $schedule->setDate($scheduleDate);
-                                $schedule->setHisId('auto_' . $hisId);
-                                $this->entityManager->persist($schedule);
-                            }
-
-                            $timeSlot = new TimeSlot();
-                            $timeSlot->setSchedule($schedule);
-                            $timeSlot->setStartTime($startTime);
-                            $timeSlot->setEndTime($endTime);
-                            $timeSlot->setIsBooked(true);
-                            $timeSlot->setHisId('auto_' . $hisId);
-                            $timeSlot->setHospitalService($hospitalService);
-                            $this->entityManager->persist($timeSlot);
-
-                            $timeSlotId = $timeSlot->getId();
-                        } else {
-                            $errors++;
-                            continue;
-                        }
-                    }
-
-                    $timeSlot = $this->entityManager->getRepository(TimeSlot::class)->find($timeSlotId);
-
+                if ($existingAppointment) {
+                    // Update existing appointment
                     $existingAppointment->setPatient($patient);
                     $existingAppointment->setDoctor($doctor);
                     $existingAppointment->setMedicalSpecialty($medicalSpecialty);
                     $existingAppointment->setHospitalService($hospitalService);
                     $existingAppointment->setTimeSlot($timeSlot);
-
-                    // Mark the appointment as active or inactive based on status
-                    if (isset($appointment['status'])) {
-                        $isActive = $appointment['status'] === 'booked' || $appointment['status'] === 'fulfilled';
-                        $existingAppointment->setIsActive($isActive);
-                    }
+                    $existingAppointment->setIsActive($isActive);
 
                     $this->entityManager->persist($existingAppointment);
+                    $stats['updated']++;
+                } else {
+                    // Create new appointment
+                    $newAppointment = new Appointment();
+                    $newAppointment->setIdHis($hisId);
+                    $newAppointment->setPatient($patient);
+                    $newAppointment->setDoctor($doctor);
+                    $newAppointment->setMedicalSpecialty($medicalSpecialty);
+                    $newAppointment->setHospitalService($hospitalService);
+                    $newAppointment->setTimeSlot($timeSlot);
+                    $newAppointment->setIsActive($isActive);
 
-                    if ($isNew) {
-                        $count++;
-                    } else {
-                        $updated++;
-                    }
-                } catch (\Exception $e) {
-                    $this->logger->error('Error processing appointment', [
-                        'hisId' => $appointment['id'] ?? 'unknown',
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
-                    $errors++;
+                    $this->entityManager->persist($newAppointment);
+                    $stats['created']++;
                 }
-            }
 
-            $this->output->writeln("Appointments: {$count} new, {$updated} updated, {$errors} errors");
-            $this->logger->info('Appointments sync completed', [
-                'new' => $count,
-                'updated' => $updated,
-                'errors' => $errors
-            ]);
-        } catch (\Exception $e) {
-            $this->logger->error('Failed to sync appointments', ['error' => $e->getMessage()]);
-            throw $e;
+                $this->entityManager->flush();
+
+            } catch (\Exception $e) {
+                $this->logger->error('Error processing FHIR Appointment', [
+                    'id' => $hisId ?? 'unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString()
+                ]);
+                $stats['errors']++;
+            }
         }
     }
 
@@ -959,8 +993,6 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Processing medical specialties from FHIR API');
 
         try {
-            // Since medical specialties might be referenced in codes/codings, we'll create a basic set
-            // based on the PractitionerRoles response
             $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
@@ -982,9 +1014,10 @@ class SyncFhirResourcesCommand extends Command
 
                 if (isset($role['specialty']) && is_array($role['specialty'])) {
                     foreach ($role['specialty'] as $specialty) {
-                        if (isset($specialty['coding'][0]['code']) && isset($specialty['coding'][0]['display'])) {
+
+                        if (isset($specialty['coding'][0]['code'])) {
                             $code = $specialty['coding'][0]['code'];
-                            $name = $specialty['coding'][0]['display'];
+                            $name = $specialty['coding'][0]['code'];
                             $specialtyCodes[$code] = $name;
                         }
                     }

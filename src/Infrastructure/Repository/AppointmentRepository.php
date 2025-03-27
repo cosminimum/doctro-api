@@ -79,13 +79,13 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             'participant' => [
                 [
                     'actor' => [
-                        'reference' => 'Patient/' . ($appointment->getPatient()->getHisId() ?? $appointment->getPatient()->getId())
+                        'reference' => 'Patient/' . ($appointment->getPatient()->getIdHis() ?? $appointment->getPatient()->getId())
                     ],
                     'status' => 'accepted'
                 ],
                 [
                     'actor' => [
-                        'reference' => 'Practitioner/' . ($appointment->getDoctor()->getHisId() ?? $appointment->getDoctor()->getId())
+                        'reference' => 'Practitioner/' . ($appointment->getDoctor()->getIdHis() ?? $appointment->getDoctor()->getId())
                     ],
                     'status' => 'accepted'
                 ]
@@ -117,7 +117,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         try {
             $response = $this->fhirApiClient->post('/api/HInterop/CreateAppointment', $fhirAppointment);
             if (isset($response['id'])) {
-                $appointment->setHisId($response['id']);
+                $appointment->setIdHis($response['id']);
                 $this->entityManager->persist($appointment);
                 $this->entityManager->flush();
             }
