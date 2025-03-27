@@ -18,7 +18,7 @@ class DoctorSchedule
     private int $id;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private string $idHis;
+    private ?string $idHis = null;
 
     #[ORM\ManyToOne(targetEntity: Doctor::class, inversedBy: 'schedules')]
     #[ORM\JoinColumn(nullable: false)]
