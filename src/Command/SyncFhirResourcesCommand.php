@@ -521,7 +521,7 @@ class SyncFhirResourcesCommand extends Command
                 'errors'  => 0
             ];
 
-            dump($response);
+            dump(json_encode($response));
             if (!isset($response['entry'])
                 || !is_array($response['entry'])
             ) {
