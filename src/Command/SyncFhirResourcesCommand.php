@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Application\Repository\DoctorRepositoryInterface;
 use App\Infrastructure\Entity\Appointment;
 use App\Infrastructure\Entity\Doctor;
 use App\Infrastructure\Entity\DoctorSchedule;
@@ -9,6 +10,7 @@ use App\Infrastructure\Entity\HospitalService;
 use App\Infrastructure\Entity\MedicalSpecialty;
 use App\Infrastructure\Entity\Patient;
 use App\Infrastructure\Entity\TimeSlot;
+use App\Infrastructure\Repository\DoctorScheduleRepository;
 use App\Infrastructure\Repository\UserRepository;
 use App\Infrastructure\Service\FhirApiClient;
 use Doctrine\ORM\EntityManagerInterface;
@@ -28,20 +30,26 @@ class SyncFhirResourcesCommand extends Command
     private FhirApiClient $apiClient;
     private LoggerInterface $logger;
     private OutputInterface $output;
+    private DoctorScheduleRepository $doctorScheduleRepository;
 
     private UserRepository $userRepository;
+    private DoctorRepositoryInterface $doctorRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
         FhirApiClient $apiClient,
         LoggerInterface $logger,
         UserRepository $userRepository,
+        DoctorScheduleRepository $doctorScheduleRepository,
+        DoctorRepositoryInterface $doctorRepository,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->apiClient = $apiClient;
         $this->logger = $logger;
         $this->userRepository = $userRepository;
+        $this->doctorScheduleRepository = $doctorScheduleRepository;
+        $this->doctorRepository = $doctorRepository;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -451,7 +459,8 @@ class SyncFhirResourcesCommand extends Command
         $this->logger->info('Fetching schedules from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetSchedules?active=true');
+            $date = date('Y-m-d');
+            $response = $this->apiClient->get('/api/HInterop/GetSchedules?GetSchedules?date=' . $date);
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No schedules found or invalid response format');
@@ -527,95 +536,193 @@ class SyncFhirResourcesCommand extends Command
     {
         $this->output->writeln('Synchronizing slots...');
         $this->logger->info('Fetching slots from FHIR API');
+        $schedules = $this->doctorScheduleRepository->findAll();
 
-        $response = $this->apiClient->get('/api/HInterop/GetSlots?active=true');
+        /** @var DoctorSchedule $schedule */
+        foreach ($schedules as $schedule) {
+            $response = $this->apiClient->get('/api/HInterop/GetSlots?schedule=' . $schedule->getIdHis());
 
-        $stats = [
-            'total'   => count($response['entry'] ?? []),
-            'created' => 0,
-            'updated' => 0,
-            'skipped' => 0,
-            'errors'  => 0
-        ];
+            $stats = [
+                'total'   => count($response['entry'] ?? []),
+                'created' => 0,
+                'updated' => 0,
+                'skipped' => 0,
+                'errors'  => 0
+            ];
 
-        if (!isset($response['entry'])
-            || !is_array($response['entry'])
-        ) {
-            $this->logger->error('Invalid FHIR bundle format: missing entries array');
-        }
+            if (!isset($response['entry'])
+                || !is_array($response['entry'])
+            ) {
+                $this->logger->error('Invalid FHIR bundle format: missing entries array');
+            }
 
-        foreach ($response['entry'] as $entry) {
-            try {
-                // Skip non-Slot resources
-                if (!isset($entry['resource'])
-                    || $entry['resource']['resourceType'] !== 'Slot'
-                ) {
-                    $stats['skipped']++;
-                    continue;
-                }
-
-                $slotResource = $entry['resource'];
-                $hisId        = $slotResource['id'] ?? null;
-
-                if (!$hisId) {
-                    $this->logger->warning('Skipping Slot without ID');
-                    $stats['skipped']++;
-                    continue;
-                }
-
-                // Check if we already have this slot
-                $existingSlot
-                    = $this->entityManager->getRepository(TimeSlot::class)
-                    ->findOneBy(['idHis' => $hisId]);
-
-                // Extract basic slot information
-                $isBooked = ($slotResource['status'] ?? '') === 'busy';
-                $status   = $slotResource['status'] ?? null;
-
-                // Extract and parse time information
-                $startDateTime = null;
-                $endDateTime   = null;
-                $slotDate      = null;
-
-                if (isset($slotResource['start'])
-                    && isset($slotResource['end'])
-                ) {
-                    $startDateTime = new \DateTime($slotResource['start']);
-                    $endDateTime   = new \DateTime($slotResource['end']);
-
-                    $slotDate = clone $startDateTime;
-                    $slotDate->setTime(0, 0, 0);
-                } else {
-                    if (!$existingSlot) {
-                        $this->logger->warning('Slot missing start/end times, cannot create new slot',
-                            [
-                                'slotId' => $hisId
-                            ]);
+            foreach ($response['entry'] as $entry) {
+                try {
+                    // Skip non-Slot resources
+                    if (!isset($entry['resource'])
+                        || $entry['resource']['resourceType'] !== 'Slot'
+                    ) {
                         $stats['skipped']++;
                         continue;
                     }
-                }
 
-                // Get hospital service if available
-                $hospitalService = null;
-                if (isset($slotResource['serviceType'][0]['reference']['identifier']['value'])) {
-                    $serviceHisId
-                        = $slotResource['serviceType'][0]['reference']['identifier']['value'];
-                    $hospitalService
-                        = $this->entityManager->getRepository(HospitalService::class)
-                        ->findOneBy(['idHis' => $serviceHisId]);
-                }
+                    $slotResource = $entry['resource'];
+                    $hisId        = $slotResource['id'] ?? null;
 
-                if ($existingSlot) {
-                    // Update existing slot
-                    $existingSlot->setIsBooked($isBooked);
-
-                    if ($status) {
-                        $existingSlot->setStatus($status);
+                    if (!$hisId) {
+                        $this->logger->warning('Skipping Slot without ID');
+                        $stats['skipped']++;
+                        continue;
                     }
 
-                    if ($startDateTime && $endDateTime) {
-                        // Create time-only objects
+                    // Check if we already have this slot
+                    $existingSlot
+                        = $this->entityManager->getRepository(TimeSlot::class)
+                        ->findOneBy(['idHis' => $hisId]);
+
+                    // Extract basic slot information
+                    $isBooked = ($slotResource['status'] ?? '') === 'busy';
+                    $status   = $slotResource['status'] ?? null;
+
+                    // Extract and parse time information
+                    $startDateTime = null;
+                    $endDateTime   = null;
+                    $slotDate      = null;
+
+                    if (isset($slotResource['start'])
+                        && isset($slotResource['end'])
+                    ) {
+                        $startDateTime = new \DateTime($slotResource['start']);
+                        $endDateTime   = new \DateTime($slotResource['end']);
+
+                        $slotDate = clone $startDateTime;
+                        $slotDate->setTime(0, 0, 0);
+                    } else {
+                        if (!$existingSlot) {
+                            $this->logger->warning('Slot missing start/end times, cannot create new slot',
+                                [
+                                    'slotId' => $hisId
+                                ]);
+                            $stats['skipped']++;
+                            continue;
+                        }
+                    }
+
+                    // Get hospital service if available
+                    $hospitalService = null;
+                    if (isset($slotResource['serviceType'][0]['reference']['identifier']['value'])) {
+                        $serviceHisId
+                            = $slotResource['serviceType'][0]['reference']['identifier']['value'];
+                        $hospitalService
+                            = $this->entityManager->getRepository(HospitalService::class)
+                            ->findOneBy(['idHis' => $serviceHisId]);
+                    }
+
+                    if ($existingSlot) {
+                        // Update existing slot
+                        $existingSlot->setIsBooked($isBooked);
+
+                        if ($status) {
+                            $existingSlot->setStatus($status);
+                        }
+
+                        if ($startDateTime && $endDateTime) {
+                            // Create time-only objects
+                            $startTime = new \DateTime();
+                            $startTime->setTime(
+                                (int)$startDateTime->format('H'),
+                                (int)$startDateTime->format('i'),
+                                (int)$startDateTime->format('s')
+                            );
+
+                            $endTime = new \DateTime();
+                            $endTime->setTime(
+                                (int)$endDateTime->format('H'),
+                                (int)$endDateTime->format('i'),
+                                (int)$endDateTime->format('s')
+                            );
+
+                            $existingSlot->setStartTime($startTime);
+                            $existingSlot->setEndTime($endTime);
+                        }
+
+                        if ($hospitalService) {
+                            $existingSlot->setHospitalService($hospitalService);
+                        }
+
+                        $this->entityManager->persist($existingSlot);
+                        $stats['updated']++;
+                    } else {
+                        // We need to create a new slot - first find or create the schedule
+                        $scheduleRef
+                            = $slotResource['schedule']['identifier']['value']
+                            ?? null;
+
+                        if (!$scheduleRef) {
+                            $this->logger->warning('Slot missing schedule reference, cannot create new slot',
+                                [
+                                    'slotId' => $hisId
+                                ]);
+                            $stats['skipped']++;
+                            continue;
+                        }
+
+                        // Find existing schedule
+                        $schedule
+                            = $this->entityManager->getRepository(DoctorSchedule::class)
+                            ->findOneBy(['idHis' => $scheduleRef]);
+
+                        if (!$schedule) {
+                            // Need to create a new schedule - extract doctor information from reference
+                            // Assuming schedule ID has format like "2__422900000000080__26_03_2025__10:00__11__30"
+                            $identifierParts = explode('__', $scheduleRef);
+
+                            if (count($identifierParts) < 3) {
+                                $this->logger->warning('Cannot parse doctor ID from schedule reference',
+                                    [
+                                        'scheduleRef' => $scheduleRef,
+                                        'slotId'      => $hisId
+                                    ]);
+                                $stats['skipped']++;
+                                continue;
+                            }
+
+                            $doctorHisId = $identifierParts[1] ?? null;
+
+                            $doctor
+                                = $this->entityManager->getRepository(Doctor::class)
+                                ->findOneBy(['idHis' => $doctorHisId]);
+
+                            if (!$doctor) {
+                                $this->logger->warning('Doctor not found for this slot',
+                                    [
+                                        'doctorHisId' => $doctorHisId,
+                                        'slotId'      => $hisId
+                                    ]);
+                                $stats['skipped']++;
+                                continue;
+                            }
+
+                            // Create the schedule
+                            $schedule = new DoctorSchedule();
+                            $schedule->setIdHis($scheduleRef);
+                            $schedule->setDoctor($doctor);
+                            $schedule->setDate($slotDate);
+
+                            $this->entityManager->persist($schedule);
+                        }
+
+                        // Now create the time slot
+                        $newSlot = new TimeSlot();
+                        $newSlot->setIdHis($hisId);
+                        $newSlot->setSchedule($schedule);
+                        $newSlot->setIsBooked($isBooked);
+
+                        if ($status) {
+                            $newSlot->setStatus($status);
+                        }
+
+                        // Create time-only objects for the slot
                         $startTime = new \DateTime();
                         $startTime->setTime(
                             (int)$startDateTime->format('H'),
@@ -630,121 +737,27 @@ class SyncFhirResourcesCommand extends Command
                             (int)$endDateTime->format('s')
                         );
 
-                        $existingSlot->setStartTime($startTime);
-                        $existingSlot->setEndTime($endTime);
-                    }
+                        $newSlot->setStartTime($startTime);
+                        $newSlot->setEndTime($endTime);
 
-                    if ($hospitalService) {
-                        $existingSlot->setHospitalService($hospitalService);
-                    }
-
-                    $this->entityManager->persist($existingSlot);
-                    $stats['updated']++;
-                } else {
-                    // We need to create a new slot - first find or create the schedule
-                    $scheduleRef
-                        = $slotResource['schedule']['identifier']['value']
-                        ?? null;
-
-                    if (!$scheduleRef) {
-                        $this->logger->warning('Slot missing schedule reference, cannot create new slot',
-                            [
-                                'slotId' => $hisId
-                            ]);
-                        $stats['skipped']++;
-                        continue;
-                    }
-
-                    // Find existing schedule
-                    $schedule
-                        = $this->entityManager->getRepository(DoctorSchedule::class)
-                        ->findOneBy(['idHis' => $scheduleRef]);
-
-                    if (!$schedule) {
-                        // Need to create a new schedule - extract doctor information from reference
-                        // Assuming schedule ID has format like "2__422900000000080__26_03_2025__10:00__11__30"
-                        $identifierParts = explode('__', $scheduleRef);
-
-                        if (count($identifierParts) < 3) {
-                            $this->logger->warning('Cannot parse doctor ID from schedule reference',
-                                [
-                                    'scheduleRef' => $scheduleRef,
-                                    'slotId'      => $hisId
-                                ]);
-                            $stats['skipped']++;
-                            continue;
+                        if ($hospitalService) {
+                            $newSlot->setHospitalService($hospitalService);
                         }
 
-                        $doctorHisId = $identifierParts[1] ?? null;
-
-                        $doctor
-                            = $this->entityManager->getRepository(Doctor::class)
-                            ->findOneBy(['idHis' => $doctorHisId]);
-
-                        if (!$doctor) {
-                            $this->logger->warning('Doctor not found for this slot',
-                                [
-                                    'doctorHisId' => $doctorHisId,
-                                    'slotId'      => $hisId
-                                ]);
-                            $stats['skipped']++;
-                            continue;
-                        }
-
-                        // Create the schedule
-                        $schedule = new DoctorSchedule();
-                        $schedule->setIdHis($scheduleRef);
-                        $schedule->setDoctor($doctor);
-                        $schedule->setDate($slotDate);
-
-                        $this->entityManager->persist($schedule);
+                        $this->entityManager->persist($newSlot);
+                        $stats['created']++;
                     }
 
-                    // Now create the time slot
-                    $newSlot = new TimeSlot();
-                    $newSlot->setIdHis($hisId);
-                    $newSlot->setSchedule($schedule);
-                    $newSlot->setIsBooked($isBooked);
+                    $this->entityManager->flush();
 
-                    if ($status) {
-                        $newSlot->setStatus($status);
-                    }
-
-                    // Create time-only objects for the slot
-                    $startTime = new \DateTime();
-                    $startTime->setTime(
-                        (int)$startDateTime->format('H'),
-                        (int)$startDateTime->format('i'),
-                        (int)$startDateTime->format('s')
-                    );
-
-                    $endTime = new \DateTime();
-                    $endTime->setTime(
-                        (int)$endDateTime->format('H'),
-                        (int)$endDateTime->format('i'),
-                        (int)$endDateTime->format('s')
-                    );
-
-                    $newSlot->setStartTime($startTime);
-                    $newSlot->setEndTime($endTime);
-
-                    if ($hospitalService) {
-                        $newSlot->setHospitalService($hospitalService);
-                    }
-
-                    $this->entityManager->persist($newSlot);
-                    $stats['created']++;
+                } catch (\Exception $e) {
+                    $this->logger->error('Error processing FHIR Slot', [
+                        'id'    => $hisId ?? 'unknown',
+                        'error' => $e->getMessage(),
+                        'trace' => $e->getTraceAsString()
+                    ]);
+                    $stats['errors']++;
                 }
-
-                $this->entityManager->flush();
-
-            } catch (\Exception $e) {
-                $this->logger->error('Error processing FHIR Slot', [
-                    'id'    => $hisId ?? 'unknown',
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
-                $stats['errors']++;
             }
         }
     }
@@ -753,6 +766,7 @@ class SyncFhirResourcesCommand extends Command
     {
         $this->output->writeln('Synchronizing appointments...');
         $this->logger->info('Fetching appointments from FHIR API');
+        $response = $this->apiClient->get('/api/HInterop/GetAppointments?status=pending');
 
         $stats = [
             'total' => count($response['entry'] ?? []),
