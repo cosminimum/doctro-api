@@ -46,7 +46,7 @@ class SyncFhirResourcesCommand extends Command
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->apiClient = $apiClient;
-        $this->logger = $logger;
+        $output = $logger;
         $this->userRepository = $userRepository;
         $this->doctorScheduleRepository = $doctorScheduleRepository;
         $this->doctorRepository = $doctorRepository;
@@ -57,7 +57,7 @@ class SyncFhirResourcesCommand extends Command
         $this->output = $output;
         $startTime = microtime(true);
 
-        $this->logger->info('Starting FHIR resources synchronization');
+        $output->writeln('Starting FHIR resources synchronization');
         $output->writeln('Starting FHIR resources synchronization...');
 
         try {
@@ -65,24 +65,21 @@ class SyncFhirResourcesCommand extends Command
 //            $this->syncPractitioners();
 //            $this->syncHealthcareServices();
 //            $this->syncPractitionerRoles();
-            $this->syncSchedules();
-            $this->syncSlots();
-            $this->syncAppointments();
+            $this->syncSchedules($output);
+            $this->syncSlots($output);
+            $this->syncAppointments($output);
 
             $this->entityManager->flush();
 
             $endTime = microtime(true);
             $executionTime = round($endTime - $startTime, 2);
 
-            $this->logger->info('FHIR resources synchronization completed', ['execution_time' => $executionTime]);
+            $output->writeln('FHIR resources synchronization completed');
             $output->writeln("Synchronization completed successfully in {$executionTime} seconds");
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $this->logger->error('Error during FHIR synchronization', [
-                'error' => $e->getMessage(),
-                'trace' => $e->getTraceAsString()
-            ]);
+            $output->writeln('Error during FHIR synchronization');
 
             $output->writeln('Error during synchronization: ' . $e->getMessage());
             return Command::FAILURE;
@@ -92,13 +89,13 @@ class SyncFhirResourcesCommand extends Command
     private function syncPractitioners(): void
     {
         $this->output->writeln('Synchronizing practitioners...');
-        $this->logger->info('Fetching practitioners from FHIR API');
+        $output->writeln('Fetching practitioners from FHIR API');
 
         try {
             $response = $this->apiClient->get('/api/HInterop/GetPractitioners?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $this->logger->warning('No practitioners found or invalid response format');
+                $output->writeln('No practitioners found or invalid response format');
                 return;
             }
 
@@ -116,7 +113,7 @@ class SyncFhirResourcesCommand extends Command
                 try {
                     $idHis = $practitioner['id'] ?? null;
                     if (!$idHis) {
-                        $this->logger->warning('Practitioner without ID', ['data' => json_encode($practitioner)]);
+                        $output->writeln('Practitioner without ID');
                         $errors++;
                         continue;
                     }
@@ -192,22 +189,15 @@ class SyncFhirResourcesCommand extends Command
                         $updated++;
                     }
                 } catch (\Exception $e) {
-                    $this->logger->error('Error processing practitioner', [
-                        'idHis' => $practitioner['id'] ?? 'unknown',
-                        'error' => $e->getMessage()
-                    ]);
+                    $output->writeln('Error processing practitioner');
                     $errors++;
                 }
             }
 
             $this->output->writeln("Practitioners: {$count} new, {$updated} updated, {$errors} errors");
-            $this->logger->info('Practitioners sync completed', [
-                'new' => $count,
-                'updated' => $updated,
-                'errors' => $errors
-            ]);
+            $output->writeln('Practitioners sync completed');
         } catch (\Exception $e) {
-            $this->logger->error('Failed to sync practitioners', ['error' => $e->getMessage()]);
+            $output->writeln('Failed to sync practitioners');
             throw $e;
         }
     }
@@ -215,13 +205,13 @@ class SyncFhirResourcesCommand extends Command
     private function syncPractitionerRoles(): void
     {
         $this->output->writeln('Synchronizing practitioner roles...');
-        $this->logger->info('Fetching practitioner roles from FHIR API');
+        $output->writeln('Fetching practitioner roles from FHIR API');
 
         try {
             $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $this->logger->warning('No practitioner roles found or invalid response format');
+                $output->writeln('No practitioner roles found or invalid response format');
                 return;
             }
 
@@ -237,7 +227,7 @@ class SyncFhirResourcesCommand extends Command
 
                 try {
                     if (!isset($role['practitioner']['reference'])) {
-                        $this->logger->warning('PractitionerRole without practitioner reference', ['data' => json_encode($role)]);
+                        $output->writeln('PractitionerRole without practitioner reference');
                         $errors++;
                         continue;
                     }
@@ -248,7 +238,7 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     if (!$practitionerId) {
-                        $this->logger->warning('Could not extract practitioner ID from reference', ['reference' => $role['practitioner']['reference']]);
+                        $output->writeln('Could not extract practitioner ID from reference');
                         $errors++;
                         continue;
                     }
@@ -256,7 +246,7 @@ class SyncFhirResourcesCommand extends Command
                     $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['idHis' => $practitionerId]);
 
                     if (!$doctor) {
-                        $this->logger->warning('Doctor not found for practitioner role', ['idHis' => $practitionerId]);
+                        $output->writeln('Doctor not found for practitioner role');
                         $errors++;
                         continue;
                     }
@@ -270,10 +260,7 @@ class SyncFhirResourcesCommand extends Command
 
                                 if ($medicalSpecialty && !$doctor->getMedicalSpecialties()->contains($medicalSpecialty)) {
                                     $doctor->addMedicalSpecialty($medicalSpecialty);
-                                    $this->logger->info('Added specialty to doctor', [
-                                        'doctorId' => $doctor->getId(),
-                                        'specialtyId' => $medicalSpecialty->getId()
-                                    ]);
+                                    $output->writeln('Added specialty to doctor');
                                 }
                             }
                         }
@@ -288,10 +275,7 @@ class SyncFhirResourcesCommand extends Command
 
                                 if ($hospitalService && !$doctor->getHospitalServices()->contains($hospitalService)) {
                                     $doctor->addHospitalService($hospitalService);
-                                    $this->logger->info('Added service to doctor', [
-                                        'doctorId' => $doctor->getId(),
-                                        'serviceId' => $hospitalService->getId()
-                                    ]);
+                                    $output->writeln('Added service to doctor');
                                 }
                             }
                         }
@@ -300,21 +284,15 @@ class SyncFhirResourcesCommand extends Command
                     $this->entityManager->persist($doctor);
                     $count++;
                 } catch (\Exception $e) {
-                    $this->logger->error('Error processing practitioner role', [
-                        'roleId' => $role['id'] ?? 'unknown',
-                        'error' => $e->getMessage()
-                    ]);
+                    $output->writeln('Error processing practitioner role');
                     $errors++;
                 }
             }
 
             $this->output->writeln("Practitioner roles: {$count} processed, {$errors} errors");
-            $this->logger->info('Practitioner roles sync completed', [
-                'processed' => $count,
-                'errors' => $errors
-            ]);
+            $output->writeln('Practitioner roles sync completed');
         } catch (\Exception $e) {
-            $this->logger->error('Failed to sync practitioner roles', ['error' => $e->getMessage()]);
+            $output->writeln('Failed to sync practitioner roles');
             throw $e;
         }
     }
@@ -322,13 +300,13 @@ class SyncFhirResourcesCommand extends Command
     private function syncHealthcareServices(): void
     {
         $this->output->writeln('Synchronizing healthcare services...');
-        $this->logger->info('Fetching healthcare services from FHIR API');
+        $output->writeln('Fetching healthcare services from FHIR API');
 
         try {
             $response = $this->apiClient->get('/api/HInterop/GetHealthcareServices?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $this->logger->warning('No healthcare services found or invalid response format');
+                $output->writeln('No healthcare services found or invalid response format');
                 return;
             }
 
@@ -346,7 +324,7 @@ class SyncFhirResourcesCommand extends Command
                 try {
                     $idHis = $service['id'] ?? null;
                     if (!$idHis) {
-                        $this->logger->warning('HealthcareService without ID', ['data' => json_encode($service)]);
+                        $output->writeln('HealthcareService without ID');
                         $errors++;
                         continue;
                     }
@@ -433,37 +411,30 @@ class SyncFhirResourcesCommand extends Command
                         $updated++;
                     }
                 } catch (\Exception $e) {
-                    $this->logger->error('Error processing healthcare service', [
-                        'idHis' => $service['id'] ?? 'unknown',
-                        'error' => $e->getMessage()
-                    ]);
+                    $output->writeln('Error processing healthcare service');
                     $errors++;
                 }
             }
 
             $this->output->writeln("Healthcare services: {$count} new, {$updated} updated, {$errors} errors");
-            $this->logger->info('Healthcare services sync completed', [
-                'new' => $count,
-                'updated' => $updated,
-                'errors' => $errors
-            ]);
+            $output->writeln('Healthcare services sync completed');
         } catch (\Exception $e) {
-            $this->logger->error('Failed to sync healthcare services', ['error' => $e->getMessage()]);
+            $output->writeln('Failed to sync healthcare services');
             throw $e;
         }
     }
 
-    private function syncSchedules(): void
+    private function syncSchedules($output): void
     {
         $this->output->writeln('Synchronizing schedules...');
-        $this->logger->info('Fetching schedules from FHIR API');
+        $output->writeln('Fetching schedules from FHIR API');
 
         try {
             $date = date('Y-m-d');
             $response = $this->apiClient->get('/api/HInterop/GetSchedules?date=' . $date);
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $this->logger->warning('No schedules found or invalid response format');
+                $output->writeln('No schedules found or invalid response format');
                 return;
             }
 
@@ -473,13 +444,13 @@ class SyncFhirResourcesCommand extends Command
                 }
 
                 $schedule = $entry['resource'];
-                $this->logger->info('New entry');
+                $output->writeln('New entry');
 
                 try {
                     $idHis = $schedule['id'] ?? null;
 
                     if (!$idHis) {
-                        $this->logger->warning('Schedule without ID', ['data' => json_encode($schedule)]);
+                        $output->writeln('Schedule without ID');
                         continue;
                     }
 
@@ -489,7 +460,7 @@ class SyncFhirResourcesCommand extends Command
 
                             $doctor = $this->userRepository->findOneBy(['idHis' => $practitionerId]);
                             if (!$doctor) {
-                                $this->logger->warning('Schedule without valid doctor reference', ['idHis' => $idHis]);
+                                $output->writeln('Schedule without valid doctor reference');
                                 continue;
                             }
 
@@ -517,25 +488,22 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                 } catch (\Exception $e) {
-                    $this->logger->error($e->getMessage(), [
-                        'idHis' => $schedule['id'] ?? 'unknown',
-                        'error' => $e->getMessage()
-                    ]);
+                    $output->writeln($e->getMessage());
                 }
             }
 
             $this->entityManager->flush();
-            $this->logger->info('Schedules sync completed');
+            $output->writeln('Schedules sync completed');
         } catch (\Exception $e) {
-            $this->logger->error('Failed to sync schedules', ['error' => $e->getMessage()]);
+            $output->writeln('Failed to sync schedules');
             throw $e;
         }
     }
 
-    private function syncSlots(): void
+    private function syncSlots($output): void
     {
         $this->output->writeln('Synchronizing slots...');
-        $this->logger->info('Fetching slots from FHIR API');
+        $output->writeln('Fetching slots from FHIR API');
         $schedules = $this->doctorScheduleRepository->findAll();
 
         /** @var DoctorSchedule $schedule */
@@ -556,7 +524,7 @@ class SyncFhirResourcesCommand extends Command
             if (!isset($response['entry'])
                 || !is_array($response['entry'])
             ) {
-                $this->logger->error('Invalid FHIR bundle format: missing entries array');
+                $output->writeln('Invalid FHIR bundle format: missing entries array');
             }
 
             foreach ($response['entry'] as $entry) {
@@ -573,7 +541,7 @@ class SyncFhirResourcesCommand extends Command
                     $hisId        = $slotResource['id'] ?? null;
 
                     if (!$hisId) {
-                        $this->logger->warning('Skipping Slot without ID');
+                        $output->writeln('Skipping Slot without ID');
                         $stats['skipped']++;
                         continue;
                     }
@@ -602,7 +570,7 @@ class SyncFhirResourcesCommand extends Command
                         $slotDate->setTime(0, 0, 0);
                     } else {
                         if (!$existingSlot) {
-                            $this->logger->warning('Slot missing start/end times, cannot create new slot',
+                            $output->writeln('Slot missing start/end times, cannot create new slot',
                                 [
                                     'slotId' => $hisId
                                 ]);
@@ -662,7 +630,7 @@ class SyncFhirResourcesCommand extends Command
                             ?? null;
 
                         if (!$scheduleRef) {
-                            $this->logger->warning('Slot missing schedule reference, cannot create new slot',
+                            $output->writeln('Slot missing schedule reference, cannot create new slot',
                                 [
                                     'slotId' => $hisId
                                 ]);
@@ -681,7 +649,7 @@ class SyncFhirResourcesCommand extends Command
                             $identifierParts = explode('__', $scheduleRef);
 
                             if (count($identifierParts) < 3) {
-                                $this->logger->warning('Cannot parse doctor ID from schedule reference',
+                                $output->writeln('Cannot parse doctor ID from schedule reference',
                                     [
                                         'scheduleRef' => $scheduleRef,
                                         'slotId'      => $hisId
@@ -697,7 +665,7 @@ class SyncFhirResourcesCommand extends Command
                                 ->findOneBy(['idHis' => $doctorHisId]);
 
                             if (!$doctor) {
-                                $this->logger->warning('Doctor not found for this slot',
+                                $output->writeln('Doctor not found for this slot',
                                     [
                                         'doctorHisId' => $doctorHisId,
                                         'slotId'      => $hisId
@@ -754,21 +722,17 @@ class SyncFhirResourcesCommand extends Command
                     $this->entityManager->flush();
 
                 } catch (\Exception $e) {
-                    $this->logger->error('Error processing FHIR Slot', [
-                        'id'    => $hisId ?? 'unknown',
-                        'error' => $e->getMessage(),
-                        'trace' => $e->getTraceAsString()
-                    ]);
+                    $output->writeln('Error processing FHIR Slot');
                     $stats['errors']++;
                 }
             }
         }
     }
 
-    private function syncAppointments(): void
+    private function syncAppointments($output): void
     {
         $this->output->writeln('Synchronizing appointments...');
-        $this->logger->info('Fetching appointments from FHIR API');
+        $output->writeln('Fetching appointments from FHIR API');
         $response = $this->apiClient->get('/api/HInterop/GetAppointments?status=pending');
 
         $stats = [
@@ -780,7 +744,7 @@ class SyncFhirResourcesCommand extends Command
         ];
 
         if (!isset($response['entry']) || !is_array($response['entry'])) {
-            $this->logger->error('Invalid FHIR bundle format: missing entries array');
+            $output->writeln('Invalid FHIR bundle format: missing entries array');
             return;
         }
 
@@ -796,7 +760,7 @@ class SyncFhirResourcesCommand extends Command
                 $hisId = $appointmentResource['id'] ?? null;
 
                 if (!$hisId) {
-                    $this->logger->warning('Skipping Appointment without ID', ['resource' => json_encode($appointmentResource)]);
+                    $output->writeln('Skipping Appointment without ID');
                     $stats['skipped']++;
                     continue;
                 }
@@ -836,12 +800,7 @@ class SyncFhirResourcesCommand extends Command
 
                 // Check if we have the required information
                 if (!$patientHisId || !$doctorHisId || !$serviceHisId) {
-                    $this->logger->warning('Appointment missing required information', [
-                        'appointmentId' => $hisId,
-                        'patientHisId' => $patientHisId,
-                        'doctorHisId' => $doctorHisId,
-                        'serviceHisId' => $serviceHisId
-                    ]);
+                    $output->writeln('Appointment missing required information');
                     $stats['skipped']++;
                     continue;
                 }
@@ -869,11 +828,7 @@ class SyncFhirResourcesCommand extends Command
 
                 // Skip if doctor or service not found
                 if (!$doctor || !$hospitalService) {
-                    $this->logger->warning('Doctor or hospital service not found for appointment', [
-                        'appointmentId' => $hisId,
-                        'doctorFound' => (bool)$doctor,
-                        'serviceFound' => (bool)$hospitalService
-                    ]);
+                    $output->writeln('Doctor or hospital service not found for appointment');
                     $stats['skipped']++;
                     continue;
                 }
@@ -881,10 +836,7 @@ class SyncFhirResourcesCommand extends Command
                 // Find medical specialty through hospital service
                 $medicalSpecialty = $hospitalService->getMedicalSpecialty();
                 if (!$medicalSpecialty) {
-                    $this->logger->warning('Hospital service has no medical specialty', [
-                        'appointmentId' => $hisId,
-                        'serviceId' => $hospitalService->getId()
-                    ]);
+                    $output->writeln('Hospital service has no medical specialty');
                     $stats['skipped']++;
                     continue;
                 }
@@ -904,9 +856,7 @@ class SyncFhirResourcesCommand extends Command
                     $startDateTime = new \DateTime($appointmentResource['start']);
                     $endDateTime = new \DateTime($appointmentResource['end']);
                 } else {
-                    $this->logger->warning('Appointment missing start/end times', [
-                        'appointmentId' => $hisId
-                    ]);
+                    $output->writeln('Appointment missing start/end times');
                     $stats['skipped']++;
                     continue;
                 }
@@ -994,11 +944,7 @@ class SyncFhirResourcesCommand extends Command
                 $this->entityManager->flush();
 
             } catch (\Exception $e) {
-                $this->logger->error('Error processing FHIR Appointment', [
-                    'id' => $hisId ?? 'unknown',
-                    'error' => $e->getMessage(),
-                    'trace' => $e->getTraceAsString()
-                ]);
+                $output->writeln('Error processing FHIR Appointment');
                 $stats['errors']++;
             }
         }
@@ -1007,13 +953,13 @@ class SyncFhirResourcesCommand extends Command
     private function syncMedicalSpecialties(): void
     {
         $this->output->writeln('Synchronizing medical specialties...');
-        $this->logger->info('Processing medical specialties from FHIR API');
+        $output->writeln('Processing medical specialties from FHIR API');
 
         try {
             $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $this->logger->warning('No practitioner roles found or invalid response format');
+                $output->writeln('No practitioner roles found or invalid response format');
                 return;
             }
 
@@ -1063,22 +1009,15 @@ class SyncFhirResourcesCommand extends Command
                         $updated++;
                     }
                 } catch (\Exception $e) {
-                    $this->logger->error('Error processing medical specialty', [
-                        'code' => $code,
-                        'error' => $e->getMessage()
-                    ]);
+                    $output->writeln('Error processing medical specialty');
                     $errors++;
                 }
             }
 
             $this->output->writeln("Medical specialties: {$count} new, {$updated} updated, {$errors} errors");
-            $this->logger->info('Medical specialties sync completed', [
-                'new' => $count,
-                'updated' => $updated,
-                'errors' => $errors
-            ]);
+            $output->writeln('Medical specialties sync completed');
         } catch (\Exception $e) {
-            $this->logger->error('Failed to sync medical specialties', ['error' => $e->getMessage()]);
+            $output->writeln('Failed to sync medical specialties');
             throw $e;
         }
     }
