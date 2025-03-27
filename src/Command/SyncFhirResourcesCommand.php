@@ -521,14 +521,6 @@ class SyncFhirResourcesCommand extends Command
                 'errors'  => 0
             ];
 
-            dump($response['entry']);
-            dump((!isset($response['entry'])), (!is_array($response['entry'])));
-            if (!isset($response['entry'])
-                || !is_array($response['entry'])
-            ) {
-                $output->writeln('Invalid FHIR bundle format: missing entries array');
-            }
-
             foreach ($response['entry'] as $entry) {
                 try {
                     // Skip non-Slot resources
