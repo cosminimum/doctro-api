@@ -46,7 +46,6 @@ class SyncFhirResourcesCommand extends Command
         parent::__construct();
         $this->entityManager = $entityManager;
         $this->apiClient = $apiClient;
-        $output = $logger;
         $this->userRepository = $userRepository;
         $this->doctorScheduleRepository = $doctorScheduleRepository;
         $this->doctorRepository = $doctorRepository;
@@ -57,45 +56,164 @@ class SyncFhirResourcesCommand extends Command
         $this->output = $output;
         $startTime = microtime(true);
 
-        $output->writeln('Starting FHIR resources synchronization');
-        $output->writeln('Starting FHIR resources synchronization...');
+        $this->output->writeln('Starting FHIR resources synchronization');
+        $this->output->writeln('Starting FHIR resources synchronization...');
 
         try {
-//            $this->syncMedicalSpecialties();
-//            $this->syncPractitioners();
-//            $this->syncHealthcareServices();
-//            $this->syncPractitionerRoles();
-            $this->syncSchedules($output);
-            $this->syncSlots($output);
-            $this->syncAppointments($output);
+            $this->syncPatients();
+            $this->syncPractitioners();
+            $this->syncHealthcareServices();
+            $this->syncPractitionerRoles();
+            $this->syncSchedules();
+            $this->syncSlots();
+            $this->syncAppointments();
 
             $this->entityManager->flush();
 
             $endTime = microtime(true);
             $executionTime = round($endTime - $startTime, 2);
 
-            $output->writeln('FHIR resources synchronization completed');
-            $output->writeln("Synchronization completed successfully in {$executionTime} seconds");
+            $this->output->writeln('FHIR resources synchronization completed');
+            $this->output->writeln("Synchronization completed successfully in {$executionTime} seconds");
 
             return Command::SUCCESS;
         } catch (\Exception $e) {
-            $output->writeln('Error during FHIR synchronization');
+            $this->output->writeln('Error during FHIR synchronization');
 
-            $output->writeln('Error during synchronization: ' . $e->getMessage());
+            $this->output->writeln('Error during synchronization: ' . $e->getMessage());
             return Command::FAILURE;
+        }
+    }
+    private function syncPatients(): void
+    {
+        $this->output->writeln('Synchronizing patients...');
+        $this->output->writeln('Fetching patients from FHIR API');
+
+        try {
+            $response = $this->apiClient->get('/api/HInterop/GetPatients?active=true');
+            if (!isset($response['entry']) || !is_array($response['entry'])) {
+                $this->output->writeln('No patients found or invalid response format');
+                return;
+            }
+
+            $count = 0;
+            $updated = 0;
+            $errors = 0;
+
+            foreach ($response['entry'] as $entry) {
+                if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'Patient') {
+                    continue;
+                }
+
+                $patient = $entry['resource'];
+
+                try {
+                    $idHis = $patient['id'] ?? null;
+                    if (!$idHis) {
+                        $this->output->writeln('Patient without ID');
+                        $errors++;
+                        continue;
+                    }
+
+                    $existingPatient = $this->entityManager->getRepository(Patient::class)->findOneBy(['idHis' => $idHis]);
+                    $isNew = false;
+
+                    if (!$existingPatient) {
+                        $existingPatient = new Patient();
+                        $existingPatient->setIdHis($idHis);
+                        $existingPatient->setRoles([Patient::BASE_ROLE]);
+                        $existingPatient->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
+                        $isNew = true;
+                    }
+
+                    $email = '';
+                    if (isset($patient['telecom']) && is_array($patient['telecom'])) {
+                        foreach ($patient['telecom'] as $telecom) {
+                            if ($telecom['system'] === 'email') {
+                                $email = $telecom['value'];
+                                break;
+                            }
+                        }
+                    }
+
+                    if (empty($email)) {
+                        $email = 'patient_' . $idHis . '@example.com';
+                    }
+
+                    $phone = '';
+                    if (isset($patient['telecom']) && is_array($patient['telecom'])) {
+                        foreach ($patient['telecom'] as $telecom) {
+                            if ($telecom['system'] === 'phone') {
+                                $phone = $telecom['value'];
+                                break;
+                            }
+                        }
+                    }
+
+                    $firstName = '';
+                    $lastName = '';
+                    if (isset($patient['name'][0])) {
+                        $name = $patient['name'][0];
+                        if (isset($name['given']) && is_array($name['given'])) {
+                            $firstName = implode(' ', $name['given']);
+                        } else {
+                            $firstName = $name['given'] ?? '';
+                        }
+                        $lastName = $name['family'] ?? '';
+                    }
+
+                    $cnp = '';
+                    if (isset($patient['identifier']) && is_array($patient['identifier'])) {
+                        foreach ($patient['identifier'] as $identifier) {
+                            if (isset($identifier['system']) && $identifier['system'] === 'http://snomed.info/sct') {
+                                $cnp = $identifier['value'];
+                                break;
+                            }
+                        }
+                    }
+
+                    if (empty($cnp)) {
+                        $cnp = str_pad((string) $idHis, 13, '0', STR_PAD_LEFT);
+                    }
+
+                    $existingPatient->setEmail($email);
+                    $existingPatient->setFirstName($firstName);
+                    $existingPatient->setLastName($lastName);
+                    $existingPatient->setCnp($cnp);
+                    $existingPatient->setPhone($phone);
+                    $existingPatient->setIsActive(true);
+
+                    $this->entityManager->persist($existingPatient);
+
+                    if ($isNew) {
+                        $count++;
+                    } else {
+                        $updated++;
+                    }
+                } catch (\Exception $e) {
+                    $this->output->writeln('Error processing patient: ' . $e->getMessage());
+                    $errors++;
+                }
+            }
+
+            $this->output->writeln("Patients: {$count} new, {$updated} updated, {$errors} errors");
+            $this->output->writeln('Patients sync completed');
+        } catch (\Exception $e) {
+            $this->output->writeln('Failed to sync patients: ' . $e->getMessage());
+            throw $e;
         }
     }
 
     private function syncPractitioners(): void
     {
         $this->output->writeln('Synchronizing practitioners...');
-        $output->writeln('Fetching practitioners from FHIR API');
+        $this->output->writeln('Fetching practitioners from FHIR API');
 
         try {
             $response = $this->apiClient->get('/api/HInterop/GetPractitioners?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $output->writeln('No practitioners found or invalid response format');
+                $this->output->writeln('No practitioners found or invalid response format');
                 return;
             }
 
@@ -113,7 +231,7 @@ class SyncFhirResourcesCommand extends Command
                 try {
                     $idHis = $practitioner['id'] ?? null;
                     if (!$idHis) {
-                        $output->writeln('Practitioner without ID');
+                        $this->output->writeln('Practitioner without ID');
                         $errors++;
                         continue;
                     }
@@ -125,22 +243,8 @@ class SyncFhirResourcesCommand extends Command
                         $doctor = new Doctor();
                         $doctor->setIdHis($idHis);
                         $doctor->setRoles([Doctor::BASE_ROLE]);
-                        $doctor->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
+                        $doctor->setPassword(password_hash('x', PASSWORD_BCRYPT));
                         $isNew = true;
-                    }
-
-                    $email = '';
-                    if (isset($practitioner['telecom']) && is_array($practitioner['telecom'])) {
-                        foreach ($practitioner['telecom'] as $telecom) {
-                            if ($telecom['system'] === 'email') {
-                                $email = $telecom['value'];
-                                break;
-                            }
-                        }
-                    }
-
-                    if (empty($email)) {
-                        $email = 'doctor_' . $idHis . '@example.com';
                     }
 
                     $phone = '';
@@ -159,6 +263,14 @@ class SyncFhirResourcesCommand extends Command
                         $name = $practitioner['name'][0];
                         $firstName = $name['given'][0] ?? '';
                         $lastName = $name['family'] ?? '';
+                    }
+
+                    $email = strtolower($firstName) . '.' . strtolower($lastName);
+
+                    $user = $this->userRepository->findOneBy(['email' => $email]);
+                    if ($user) {
+                        $this->output->writeln("User found {$firstName} {$lastName}. Skip");
+                        continue;
                     }
 
                     $cnp = '';
@@ -182,6 +294,13 @@ class SyncFhirResourcesCommand extends Command
                     $doctor->setPhone($phone);
 
                     $this->entityManager->persist($doctor);
+                    try {
+                        $this->entityManager->flush();
+                    } catch (\Exception $e) {
+                        $this->output->writeln("Failed to update practitioner {$firstName} {$lastName}");
+                        $errors++;
+                        continue;
+                    }
 
                     if ($isNew) {
                         $count++;
@@ -189,15 +308,15 @@ class SyncFhirResourcesCommand extends Command
                         $updated++;
                     }
                 } catch (\Exception $e) {
-                    $output->writeln('Error processing practitioner');
+                    $this->output->writeln("Error processing practitioner {$e->getMessage()}");
                     $errors++;
                 }
             }
 
             $this->output->writeln("Practitioners: {$count} new, {$updated} updated, {$errors} errors");
-            $output->writeln('Practitioners sync completed');
+            $this->output->writeln('Practitioners sync completed');
         } catch (\Exception $e) {
-            $output->writeln('Failed to sync practitioners');
+            $this->output->writeln("Failed to sync practitioners: {$e->getMessage()}");
             throw $e;
         }
     }
@@ -205,18 +324,20 @@ class SyncFhirResourcesCommand extends Command
     private function syncPractitionerRoles(): void
     {
         $this->output->writeln('Synchronizing practitioner roles...');
-        $output->writeln('Fetching practitioner roles from FHIR API');
+        $this->output->writeln('Fetching practitioner roles from FHIR API');
 
         try {
             $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $output->writeln('No practitioner roles found or invalid response format');
+                $this->output->writeln('No practitioner roles found or invalid response format');
                 return;
             }
 
             $count = 0;
             $errors = 0;
+            $specialtiesCreated = 0;
+            $servicesCreated = 0;
 
             foreach ($response['entry'] as $entry) {
                 if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'PractitionerRole') {
@@ -226,27 +347,24 @@ class SyncFhirResourcesCommand extends Command
                 $role = $entry['resource'];
 
                 try {
-                    if (!isset($role['practitioner']['reference'])) {
-                        $output->writeln('PractitionerRole without practitioner reference');
+                    if (!isset($role['practitioner']['identifier'])) {
+                        $this->output->writeln('PractitionerRole without practitioner reference');
                         $errors++;
                         continue;
                     }
 
-                    $practitionerId = null;
-                    if (preg_match('/Practitioner\/(\w+)/', $role['practitioner']['reference'], $matches)) {
-                        $practitionerId = $matches[1];
-                    }
+                    $practitionerId = $role['practitioner']['identifier']['value'];
 
                     if (!$practitionerId) {
-                        $output->writeln('Could not extract practitioner ID from reference');
+                        $this->output->writeln('Could not extract practitioner ID from reference');
                         $errors++;
                         continue;
                     }
 
-                    $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['idHis' => $practitionerId]);
+                    $doctor = $this->userRepository->findOneBy(['idHis' => $practitionerId]);
 
                     if (!$doctor) {
-                        $output->writeln('Doctor not found for practitioner role');
+                        $this->output->writeln('Doctor not found for practitioner role');
                         $errors++;
                         continue;
                     }
@@ -256,11 +374,25 @@ class SyncFhirResourcesCommand extends Command
                         foreach ($role['specialty'] as $specialty) {
                             if (isset($specialty['coding'][0]['code'])) {
                                 $specialtyCode = $specialty['coding'][0]['code'];
-                                $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->findOneBy(['code' => $specialtyCode]);
+                                $specialtyName = $specialty['coding'][0]['display'] ?? $specialtyCode;
 
-                                if ($medicalSpecialty && !$doctor->getMedicalSpecialties()->contains($medicalSpecialty)) {
+                                $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)
+                                    ->findOneBy(['code' => $specialtyCode]);
+
+                                // Create specialty if it doesn't exist
+                                if (!$medicalSpecialty) {
+                                    $medicalSpecialty = new MedicalSpecialty();
+                                    $medicalSpecialty->setCode($specialtyCode);
+                                    $medicalSpecialty->setName($specialtyName);
+                                    $medicalSpecialty->setIsActive(true);
+                                    $this->entityManager->persist($medicalSpecialty);
+                                    $specialtiesCreated++;
+                                    $this->output->writeln("Created new specialty: {$specialtyName} with code {$specialtyCode}");
+                                }
+
+                                if (!$doctor->getMedicalSpecialties()->contains($medicalSpecialty)) {
                                     $doctor->addMedicalSpecialty($medicalSpecialty);
-                                    $output->writeln('Added specialty to doctor');
+                                    $this->output->writeln("Added specialty {$specialtyName} to doctor {$doctor->getFirstName()} {$doctor->getLastName()}");
                                 }
                             }
                         }
@@ -271,11 +403,37 @@ class SyncFhirResourcesCommand extends Command
                         foreach ($role['code'] as $code) {
                             if (isset($code['coding'][0]['code'])) {
                                 $serviceCode = $code['coding'][0]['code'];
-                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['code' => $serviceCode]);
+                                $serviceName = $code['coding'][0]['display'] ?? $serviceCode;
 
-                                if ($hospitalService && !$doctor->getHospitalServices()->contains($hospitalService)) {
+                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)
+                                    ->findOneBy(['code' => $serviceCode]);
+
+                                // Create service if it doesn't exist
+                                if (!$hospitalService) {
+                                    $hospitalService = new HospitalService();
+                                    $hospitalService->setCode($serviceCode);
+                                    $hospitalService->setName($serviceName);
+                                    $hospitalService->setDescription($serviceName);
+                                    $hospitalService->setPrice('0');
+                                    $hospitalService->setDuration('30');
+                                    $hospitalService->setMode(HospitalService::AMB_MODE);
+                                    $hospitalService->setIsActive(true);
+                                    $hospitalService->setColor('#3788d8');
+
+                                    // Try to associate with a specialty if possible
+                                    if (count($doctor->getMedicalSpecialties()) > 0) {
+                                        $firstSpecialty = $doctor->getMedicalSpecialties()->first();
+                                        $hospitalService->setMedicalSpecialty($firstSpecialty);
+                                    }
+
+                                    $this->entityManager->persist($hospitalService);
+                                    $servicesCreated++;
+                                    $this->output->writeln("Created new service: {$serviceName} with code {$serviceCode}");
+                                }
+
+                                if (!$doctor->getHospitalServices()->contains($hospitalService)) {
                                     $doctor->addHospitalService($hospitalService);
-                                    $output->writeln('Added service to doctor');
+                                    $this->output->writeln("Added service {$serviceName} to doctor {$doctor->getFirstName()} {$doctor->getLastName()}");
                                 }
                             }
                         }
@@ -283,16 +441,25 @@ class SyncFhirResourcesCommand extends Command
 
                     $this->entityManager->persist($doctor);
                     $count++;
+
+                    // Flush every 20 items to avoid memory issues
+                    if ($count % 20 === 0) {
+                        $this->entityManager->flush();
+                    }
+
                 } catch (\Exception $e) {
-                    $output->writeln('Error processing practitioner role');
+                    $this->output->writeln('Error processing practitioner role: ' . $e->getMessage());
                     $errors++;
                 }
             }
 
-            $this->output->writeln("Practitioner roles: {$count} processed, {$errors} errors");
-            $output->writeln('Practitioner roles sync completed');
+            // Final flush to save any remaining changes
+            $this->entityManager->flush();
+
+            $this->output->writeln("Practitioner roles: {$count} processed, {$specialtiesCreated} specialties created, {$servicesCreated} services created, {$errors} errors");
+            $this->output->writeln('Practitioner roles sync completed');
         } catch (\Exception $e) {
-            $output->writeln('Failed to sync practitioner roles');
+            $this->output->writeln('Failed to sync practitioner roles: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -300,13 +467,12 @@ class SyncFhirResourcesCommand extends Command
     private function syncHealthcareServices(): void
     {
         $this->output->writeln('Synchronizing healthcare services...');
-        $output->writeln('Fetching healthcare services from FHIR API');
+        $this->output->writeln('Fetching healthcare services from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetHealthcareServices?active=true');
-
+            $response = $this->apiClient->get('/api/HInterop/GetHealthcareServices?category=APPSERV');
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $output->writeln('No healthcare services found or invalid response format');
+                $this->output->writeln('No healthcare services found or invalid response format');
                 return;
             }
 
@@ -324,7 +490,7 @@ class SyncFhirResourcesCommand extends Command
                 try {
                     $idHis = $service['id'] ?? null;
                     if (!$idHis) {
-                        $output->writeln('HealthcareService without ID');
+                        $this->output->writeln('HealthcareService without ID');
                         $errors++;
                         continue;
                     }
@@ -347,10 +513,21 @@ class SyncFhirResourcesCommand extends Command
                         $description = $service['comment'];
                     } elseif (isset($service['description'])) {
                         $description = $service['description'];
+                    } else {
+                        // Default description if none provided
+                        $description = $name;
                     }
 
                     $code = '';
-                    if (isset($service['type']) && is_array($service['type'])) {
+                    // Extract code from identifier or type
+                    if (isset($service['identifier']) && is_array($service['identifier'])) {
+                        foreach ($service['identifier'] as $identifier) {
+                            if (isset($identifier['value'])) {
+                                $code = $identifier['value'];
+                                break;
+                            }
+                        }
+                    } elseif (isset($service['type']) && is_array($service['type'])) {
                         foreach ($service['type'] as $type) {
                             if (isset($type['coding'][0]['code'])) {
                                 $code = $type['coding'][0]['code'];
@@ -375,18 +552,40 @@ class SyncFhirResourcesCommand extends Command
                         }
                     }
 
+                    // Find medical specialty from category if available
                     $specialtyId = null;
-                    if (isset($service['specialty']) && is_array($service['specialty'])) {
-                        foreach ($service['specialty'] as $specialty) {
-                            if (isset($specialty['coding'][0]['code'])) {
-                                $specialtyCode = $specialty['coding'][0]['code'];
-                                $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->findOneBy(['code' => $specialtyCode]);
-
-                                if ($medicalSpecialty) {
-                                    $specialtyId = $medicalSpecialty->getId();
-                                    break;
-                                }
+                    $categoryCode = null;
+                    if (isset($service['category']) && is_array($service['category'])) {
+                        foreach ($service['category'] as $category) {
+                            if (isset($category['coding'][0]['code'])) {
+                                $categoryCode = $category['coding'][0]['code'];
+                                break;
                             }
+                        }
+                    }
+
+                    if ($categoryCode) {
+                        $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)
+                            ->findOneBy(['code' => $categoryCode]);
+
+                        if (!$medicalSpecialty) {
+                            // Create a new specialty if not found
+                            $medicalSpecialty = new MedicalSpecialty();
+                            $medicalSpecialty->setCode($categoryCode);
+                            $medicalSpecialty->setName($service['category'][0]['text'] ?? 'Specialty ' . $categoryCode);
+                            $medicalSpecialty->setIsActive(true);
+                            $this->entityManager->persist($medicalSpecialty);
+                            $this->entityManager->flush();
+                        }
+
+                        $specialtyId = $medicalSpecialty->getId();
+                    } else {
+                        // Fallback to first specialty if no category found
+                        $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)
+                            ->findOneBy([], ['id' => 'ASC']);
+
+                        if ($medicalSpecialty) {
+                            $specialtyId = $medicalSpecialty->getId();
                         }
                     }
 
@@ -411,30 +610,31 @@ class SyncFhirResourcesCommand extends Command
                         $updated++;
                     }
                 } catch (\Exception $e) {
-                    $output->writeln('Error processing healthcare service');
+                    $this->output->writeln('Error processing healthcare service: ' . $e->getMessage());
                     $errors++;
                 }
             }
 
+            $this->entityManager->flush();
             $this->output->writeln("Healthcare services: {$count} new, {$updated} updated, {$errors} errors");
-            $output->writeln('Healthcare services sync completed');
+            $this->output->writeln('Healthcare services sync completed');
         } catch (\Exception $e) {
-            $output->writeln('Failed to sync healthcare services');
+            $this->output->writeln('Failed to sync healthcare services: ' . $e->getMessage());
             throw $e;
         }
     }
 
-    private function syncSchedules($output): void
+    private function syncSchedules(): void
     {
         $this->output->writeln('Synchronizing schedules...');
-        $output->writeln('Fetching schedules from FHIR API');
+        $this->output->writeln('Fetching schedules from FHIR API');
 
         try {
             $date = date('Y-m-d');
             $response = $this->apiClient->get('/api/HInterop/GetSchedules?date=' . $date);
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $output->writeln('No schedules found or invalid response format');
+                $this->output->writeln('No schedules found or invalid response format');
                 return;
             }
 
@@ -444,13 +644,13 @@ class SyncFhirResourcesCommand extends Command
                 }
 
                 $schedule = $entry['resource'];
-                $output->writeln('New entry');
+                $this->output->writeln('New entry');
 
                 try {
                     $idHis = $schedule['id'] ?? null;
 
                     if (!$idHis) {
-                        $output->writeln('Schedule without ID');
+                        $this->output->writeln('Schedule without ID');
                         continue;
                     }
 
@@ -460,7 +660,7 @@ class SyncFhirResourcesCommand extends Command
 
                             $doctor = $this->userRepository->findOneBy(['idHis' => $practitionerId]);
                             if (!$doctor) {
-                                $output->writeln('Schedule without valid doctor reference');
+                                $this->output->writeln('Schedule without valid doctor reference');
                                 continue;
                             }
 
@@ -488,22 +688,22 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                 } catch (\Exception $e) {
-                    $output->writeln($e->getMessage());
+                    $this->output->writeln($e->getMessage());
                 }
             }
 
             $this->entityManager->flush();
-            $output->writeln('Schedules sync completed');
+            $this->output->writeln('Schedules sync completed');
         } catch (\Exception $e) {
-            $output->writeln('Failed to sync schedules');
+            $this->output->writeln('Failed to sync schedules');
             throw $e;
         }
     }
 
-    private function syncSlots($output): void
+    private function syncSlots(): void
     {
         $this->output->writeln('Synchronizing slots...');
-        $output->writeln('Fetching slots from FHIR API');
+        $this->output->writeln('Fetching slots from FHIR API');
         $schedules = $this->doctorScheduleRepository->findAll();
 
         /** @var DoctorSchedule $schedule */
@@ -511,6 +711,7 @@ class SyncFhirResourcesCommand extends Command
             if ($schedule->getIdHis() === null) {
                 continue;
             }
+            $this->output->writeln('Fetching slots from FHIR API for ' . $schedule->getIdHis());
             $response = $this->apiClient->get('/api/HInterop/GetSlots?schedule=' . $schedule->getIdHis());
 
             $stats = [
@@ -524,7 +725,7 @@ class SyncFhirResourcesCommand extends Command
             if (!isset($response['entry'])
                 || !is_array($response['entry'])
             ) {
-                $output->writeln('Invalid FHIR bundle format: missing entries array');
+                $this->output->writeln('Invalid FHIR bundle format: missing entries array');
                 continue;
             }
 
@@ -542,7 +743,7 @@ class SyncFhirResourcesCommand extends Command
                     $hisId        = $slotResource['id'] ?? null;
 
                     if (!$hisId) {
-                        $output->writeln('Skipping Slot without ID');
+                        $this->output->writeln('Skipping Slot without ID');
                         $stats['skipped']++;
                         continue;
                     }
@@ -571,7 +772,7 @@ class SyncFhirResourcesCommand extends Command
                         $slotDate->setTime(0, 0, 0);
                     } else {
                         if (!$existingSlot) {
-                            $output->writeln('Slot missing start/end times, cannot create new slot',
+                            $this->output->writeln('Slot missing start/end times, cannot create new slot',
                                 [
                                     'slotId' => $hisId
                                 ]);
@@ -631,7 +832,7 @@ class SyncFhirResourcesCommand extends Command
                             ?? null;
 
                         if (!$scheduleRef) {
-                            $output->writeln('Slot missing schedule reference, cannot create new slot',
+                            $this->output->writeln('Slot missing schedule reference, cannot create new slot',
                                 [
                                     'slotId' => $hisId
                                 ]);
@@ -650,7 +851,7 @@ class SyncFhirResourcesCommand extends Command
                             $identifierParts = explode('__', $scheduleRef);
 
                             if (count($identifierParts) < 3) {
-                                $output->writeln('Cannot parse doctor ID from schedule reference',
+                                $this->output->writeln('Cannot parse doctor ID from schedule reference',
                                     [
                                         'scheduleRef' => $scheduleRef,
                                         'slotId'      => $hisId
@@ -666,7 +867,7 @@ class SyncFhirResourcesCommand extends Command
                                 ->findOneBy(['idHis' => $doctorHisId]);
 
                             if (!$doctor) {
-                                $output->writeln('Doctor not found for this slot',
+                                $this->output->writeln('Doctor not found for this slot',
                                     [
                                         'doctorHisId' => $doctorHisId,
                                         'slotId'      => $hisId
@@ -723,17 +924,17 @@ class SyncFhirResourcesCommand extends Command
                     $this->entityManager->flush();
 
                 } catch (\Exception $e) {
-                    $output->writeln('Error processing FHIR Slot');
+                    $this->output->writeln('Error processing FHIR Slot');
                     $stats['errors']++;
                 }
             }
         }
     }
 
-    private function syncAppointments($output): void
+    private function syncAppointments(): void
     {
         $this->output->writeln('Synchronizing appointments...');
-        $output->writeln('Fetching appointments from FHIR API');
+        $this->output->writeln('Fetching appointments from FHIR API');
         $response = $this->apiClient->get('/api/HInterop/GetAppointments?status=pending');
 
         $stats = [
@@ -745,7 +946,7 @@ class SyncFhirResourcesCommand extends Command
         ];
 
         if (!isset($response['entry']) || !is_array($response['entry'])) {
-            $output->writeln('Invalid FHIR bundle format: missing entries array');
+            $this->output->writeln('Invalid FHIR bundle format: missing entries array');
             return;
         }
 
@@ -761,7 +962,7 @@ class SyncFhirResourcesCommand extends Command
                 $hisId = $appointmentResource['id'] ?? null;
 
                 if (!$hisId) {
-                    $output->writeln('Skipping Appointment without ID');
+                    $this->output->writeln('Skipping Appointment without ID');
                     $stats['skipped']++;
                     continue;
                 }
@@ -801,7 +1002,7 @@ class SyncFhirResourcesCommand extends Command
 
                 // Check if we have the required information
                 if (!$patientHisId || !$doctorHisId || !$serviceHisId) {
-                    $output->writeln('Appointment missing required information');
+                    $this->output->writeln('Appointment missing required information');
                     $stats['skipped']++;
                     continue;
                 }
@@ -829,7 +1030,7 @@ class SyncFhirResourcesCommand extends Command
 
                 // Skip if doctor or service not found
                 if (!$doctor || !$hospitalService) {
-                    $output->writeln('Doctor or hospital service not found for appointment');
+                    $this->output->writeln('Doctor or hospital service not found for appointment');
                     $stats['skipped']++;
                     continue;
                 }
@@ -837,7 +1038,7 @@ class SyncFhirResourcesCommand extends Command
                 // Find medical specialty through hospital service
                 $medicalSpecialty = $hospitalService->getMedicalSpecialty();
                 if (!$medicalSpecialty) {
-                    $output->writeln('Hospital service has no medical specialty');
+                    $this->output->writeln('Hospital service has no medical specialty');
                     $stats['skipped']++;
                     continue;
                 }
@@ -857,7 +1058,7 @@ class SyncFhirResourcesCommand extends Command
                     $startDateTime = new \DateTime($appointmentResource['start']);
                     $endDateTime = new \DateTime($appointmentResource['end']);
                 } else {
-                    $output->writeln('Appointment missing start/end times');
+                    $this->output->writeln('Appointment missing start/end times');
                     $stats['skipped']++;
                     continue;
                 }
@@ -945,81 +1146,9 @@ class SyncFhirResourcesCommand extends Command
                 $this->entityManager->flush();
 
             } catch (\Exception $e) {
-                $output->writeln('Error processing FHIR Appointment');
+                $this->output->writeln('Error processing FHIR Appointment');
                 $stats['errors']++;
             }
-        }
-    }
-
-    private function syncMedicalSpecialties(): void
-    {
-        $this->output->writeln('Synchronizing medical specialties...');
-        $output->writeln('Processing medical specialties from FHIR API');
-
-        try {
-            $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
-
-            if (!isset($response['entry']) || !is_array($response['entry'])) {
-                $output->writeln('No practitioner roles found or invalid response format');
-                return;
-            }
-
-            $count = 0;
-            $updated = 0;
-            $errors = 0;
-            $specialtyCodes = [];
-
-            foreach ($response['entry'] as $entry) {
-                if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'PractitionerRole') {
-                    continue;
-                }
-
-                $role = $entry['resource'];
-
-                if (isset($role['specialty']) && is_array($role['specialty'])) {
-                    foreach ($role['specialty'] as $specialty) {
-
-                        if (isset($specialty['coding'][0]['code'])) {
-                            $code = $specialty['coding'][0]['code'];
-                            $name = $specialty['coding'][0]['code'];
-                            $specialtyCodes[$code] = $name;
-                        }
-                    }
-                }
-            }
-
-            foreach ($specialtyCodes as $code => $name) {
-                try {
-                    $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->findOneBy(['code' => $code]);
-                    $isNew = false;
-
-                    if (!$medicalSpecialty) {
-                        $medicalSpecialty = new MedicalSpecialty();
-                        $medicalSpecialty->setCode($code);
-                        $medicalSpecialty->setIsActive(true);
-                        $isNew = true;
-                    }
-
-                    $medicalSpecialty->setName($name);
-
-                    $this->entityManager->persist($medicalSpecialty);
-
-                    if ($isNew) {
-                        $count++;
-                    } else {
-                        $updated++;
-                    }
-                } catch (\Exception $e) {
-                    $output->writeln('Error processing medical specialty');
-                    $errors++;
-                }
-            }
-
-            $this->output->writeln("Medical specialties: {$count} new, {$updated} updated, {$errors} errors");
-            $output->writeln('Medical specialties sync completed');
-        } catch (\Exception $e) {
-            $output->writeln('Failed to sync medical specialties');
-            throw $e;
         }
     }
 }
