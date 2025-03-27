@@ -460,7 +460,7 @@ class SyncFhirResourcesCommand extends Command
 
         try {
             $date = date('Y-m-d');
-            $response = $this->apiClient->get('/api/HInterop/GetSchedules?GetSchedules?date=' . $date);
+            $response = $this->apiClient->get('/api/HInterop/GetSchedules?date=' . $date);
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->logger->warning('No schedules found or invalid response format');
