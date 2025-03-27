@@ -47,7 +47,7 @@ class DoctorSchedule
         return $this;
     }
 
-    public function getIdHis(): string
+    public function getIdHis(): ?string
     {
         return $this->idHis;
     }
