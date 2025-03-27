@@ -540,6 +540,9 @@ class SyncFhirResourcesCommand extends Command
 
         /** @var DoctorSchedule $schedule */
         foreach ($schedules as $schedule) {
+            if ($schedule->getIdHis() === null) {
+                continue;
+            }
             $response = $this->apiClient->get('/api/HInterop/GetSlots?schedule=' . $schedule->getIdHis());
 
             $stats = [
