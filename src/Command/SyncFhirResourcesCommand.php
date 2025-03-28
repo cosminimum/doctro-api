@@ -192,6 +192,7 @@ class SyncFhirResourcesCommand extends Command
                     $existingPatient->setIsActive(true);
 
                     $this->entityManager->persist($existingPatient);
+                    $this->entityManager->flush();
 
                     if ($isNew) {
                         $count++;
@@ -302,6 +303,7 @@ class SyncFhirResourcesCommand extends Command
                     $doctor->setPhone($phone);
 
                     $this->entityManager->persist($doctor);
+                    $this->entityManager->flush();
                     try {
                         $this->entityManager->flush();
                     } catch (\Exception $e) {
@@ -589,6 +591,7 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     $this->entityManager->persist($hospitalService);
+                    $this->entityManager->flush();
 
                     if ($isNew) {
                         $count++;
@@ -655,12 +658,9 @@ class SyncFhirResourcesCommand extends Command
                                 $date = new \DateTime($schedule['planningHorizon']['start']);
                             }
 
-                            $doctorSchedule = $this->entityManager->getRepository(DoctorSchedule::class)
-                                ->findOneBy([
-                                    'doctor' => $doctor,
-                                    'date' => $date,
-                                    'idHis' => $idHis
-                                ]);
+                            $doctorSchedule = $this->doctorScheduleRepository->findOneBy([
+                                'idHis' => $idHis,
+                            ]);
 
                             if (!$doctorSchedule) {
                                 $doctorSchedule = new DoctorSchedule();
@@ -670,6 +670,7 @@ class SyncFhirResourcesCommand extends Command
                             }
 
                             $this->entityManager->persist($doctorSchedule);
+                            $this->entityManager->flush();
                         }
                     }
 
@@ -678,7 +679,6 @@ class SyncFhirResourcesCommand extends Command
                 }
             }
 
-            $this->entityManager->flush();
             $this->output->writeln('Schedules sync completed');
         } catch (\Exception $e) {
             $this->output->writeln('Failed to sync schedules');
@@ -811,6 +811,7 @@ class SyncFhirResourcesCommand extends Command
                         }
 
                         $this->entityManager->persist($existingSlot);
+                        $this->entityManager->flush();
                         $stats['updated']++;
                     } else {
                         // We need to create a new slot - first find or create the schedule
@@ -870,6 +871,7 @@ class SyncFhirResourcesCommand extends Command
                             $schedule->setDate($slotDate);
 
                             $this->entityManager->persist($schedule);
+                            $this->entityManager->flush();
                         }
 
                         // Now create the time slot
@@ -905,6 +907,7 @@ class SyncFhirResourcesCommand extends Command
                         }
 
                         $this->entityManager->persist($newSlot);
+                        $this->entityManager->flush();
                         $stats['created']++;
                     }
 
@@ -1114,6 +1117,7 @@ class SyncFhirResourcesCommand extends Command
                     $existingAppointment->setIsActive($isActive);
 
                     $this->entityManager->persist($existingAppointment);
+                    $this->entityManager->flush();
                     $stats['updated']++;
                 } else {
                     // Create new appointment
@@ -1127,6 +1131,7 @@ class SyncFhirResourcesCommand extends Command
                     $newAppointment->setIsActive($isActive);
 
                     $this->entityManager->persist($newAppointment);
+                    $this->entityManager->flush();
                     $stats['created']++;
                 }
 
