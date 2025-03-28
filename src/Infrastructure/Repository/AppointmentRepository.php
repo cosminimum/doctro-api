@@ -54,7 +54,12 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
         $this->getEntityManager()->persist($appointment);
         $this->getEntityManager()->flush();
-        $this->createFhirAppointment($appointment);
+        try {
+            $this->createFhirAppointment($appointment);
+        } catch (\Exception $exception) {
+            //
+        }
+
 
         return $appointment->getId();
     }
@@ -79,7 +84,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
             'participant' => [
                 [
                     'actor' => [
-                        'reference' => 'Patient/' . ($appointment->getPatient()->getIdHis() ?? $appointment->getPatient()->getId())
+                        'reference' => 'Patient/' . ($appointment->getPatient()->getId())
                     ],
                     'status' => 'accepted'
                 ],
