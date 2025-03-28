@@ -331,7 +331,7 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Fetching practitioner roles from FHIR API');
 
         try {
-            $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true');
+            $response = $this->apiClient->get('/api/HInterop/GetPractitionerRoles?active=true&role=app_doctor');
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->output->writeln('No practitioner roles found or invalid response format');
