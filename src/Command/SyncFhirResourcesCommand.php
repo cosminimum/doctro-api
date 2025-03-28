@@ -403,42 +403,24 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     // Associate services
-                    if (isset($role['code']) && is_array($role['code'])) {
-                        foreach ($role['code'] as $code) {
-                            if (isset($code['coding'][0]['code'])) {
-                                $serviceCode = $code['coding'][0]['code'];
-                                $serviceName = $code['coding'][0]['display'] ?? $serviceCode;
+                    if (isset($role['healthcareService']) && is_array($role['healthcareService'])) {
+                        foreach ($role['healthcareService'] as $service) {
+                            if (isset($service['identifier']['value'])) {
+                                $serviceCode = $service['identifier']['value'];
 
+                                /** @var HospitalService $hospitalService */
                                 $hospitalService = $this->entityManager->getRepository(HospitalService::class)
                                     ->findOneBy(['code' => $serviceCode]);
 
                                 // Create service if it doesn't exist
                                 if (!$hospitalService) {
-                                    $hospitalService = new HospitalService();
-                                    $hospitalService->setCode($serviceCode);
-                                    $hospitalService->setName($serviceName);
-                                    $hospitalService->setDescription($serviceName);
-                                    $hospitalService->setPrice('0');
-                                    $hospitalService->setDuration('30');
-                                    $hospitalService->setMode(HospitalService::AMB_MODE);
-                                    $hospitalService->setIsActive(true);
-                                    $hospitalService->setColor('#3788d8');
-
-                                    // Try to associate with a specialty if possible
-                                    if (count($doctor->getMedicalSpecialties()) > 0) {
-                                        $firstSpecialty = $doctor->getMedicalSpecialties()->first();
-                                        $hospitalService->setMedicalSpecialty($firstSpecialty);
-                                    }
-
-                                    $this->entityManager->persist($hospitalService);
-                                    $this->entityManager->flush();
-                                    $servicesCreated++;
-                                    $this->output->writeln("Created new service: {$serviceName} with code {$serviceCode}");
+                                    $this->output->writeln("Service not found for service {$serviceCode}");
+                                    continue;
                                 }
 
                                 if (!$doctor->getHospitalServices()->contains($hospitalService)) {
                                     $doctor->addHospitalService($hospitalService);
-                                    $this->output->writeln("Added service {$serviceName} to doctor {$doctor->getFirstName()} {$doctor->getLastName()}");
+                                    $this->output->writeln("Added service {$hospitalService->getName()} to doctor {$doctor->getFirstName()} {$doctor->getLastName()}");
                                 }
                             }
                         }
