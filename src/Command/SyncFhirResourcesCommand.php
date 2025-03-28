@@ -68,13 +68,13 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Starting FHIR resources synchronization...');
 
         try {
-//            $this->syncPatients();
+            $this->syncPatients();
             $this->syncPractitioners();
             $this->syncHealthcareServices();
             $this->syncPractitionerRoles();
-//            $this->syncSchedules();
-//            $this->syncSlots();
-//            $this->syncAppointments();
+            $this->syncSchedules();
+            $this->syncSlots();
+            $this->syncAppointments();
 
             $this->entityManager->flush();
 
