@@ -11,6 +11,7 @@ use App\Infrastructure\Entity\MedicalSpecialty;
 use App\Infrastructure\Entity\Patient;
 use App\Infrastructure\Entity\TimeSlot;
 use App\Infrastructure\Repository\DoctorScheduleRepository;
+use App\Infrastructure\Repository\HospitalServiceRepository;
 use App\Infrastructure\Repository\MedicalSpecialtyRepository;
 use App\Infrastructure\Repository\UserRepository;
 use App\Infrastructure\Service\FhirApiClient;
@@ -36,6 +37,7 @@ class SyncFhirResourcesCommand extends Command
     private UserRepository $userRepository;
     private DoctorRepositoryInterface $doctorRepository;
     private MedicalSpecialtyRepository $medicalSpecialtyRepository;
+    private HospitalServiceRepository $hospitalServiceRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -45,6 +47,7 @@ class SyncFhirResourcesCommand extends Command
         DoctorScheduleRepository $doctorScheduleRepository,
         DoctorRepositoryInterface $doctorRepository,
         MedicalSpecialtyRepository $medicalSpecialtyRepository,
+        HospitalServiceRepository $hospitalServiceRepository,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
@@ -53,6 +56,7 @@ class SyncFhirResourcesCommand extends Command
         $this->doctorScheduleRepository = $doctorScheduleRepository;
         $this->doctorRepository = $doctorRepository;
         $this->medicalSpecialtyRepository = $medicalSpecialtyRepository;
+        $this->hospitalServiceRepository = $hospitalServiceRepository;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -64,13 +68,13 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Starting FHIR resources synchronization...');
 
         try {
-            $this->syncPatients();
+//            $this->syncPatients();
             $this->syncPractitioners();
             $this->syncHealthcareServices();
             $this->syncPractitionerRoles();
-            $this->syncSchedules();
-            $this->syncSlots();
-            $this->syncAppointments();
+//            $this->syncSchedules();
+//            $this->syncSlots();
+//            $this->syncAppointments();
 
             $this->entityManager->flush();
 
@@ -409,8 +413,7 @@ class SyncFhirResourcesCommand extends Command
                                 $serviceCode = $service['identifier']['value'];
 
                                 /** @var HospitalService $hospitalService */
-                                $hospitalService = $this->entityManager->getRepository(HospitalService::class)
-                                    ->findOneBy(['code' => $serviceCode]);
+                                $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $serviceCode]);
 
                                 // Create service if it doesn't exist
                                 if (!$hospitalService) {
@@ -427,12 +430,8 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     $this->entityManager->persist($doctor);
+                    $this->entityManager->flush();
                     $count++;
-
-                    // Flush every 20 items to avoid memory issues
-                    if ($count % 20 === 0) {
-                        $this->entityManager->flush();
-                    }
 
                 } catch (\Exception $e) {
                     $this->output->writeln('Error processing practitioner role: ' . $e->getMessage());
