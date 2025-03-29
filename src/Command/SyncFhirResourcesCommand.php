@@ -931,6 +931,7 @@ class SyncFhirResourcesCommand extends Command
                     // Create patient if not found (simplified version - you may want to expand this)
                     $existingPatient = $patient;
                     if (!$patient) {
+                        $this->output->writeln("Searching patient with ID: {$patientHisId}");
                         $response = $this->apiClient->get('/api/HInterop/GetPatients?idhis=' . $patientHisId);
                         if (!isset($response['entry']) || !is_array($response['entry'])) {
                             $this->output->writeln('No patients found or invalid response format');
