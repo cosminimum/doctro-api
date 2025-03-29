@@ -863,217 +863,226 @@ class SyncFhirResourcesCommand extends Command
     {
         $this->output->writeln('Synchronizing appointments...');
         $this->output->writeln('Fetching appointments from FHIR API');
-        $response = $this->apiClient->get('/api/HInterop/GetAppointments?status=pending');
 
-        $stats = [
-            'total' => count($response['entry'] ?? []),
-            'created' => 0,
-            'updated' => 0,
-            'skipped' => 0,
-            'errors' => 0
+        $appointmentDates = [
+            new \DateTime(),
+            (new \DateTime())->modify('+1 day'),
+            (new \DateTime())->modify('+2 day'),
         ];
 
-        if (!isset($response['entry']) || !is_array($response['entry'])) {
-            $this->output->writeln('Invalid FHIR bundle format: missing entries array');
-            return;
-        }
+        foreach ($appointmentDates as $appointmentDate) {
+            $response = $this->apiClient->get('/api/HInterop/GetAppointments?date=' . $appointmentDate->format('Y-m-d'));
 
-        foreach ($response['entry'] as $entry) {
-            try {
-                // Skip non-Appointment resources
-                if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'Appointment') {
-                    $stats['skipped']++;
-                    continue;
-                }
+            $stats = [
+                'total' => count($response['entry'] ?? []),
+                'created' => 0,
+                'updated' => 0,
+                'skipped' => 0,
+                'errors' => 0
+            ];
 
-                $appointmentResource = $entry['resource'];
-                $hisId = $appointmentResource['id'] ?? null;
+            if (!isset($response['entry']) || !is_array($response['entry'])) {
+                $this->output->writeln('Invalid FHIR bundle format: missing entries array');
+                return;
+            }
 
-                if (!$hisId) {
-                    $this->output->writeln('Skipping Appointment without ID');
-                    $stats['skipped']++;
-                    continue;
-                }
-
-                // Check if we already have this appointment
-                $existingAppointment = $this->appointmentRepository->findOneBy(['idHis' => $hisId]);
-
-                // Extract appointment information
-                $status = $appointmentResource['status'] ?? 'pending';
-                $isActive = ($status === 'booked' || $status === 'pending');
-
-                // Extract patient, doctor and service information
-                $patientHisId = $appointmentResource['subject']['identifier']['value'];
-                $doctorHisId = $appointmentResource['participant'][0]['actor']['identifier']['value'];
-                $serviceHisId = $appointmentResource['serviceType'][0]['reference']['identifier']['value'];
-
-
-                // Check if we have the required information
-                if (!$patientHisId || !$doctorHisId || !$serviceHisId) {
-                    $this->output->writeln('Appointment missing required information');
-                    $stats['skipped']++;
-                    continue;
-                }
-
-                // Find entities
-                $patient = $this->userRepository->findOneBy(['idHis' => $patientHisId]);
-                $doctor = $this->userRepository->findOneBy(['idHis' => $doctorHisId]);
-                $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $serviceHisId]);
-
-                // Create patient if not found (simplified version - you may want to expand this)
-                if (!$patient) {
-                    $response = $this->apiClient->get('/api/HInterop/GetPatients?idhis=' . $patientHisId);
-                    if (!isset($response['entry']) || !is_array($response['entry'])) {
-                        $this->output->writeln('No patients found or invalid response format');
+            foreach ($response['entry'] as $entry) {
+                try {
+                    // Skip non-Appointment resources
+                    if (!isset($entry['resource']) || $entry['resource']['resourceType'] !== 'Appointment') {
+                        $stats['skipped']++;
                         continue;
                     }
 
-                    $patient = $response['entry'][0]['resource'];
+                    $appointmentResource = $entry['resource'];
+                    $hisId = $appointmentResource['id'] ?? null;
 
-                    try {
-                        $idHis = $patient['id'] ?? null;
-                        if (!$idHis) {
-                            $this->output->writeln('Patient without ID');
+                    if (!$hisId) {
+                        $this->output->writeln('Skipping Appointment without ID');
+                        $stats['skipped']++;
+                        continue;
+                    }
+
+                    // Check if we already have this appointment
+                    $existingAppointment = $this->appointmentRepository->findOneBy(['idHis' => $hisId]);
+
+                    // Extract appointment information
+                    $status = $appointmentResource['status'] ?? 'pending';
+                    $isActive = ($status === 'booked' || $status === 'pending');
+
+                    // Extract patient, doctor and service information
+                    $patientHisId = $appointmentResource['subject']['identifier']['value'];
+                    $doctorHisId = $appointmentResource['participant'][0]['actor']['identifier']['value'];
+                    $serviceHisId = $appointmentResource['serviceType'][0]['reference']['identifier']['value'];
+
+
+                    // Check if we have the required information
+                    if (!$patientHisId || !$doctorHisId || !$serviceHisId) {
+                        $this->output->writeln('Appointment missing required information');
+                        $stats['skipped']++;
+                        continue;
+                    }
+
+                    // Find entities
+                    $patient = $this->userRepository->findOneBy(['idHis' => $patientHisId]);
+                    $doctor = $this->userRepository->findOneBy(['idHis' => $doctorHisId]);
+                    $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $serviceHisId]);
+
+                    // Create patient if not found (simplified version - you may want to expand this)
+                    if (!$patient) {
+                        $response = $this->apiClient->get('/api/HInterop/GetPatients?idhis=' . $patientHisId);
+                        if (!isset($response['entry']) || !is_array($response['entry'])) {
+                            $this->output->writeln('No patients found or invalid response format');
                             continue;
                         }
 
-                        $existingPatient = new Patient();
-                        $existingPatient->setIdHis($idHis);
-                        $existingPatient->setRoles([Patient::BASE_ROLE]);
-                        $existingPatient->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
+                        $patient = $response['entry'][0]['resource'];
 
-                        $email = '';
-                        if (isset($patient['telecom']) && is_array($patient['telecom'])) {
-                            foreach ($patient['telecom'] as $telecom) {
-                                if ($telecom['system'] === 'email') {
-                                    $email = $telecom['value'];
-                                    break;
+                        try {
+                            $idHis = $patient['id'] ?? null;
+                            if (!$idHis) {
+                                $this->output->writeln('Patient without ID');
+                                continue;
+                            }
+
+                            $existingPatient = new Patient();
+                            $existingPatient->setIdHis($idHis);
+                            $existingPatient->setRoles([Patient::BASE_ROLE]);
+                            $existingPatient->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
+
+                            $email = '';
+                            if (isset($patient['telecom']) && is_array($patient['telecom'])) {
+                                foreach ($patient['telecom'] as $telecom) {
+                                    if ($telecom['system'] === 'email') {
+                                        $email = $telecom['value'];
+                                        break;
+                                    }
                                 }
                             }
-                        }
 
-                        if (empty($email)) {
-                            $email = 'patient_' . $idHis . '@example.com';
-                        }
+                            if (empty($email)) {
+                                $email = 'patient_' . $idHis . '@example.com';
+                            }
 
-                        $phone = '';
-                        if (isset($patient['telecom']) && is_array($patient['telecom'])) {
-                            foreach ($patient['telecom'] as $telecom) {
-                                if ($telecom['system'] === 'phone') {
-                                    $phone = $telecom['value'];
-                                    break;
+                            $phone = '';
+                            if (isset($patient['telecom']) && is_array($patient['telecom'])) {
+                                foreach ($patient['telecom'] as $telecom) {
+                                    if ($telecom['system'] === 'phone') {
+                                        $phone = $telecom['value'];
+                                        break;
+                                    }
                                 }
                             }
-                        }
 
-                        $firstName = '';
-                        $lastName = '';
-                        if (isset($patient['name'][0])) {
-                            $name = $patient['name'][0];
-                            if (isset($name['given']) && is_array($name['given'])) {
-                                $firstName = implode(' ', $name['given']);
-                            } else {
-                                $firstName = $name['given'] ?? '';
+                            $firstName = '';
+                            $lastName = '';
+                            if (isset($patient['name'][0])) {
+                                $name = $patient['name'][0];
+                                if (isset($name['given']) && is_array($name['given'])) {
+                                    $firstName = implode(' ', $name['given']);
+                                } else {
+                                    $firstName = $name['given'] ?? '';
+                                }
+                                $lastName = $name['family'] ?? '';
                             }
-                            $lastName = $name['family'] ?? '';
-                        }
 
-                        $cnp = '';
-                        if (isset($patient['identifier']) && is_array($patient['identifier'])) {
-                            foreach ($patient['identifier'] as $identifier) {
-                                if (isset($identifier['system']) && $identifier['system'] === 'http://snomed.info/sct') {
-                                    $cnp = $identifier['value'];
-                                    break;
+                            $cnp = '';
+                            if (isset($patient['identifier']) && is_array($patient['identifier'])) {
+                                foreach ($patient['identifier'] as $identifier) {
+                                    if (isset($identifier['system']) && $identifier['system'] === 'http://snomed.info/sct') {
+                                        $cnp = $identifier['value'];
+                                        break;
+                                    }
                                 }
                             }
+
+                            if (empty($cnp)) {
+                                $cnp = str_pad((string) $idHis, 13, '0', STR_PAD_LEFT);
+                            }
+
+                            $existingPatient->setEmail($email);
+                            $existingPatient->setFirstName($firstName);
+                            $existingPatient->setLastName($lastName);
+                            $existingPatient->setCnp($cnp);
+                            $existingPatient->setPhone($phone);
+                            $existingPatient->setIsActive(true);
+
+                            $this->entityManager->persist($existingPatient);
+                            $this->entityManager->flush();
+                        } catch (\Exception $e) {
+                            $this->output->writeln('Error processing patient: ' . $e->getMessage());
                         }
-
-                        if (empty($cnp)) {
-                            $cnp = str_pad((string) $idHis, 13, '0', STR_PAD_LEFT);
-                        }
-
-                        $existingPatient->setEmail($email);
-                        $existingPatient->setFirstName($firstName);
-                        $existingPatient->setLastName($lastName);
-                        $existingPatient->setCnp($cnp);
-                        $existingPatient->setPhone($phone);
-                        $existingPatient->setIsActive(true);
-
-                        $this->entityManager->persist($existingPatient);
-                        $this->entityManager->flush();
-                    } catch (\Exception $e) {
-                        $this->output->writeln('Error processing patient: ' . $e->getMessage());
                     }
-                }
 
-                // Skip if doctor or service not found
-                if (!$doctor || !$hospitalService) {
-                    $this->output->writeln('Doctor or hospital service not found for appointment');
-                    $stats['skipped']++;
-                    continue;
-                }
+                    // Skip if doctor or service not found
+                    if (!$doctor || !$hospitalService) {
+                        $this->output->writeln('Doctor or hospital service not found for appointment');
+                        $stats['skipped']++;
+                        continue;
+                    }
 
-                // Find medical specialty through hospital service
-                $medicalSpecialty = $hospitalService->getMedicalSpecialty();
-                if (!$medicalSpecialty) {
-                    $this->output->writeln('Hospital service has no medical specialty');
-                    $stats['skipped']++;
-                    continue;
-                }
+                    // Find medical specialty through hospital service
+                    $medicalSpecialty = $hospitalService->getMedicalSpecialty();
+                    if (!$medicalSpecialty) {
+                        $this->output->writeln('Hospital service has no medical specialty');
+                        $stats['skipped']++;
+                        continue;
+                    }
 
-                // Extract time slot information
-                $slotIdentifier = null;
-                if (isset($appointmentResource['slot'][0]['identifier']['value'])) {
-                    $slotIdentifier = $appointmentResource['slot'][0]['identifier']['value'];
-                }
+                    // Extract time slot information
+                    $slotIdentifier = null;
+                    if (isset($appointmentResource['slot'][0]['identifier']['value'])) {
+                        $slotIdentifier = $appointmentResource['slot'][0]['identifier']['value'];
+                    }
 
-                // Find or create time slot
-                $timeSlot = null;
-                $this->output->writeln("Slot identifier: " . $slotIdentifier);
-                if ($slotIdentifier) {
-                    // Try to find existing slot
-                    $timeSlot = $this->timeSlotRepository->findOneBy(['idHis' => $slotIdentifier]);
-                }
+                    // Find or create time slot
+                    $timeSlot = null;
+                    $this->output->writeln("Slot identifier: " . $slotIdentifier);
+                    if ($slotIdentifier) {
+                        // Try to find existing slot
+                        $timeSlot = $this->timeSlotRepository->findOneBy(['idHis' => $slotIdentifier]);
+                    }
 
-                if (!$timeSlot) {
-                    $this->output->writeln('Timeslot unavailable');
-                    $stats['skipped']++;
-                    continue;
-                }
+                    if (!$timeSlot) {
+                        $this->output->writeln('Timeslot unavailable');
+                        $stats['skipped']++;
+                        continue;
+                    }
 
-                if ($existingAppointment) {
-                    // Update existing appointment
-                    $existingAppointment->setPatient($patient);
-                    $existingAppointment->setDoctor($doctor);
-                    $existingAppointment->setMedicalSpecialty($medicalSpecialty);
-                    $existingAppointment->setHospitalService($hospitalService);
-                    $existingAppointment->setTimeSlot($timeSlot);
-                    $existingAppointment->setIsActive($isActive);
+                    if ($existingAppointment) {
+                        // Update existing appointment
+                        $existingAppointment->setPatient($patient);
+                        $existingAppointment->setDoctor($doctor);
+                        $existingAppointment->setMedicalSpecialty($medicalSpecialty);
+                        $existingAppointment->setHospitalService($hospitalService);
+                        $existingAppointment->setTimeSlot($timeSlot);
+                        $existingAppointment->setIsActive($isActive);
 
-                    $this->entityManager->persist($existingAppointment);
+                        $this->entityManager->persist($existingAppointment);
+                        $this->entityManager->flush();
+                        $stats['updated']++;
+                    } else {
+                        // Create new appointment
+                        $newAppointment = new Appointment();
+                        $newAppointment->setIdHis($hisId);
+                        $newAppointment->setPatient($patient);
+                        $newAppointment->setDoctor($doctor);
+                        $newAppointment->setMedicalSpecialty($medicalSpecialty);
+                        $newAppointment->setHospitalService($hospitalService);
+                        $newAppointment->setTimeSlot($timeSlot);
+                        $newAppointment->setIsActive($isActive);
+
+                        $this->entityManager->persist($newAppointment);
+                        $this->entityManager->flush();
+                        $stats['created']++;
+                    }
+
                     $this->entityManager->flush();
-                    $stats['updated']++;
-                } else {
-                    // Create new appointment
-                    $newAppointment = new Appointment();
-                    $newAppointment->setIdHis($hisId);
-                    $newAppointment->setPatient($patient);
-                    $newAppointment->setDoctor($doctor);
-                    $newAppointment->setMedicalSpecialty($medicalSpecialty);
-                    $newAppointment->setHospitalService($hospitalService);
-                    $newAppointment->setTimeSlot($timeSlot);
-                    $newAppointment->setIsActive($isActive);
 
-                    $this->entityManager->persist($newAppointment);
-                    $this->entityManager->flush();
-                    $stats['created']++;
+                } catch (\Exception $e) {
+                    $this->output->writeln("Error processing FHIR Appointment: {$e->getMessage()}");
+                    $stats['errors']++;
                 }
-
-                $this->entityManager->flush();
-
-            } catch (\Exception $e) {
-                $this->output->writeln("Error processing FHIR Appointment: {$e->getMessage()}");
-                $stats['errors']++;
             }
         }
     }
