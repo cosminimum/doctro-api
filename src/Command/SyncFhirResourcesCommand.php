@@ -698,6 +698,11 @@ class SyncFhirResourcesCommand extends Command
                     if (isset($slotResource['serviceType'][0]['reference']['identifier']['value'])) {
                         $serviceHisId = $slotResource['serviceType'][0]['reference']['identifier']['value'];
                         $hospitalService = $this->hospitalServiceRepository->findOneBy(['id' => $serviceHisId]);
+                        if (!$hospitalService) {
+                            $this->output->writeln("Service not found: $serviceHisId");
+                        }
+                    } else {
+                        $this->output->writeln("Slot missing serviceType, cannot create new slot for ID: {$hisId}");
                     }
 
                     if ($existingSlot) {
