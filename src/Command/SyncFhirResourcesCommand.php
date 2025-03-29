@@ -76,15 +76,15 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Starting FHIR resources synchronization...');
 
         try {
-//            $this->syncPatients();
-//            $this->syncPractitioners();
-//            $this->syncHealthcareServices();
-//            $this->syncPractitionerRoles();
-//            $this->syncSchedules();
+            $this->syncPatients();
+            $this->syncPractitioners();
+            $this->syncHealthcareServices();
+            $this->syncPractitionerRoles();
+            $this->syncSchedules();
             $this->syncSlots();
-//            $this->syncAppointments();
+            $this->syncAppointments();
 
-//            $this->entityManager->flush();
+            $this->entityManager->flush();
 
             $endTime = microtime(true);
             $executionTime = round($endTime - $startTime, 2);
