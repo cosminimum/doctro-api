@@ -968,7 +968,7 @@ class SyncFhirResourcesCommand extends Command
                 }
 
                 // Check if we already have this appointment
-                $existingAppointment = $this->appointmentRepository->findOneBy(['idHis' => $existingAppointment]);
+                $existingAppointment = $this->appointmentRepository->findOneBy(['idHis' => $hisId]);
 
                 // Extract appointment information
                 $status = $appointmentResource['status'] ?? 'pending';
