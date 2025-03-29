@@ -1098,7 +1098,7 @@ class SyncFhirResourcesCommand extends Command
                 $this->entityManager->flush();
 
             } catch (\Exception $e) {
-                $this->output->writeln('Error processing FHIR Appointment');
+                $this->output->writeln("Error processing FHIR Appointment: {$e->getMessage()}");
                 $stats['errors']++;
             }
         }
