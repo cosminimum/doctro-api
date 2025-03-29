@@ -735,7 +735,7 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     $slotResource = $entry['resource'];
-                    $hisId = $slotResource['identifier']['value'] ?? null;
+                    $hisId = $slotResource['identifier'][0]['value'] ?? null;
 
                     if (!$hisId) {
                         $this->output->writeln('Skipping Slot without ID');
