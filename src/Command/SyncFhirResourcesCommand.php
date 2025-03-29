@@ -883,7 +883,7 @@ class SyncFhirResourcesCommand extends Command
 
             if (!isset($response['entry']) || !is_array($response['entry'])) {
                 $this->output->writeln('Invalid FHIR bundle format: missing entries array');
-                return;
+                continue;
             }
 
             foreach ($response['entry'] as $entry) {
