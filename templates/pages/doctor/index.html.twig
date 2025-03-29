@@ -214,22 +214,20 @@
       const doctorSchedules = {{ doctorSchedules|default('[]')|raw }};
       const services = {{ services|json_encode()|raw }}; // Make sure to pass services to the template
 
-      // Create a map of service colors by ID for quick lookup
+// Create a map of service colors by ID for quick lookup
       const serviceColors = {};
       services.forEach(service => {
         serviceColors[service.id] = service.color || '#3788d8';
       });
 
-      // Instead of using businessHours (which only takes one color),
-      // we'll create background events for each slot with the appropriate service color
+// Instead of using businessHours (which only takes one color),
+// we'll create background events for each slot with the appropriate service color
       var businessHourEvents = [];
       var earliestStart = "23:59:59";
       var latestEnd = "00:00:00";
 
       doctorSchedules.forEach(schedule => {
         var scheduleDate = new Date(schedule.date);
-        var day = scheduleDate.getDay();
-        day = (day === 0) ? 7 : day;
 
         schedule.slots.forEach(slot => {
           if (!slot.isBooked) {
@@ -245,11 +243,11 @@
                     ? serviceColors[slot.serviceId]
                     : '#3788d8';
 
-            // Create a recurring business hours event for this slot with the service color
+            // Create a business hours event for this specific date with the service color
             businessHourEvents.push({
-              daysOfWeek: [day],
-              startTime: slot.startTime,
-              endTime: slot.endTime,
+              // Use the specific date instead of daysOfWeek
+              start: schedule.date + 'T' + slot.startTime,
+              end: schedule.date + 'T' + slot.endTime,
               display: 'background',
               backgroundColor: serviceColor,
               // Make these non-interactive
@@ -291,7 +289,7 @@
         });
       });
 
-      // Combine all events: appointments, blocked slots, and business hour events
+// Combine all events: appointments, blocked slots, and business hour events
       var allEvents = [...appointments, ...blockedEvents, ...businessHourEvents];
 
       var calendar = new FullCalendar.Calendar(calendarEl, {

@@ -35,18 +35,11 @@ class HomeController extends AbstractController
 
         if ($this->getUser() && in_array(Doctor::BASE_ROLE, $this->getUser()->getRoles())) {
             $doctor = $this->getUser();
-            $today = new \DateTime();
-
-            $startOfWeek = (clone $today)->modify('monday this week');
-            $endOfWeek   = (clone $today)->modify('sunday this week');
 
             $schedules = $em->getRepository(DoctorSchedule::class)
                 ->createQueryBuilder('ds')
                 ->where('ds.doctor = :doctor')
-                ->andWhere('ds.date BETWEEN :start AND :end')
                 ->setParameter('doctor', $doctor)
-                ->setParameter('start', $startOfWeek->format('Y-m-d'))
-                ->setParameter('end', $endOfWeek->format('Y-m-d'))
                 ->getQuery()
                 ->getResult();
 
@@ -72,10 +65,7 @@ class HomeController extends AbstractController
                 ->join('a.timeSlot', 'ts')
                 ->join('ts.schedule', 'ds')
                 ->where('ds.doctor = :doctor')
-                ->andWhere('ds.date BETWEEN :start AND :end')
                 ->setParameter('doctor', $doctor)
-                ->setParameter('start', $startOfWeek->format('Y-m-d'))
-                ->setParameter('end', $endOfWeek->format('Y-m-d'))
                 ->getQuery()
                 ->getResult();
 
@@ -95,7 +85,6 @@ class HomeController extends AbstractController
                         $timeSlot->getEndTime()->format('H:i:s'),
                 ];
             }
-
             $services = $hospitalServiceRepository->findServicesByDoctor($this->getUser());
             return $this->render('pages/doctor/index.html.twig', [
                 'appointments'     => json_encode($appointments),
