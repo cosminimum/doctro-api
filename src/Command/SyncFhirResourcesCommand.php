@@ -490,7 +490,7 @@ class SyncFhirResourcesCommand extends Command
                         continue;
                     }
 
-                    $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['idHis' => $idHis]);
+                    $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $idHis]);
                     $isNew = false;
 
                     if (!$hospitalService) {
@@ -502,100 +502,23 @@ class SyncFhirResourcesCommand extends Command
                         $isNew = true;
                     }
 
-                    $name = $service['name'] ?? 'Service ' . $idHis;
+                    $name = $service['name'];
                     $description = '';
-                    if (isset($service['comment'])) {
-                        $description = $service['comment'];
-                    } elseif (isset($service['description'])) {
-                        $description = $service['description'];
-                    } else {
-                        // Default description if none provided
-                        $description = $name;
-                    }
 
-                    $code = '';
-                    // Extract code from identifier or type
-                    if (isset($service['identifier']) && is_array($service['identifier'])) {
-                        foreach ($service['identifier'] as $identifier) {
-                            if (isset($identifier['value'])) {
-                                $code = $identifier['value'];
-                                break;
-                            }
-                        }
-                    } elseif (isset($service['type']) && is_array($service['type'])) {
-                        foreach ($service['type'] as $type) {
-                            if (isset($type['coding'][0]['code'])) {
-                                $code = $type['coding'][0]['code'];
-                                break;
-                            }
-                        }
-                    }
-
-                    if (empty($code)) {
-                        $code = 'CODE_' . $idHis;
-                    }
+                    $code = $idHis;
 
                     $duration = 30; // Default duration
-                    if (isset($service['appointmentDuration'])) {
-                        $duration = intval($service['appointmentDuration']);
-                    }
-
                     $price = '0'; // Default price
-                    if (isset($service['extraDetails'])) {
-                        if (preg_match('/price[:\s]+(\d+)/i', $service['extraDetails'], $matches)) {
-                            $price = $matches[1];
-                        }
-                    }
 
-                    // Find medical specialty from category if available
-                    $specialtyId = null;
-                    $categoryCode = null;
-                    if (isset($service['category']) && is_array($service['category'])) {
-                        foreach ($service['category'] as $category) {
-                            if (isset($category['coding'][0]['code'])) {
-                                $categoryCode = $category['coding'][0]['code'];
-                                break;
-                            }
-                        }
-                    }
-
-                    if ($categoryCode) {
-                        $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)
-                            ->findOneBy(['code' => $categoryCode]);
-
-                        if (!$medicalSpecialty) {
-                            // Create a new specialty if not found
-                            $medicalSpecialty = new MedicalSpecialty();
-                            $medicalSpecialty->setCode($categoryCode);
-                            $medicalSpecialty->setName($service['category'][0]['text'] ?? 'Specialty ' . $categoryCode);
-                            $medicalSpecialty->setIsActive(true);
-                            $this->entityManager->persist($medicalSpecialty);
-                            $this->entityManager->flush();
-                        }
-
-                        $specialtyId = $medicalSpecialty->getId();
-                    } else {
-                        // Fallback to first specialty if no category found
-                        $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)
-                            ->findOneBy([], ['id' => 'ASC']);
-
-                        if ($medicalSpecialty) {
-                            $specialtyId = $medicalSpecialty->getId();
-                        }
-                    }
+                    // Default specialty
+                    $medicalSpecialty = $this->medicalSpecialtyRepository->findAll()[0];
 
                     $hospitalService->setName($name);
                     $hospitalService->setDescription($description);
                     $hospitalService->setCode($code);
                     $hospitalService->setDuration((string) $duration);
                     $hospitalService->setPrice($price);
-
-                    if ($specialtyId) {
-                        $medicalSpecialty = $this->entityManager->getRepository(MedicalSpecialty::class)->find($specialtyId);
-                        if ($medicalSpecialty) {
-                            $hospitalService->setMedicalSpecialty($medicalSpecialty);
-                        }
-                    }
+                    $hospitalService->setMedicalSpecialty($medicalSpecialty);
 
                     $this->entityManager->persist($hospitalService);
                     $this->entityManager->flush();
@@ -611,7 +534,6 @@ class SyncFhirResourcesCommand extends Command
                 }
             }
 
-            $this->entityManager->flush();
             $this->output->writeln("Healthcare services: {$count} new, {$updated} updated, {$errors} errors");
             $this->output->writeln('Healthcare services sync completed');
         } catch (\Exception $e) {
