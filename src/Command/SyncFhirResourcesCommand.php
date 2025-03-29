@@ -387,24 +387,16 @@ class SyncFhirResourcesCommand extends Command
                     }
 
                     // Associate specialties
+
                     if (isset($role['specialty']) && is_array($role['specialty'])) {
                         foreach ($role['specialty'] as $specialty) {
-                            if (isset($specialty['coding'][0]['code'])) {
-                                $specialtyCode = $specialty['coding'][0]['code'];
-                                $specialtyName = $specialty['coding'][0]['display'] ?? $specialtyCode;
+                            if (isset($specialty['text'])) {
+                                $specialtyName = $specialty['text'];
+                                $medicalSpecialty = $this->medicalSpecialtyRepository->findOneBy(['name' => $specialtyName]);
 
-                                $medicalSpecialty = $this->medicalSpecialtyRepository->findOneBy(['code' => $specialtyCode]);
-
-                                // Create specialty if it doesn't exist
                                 if (!$medicalSpecialty) {
-                                    $medicalSpecialty = new MedicalSpecialty();
-                                    $medicalSpecialty->setCode($specialtyCode);
-                                    $medicalSpecialty->setName($specialtyName);
-                                    $medicalSpecialty->setIsActive(true);
-                                    $this->entityManager->persist($medicalSpecialty);
-                                    $this->entityManager->flush();
-                                    $specialtiesCreated++;
-                                    $this->output->writeln("Created new specialty: {$specialtyName} with code {$specialtyCode}");
+                                    $this->output->writeln("specialty not found: {$specialtyName}");
+                                    continue;
                                 }
 
                                 if (!$doctor->getMedicalSpecialties()->contains($medicalSpecialty)) {
@@ -424,7 +416,6 @@ class SyncFhirResourcesCommand extends Command
                                 /** @var HospitalService $hospitalService */
                                 $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $serviceCode]);
 
-                                // Create service if it doesn't exist
                                 if (!$hospitalService) {
                                     $this->output->writeln("Service not found for service {$serviceCode}");
                                     continue;
