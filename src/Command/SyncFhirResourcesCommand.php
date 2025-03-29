@@ -1029,6 +1029,7 @@ class SyncFhirResourcesCommand extends Command
 
                 // Find or create time slot
                 $timeSlot = null;
+                $this->output->writeln("Slot identifier: " . $slotIdentifier);
                 if ($slotIdentifier) {
                     // Try to find existing slot
                     $timeSlot = $this->timeSlotRepository->findOneBy(['idHis' => $slotIdentifier]);
