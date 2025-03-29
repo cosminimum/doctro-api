@@ -936,10 +936,10 @@ class SyncFhirResourcesCommand extends Command
                             continue;
                         }
 
-                        $patient = $response['entry'][0]['resource'];
+                        $patientResource = $response['entry'][0]['resource'];
 
                         try {
-                            $idHis = $patient['id'] ?? null;
+                            $idHis = $patientResource['id'] ?? null;
                             if (!$idHis) {
                                 $this->output->writeln('Patient without ID');
                                 continue;
@@ -951,8 +951,8 @@ class SyncFhirResourcesCommand extends Command
                             $existingPatient->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
 
                             $email = '';
-                            if (isset($patient['telecom']) && is_array($patient['telecom'])) {
-                                foreach ($patient['telecom'] as $telecom) {
+                            if (isset($patientResource['telecom']) && is_array($patientResource['telecom'])) {
+                                foreach ($patientResource['telecom'] as $telecom) {
                                     if ($telecom['system'] === 'email') {
                                         $email = $telecom['value'];
                                         break;
@@ -965,8 +965,8 @@ class SyncFhirResourcesCommand extends Command
                             }
 
                             $phone = '';
-                            if (isset($patient['telecom']) && is_array($patient['telecom'])) {
-                                foreach ($patient['telecom'] as $telecom) {
+                            if (isset($patientResource['telecom']) && is_array($patientResource['telecom'])) {
+                                foreach ($patientResource['telecom'] as $telecom) {
                                     if ($telecom['system'] === 'phone') {
                                         $phone = $telecom['value'];
                                         break;
@@ -976,8 +976,8 @@ class SyncFhirResourcesCommand extends Command
 
                             $firstName = '';
                             $lastName = '';
-                            if (isset($patient['name'][0])) {
-                                $name = $patient['name'][0];
+                            if (isset($patientResource['name'][0])) {
+                                $name = $patientResource['name'][0];
                                 if (isset($name['given']) && is_array($name['given'])) {
                                     $firstName = implode(' ', $name['given']);
                                 } else {
@@ -987,8 +987,8 @@ class SyncFhirResourcesCommand extends Command
                             }
 
                             $cnp = '';
-                            if (isset($patient['identifier']) && is_array($patient['identifier'])) {
-                                foreach ($patient['identifier'] as $identifier) {
+                            if (isset($patientResource['identifier']) && is_array($patientResource['identifier'])) {
+                                foreach ($patientResource['identifier'] as $identifier) {
                                     if (isset($identifier['system']) && $identifier['system'] === 'http://snomed.info/sct') {
                                         $cnp = $identifier['value'];
                                         break;
@@ -1051,7 +1051,7 @@ class SyncFhirResourcesCommand extends Command
 
                     if ($existingAppointment) {
                         // Update existing appointment
-                        $existingAppointment->setPatient($patient);
+                        $existingAppointment->setPatient($existingPatient);
                         $existingAppointment->setDoctor($doctor);
                         $existingAppointment->setMedicalSpecialty($medicalSpecialty);
                         $existingAppointment->setHospitalService($hospitalService);
@@ -1065,7 +1065,7 @@ class SyncFhirResourcesCommand extends Command
                         // Create new appointment
                         $newAppointment = new Appointment();
                         $newAppointment->setIdHis($hisId);
-                        $newAppointment->setPatient($patient);
+                        $newAppointment->setPatient($existingPatient);
                         $newAppointment->setDoctor($doctor);
                         $newAppointment->setMedicalSpecialty($medicalSpecialty);
                         $newAppointment->setHospitalService($hospitalService);
