@@ -76,7 +76,6 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Starting FHIR resources synchronization...');
 
         try {
-            $this->syncPatients();
             $this->syncPractitioners();
             $this->syncHealthcareServices();
             $this->syncPractitionerRoles();
@@ -901,33 +900,13 @@ class SyncFhirResourcesCommand extends Command
 
                 // Extract appointment information
                 $status = $appointmentResource['status'] ?? 'pending';
-                $isActive = ($status === 'booked' || $status === 'fulfilled' || $status === 'pending');
+                $isActive = ($status === 'booked' || $status === 'pending');
 
                 // Extract patient, doctor and service information
-                $patientHisId = null;
-                $doctorHisId = null;
-                $serviceHisId = null;
+                $patientHisId = $appointmentResource['subject']['identifier']['value'];
+                $doctorHisId = $appointmentResource['participant'][0]['actor']['identifier']['value'];
+                $serviceHisId = $appointmentResource['serviceType'][0]['reference']['identifier']['value'];
 
-                // Extract participant information
-                if (isset($appointmentResource['participant']) && is_array($appointmentResource['participant'])) {
-                    foreach ($appointmentResource['participant'] as $participant) {
-                        if (isset($participant['actor']['identifier']['value'])) {
-                            if (isset($participant['type'][0]['coding'][0]['code']) && $participant['type'][0]['coding'][0]['code'] === 'practitioner') {
-                                $doctorHisId = $participant['actor']['identifier']['value'];
-                            }
-                        }
-                    }
-                }
-
-                // Try to get patient information from subject if not found in participants
-                if (isset($appointmentResource['subject']['identifier']['value'])) {
-                    $patientHisId = $appointmentResource['subject']['identifier']['value'];
-                }
-
-                // Get service information
-                if (isset($appointmentResource['serviceType'][0]['reference']['identifier']['value'])) {
-                    $serviceHisId = $appointmentResource['serviceType'][0]['reference']['identifier']['value'];
-                }
 
                 // Check if we have the required information
                 if (!$patientHisId || !$doctorHisId || !$serviceHisId) {
@@ -943,9 +922,88 @@ class SyncFhirResourcesCommand extends Command
 
                 // Create patient if not found (simplified version - you may want to expand this)
                 if (!$patient) {
-                    $this->output->writeln("Patient doesnt exist. ID: {$patientHisId}");
-                    $stats['skipped']++;
-                    continue;
+                    $response = $this->apiClient->get('/api/HInterop/GetPatients?idhis=' . $patientHisId);
+                    if (!isset($response['entry']) || !is_array($response['entry'])) {
+                        $this->output->writeln('No patients found or invalid response format');
+                        continue;
+                    }
+
+                    $patient = $response['entry'][0]['resource'];
+
+                    try {
+                        $idHis = $patient['id'] ?? null;
+                        if (!$idHis) {
+                            $this->output->writeln('Patient without ID');
+                            continue;
+                        }
+
+                        $existingPatient = new Patient();
+                        $existingPatient->setIdHis($idHis);
+                        $existingPatient->setRoles([Patient::BASE_ROLE]);
+                        $existingPatient->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
+
+                        $email = '';
+                        if (isset($patient['telecom']) && is_array($patient['telecom'])) {
+                            foreach ($patient['telecom'] as $telecom) {
+                                if ($telecom['system'] === 'email') {
+                                    $email = $telecom['value'];
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (empty($email)) {
+                            $email = 'patient_' . $idHis . '@example.com';
+                        }
+
+                        $phone = '';
+                        if (isset($patient['telecom']) && is_array($patient['telecom'])) {
+                            foreach ($patient['telecom'] as $telecom) {
+                                if ($telecom['system'] === 'phone') {
+                                    $phone = $telecom['value'];
+                                    break;
+                                }
+                            }
+                        }
+
+                        $firstName = '';
+                        $lastName = '';
+                        if (isset($patient['name'][0])) {
+                            $name = $patient['name'][0];
+                            if (isset($name['given']) && is_array($name['given'])) {
+                                $firstName = implode(' ', $name['given']);
+                            } else {
+                                $firstName = $name['given'] ?? '';
+                            }
+                            $lastName = $name['family'] ?? '';
+                        }
+
+                        $cnp = '';
+                        if (isset($patient['identifier']) && is_array($patient['identifier'])) {
+                            foreach ($patient['identifier'] as $identifier) {
+                                if (isset($identifier['system']) && $identifier['system'] === 'http://snomed.info/sct') {
+                                    $cnp = $identifier['value'];
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (empty($cnp)) {
+                            $cnp = str_pad((string) $idHis, 13, '0', STR_PAD_LEFT);
+                        }
+
+                        $existingPatient->setEmail($email);
+                        $existingPatient->setFirstName($firstName);
+                        $existingPatient->setLastName($lastName);
+                        $existingPatient->setCnp($cnp);
+                        $existingPatient->setPhone($phone);
+                        $existingPatient->setIsActive(true);
+
+                        $this->entityManager->persist($existingPatient);
+                        $this->entityManager->flush();
+                    } catch (\Exception $e) {
+                        $this->output->writeln('Error processing patient: ' . $e->getMessage());
+                    }
                 }
 
                 // Skip if doctor or service not found
@@ -967,20 +1025,6 @@ class SyncFhirResourcesCommand extends Command
                 $slotIdentifier = null;
                 if (isset($appointmentResource['slot'][0]['identifier']['value'])) {
                     $slotIdentifier = $appointmentResource['slot'][0]['identifier']['value'];
-                }
-
-
-
-                // Extract date/time information
-                $startDateTime = null;
-                $endDateTime = null;
-                if (isset($appointmentResource['start']) && isset($appointmentResource['end'])) {
-                    $startDateTime = new \DateTime($appointmentResource['start']);
-                    $endDateTime = new \DateTime($appointmentResource['end']);
-                } else {
-                    $this->output->writeln('Appointment missing start/end times');
-                    $stats['skipped']++;
-                    continue;
                 }
 
                 // Find or create time slot
