@@ -688,7 +688,7 @@ class SyncFhirResourcesCommand extends Command
                     $hospitalService = null;
                     if (isset($slotResource['serviceType'][0]['reference']['identifier']['value'])) {
                         $serviceHisId = $slotResource['serviceType'][0]['reference']['identifier']['value'];
-                        $hospitalService = $this->hospitalServiceRepository->findOneBy(['id' => $serviceHisId]);
+                        $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $serviceHisId]);
                         if (!$hospitalService) {
                             $this->output->writeln("Service not found: $serviceHisId");
                         }
