@@ -36,6 +36,7 @@ class DoctorController extends AbstractController
         PatientRepository $patientRepo,
         DoctorScheduleRepository $doctorScheduleRepository,
         PatientRegisterStory $patientRegisterStory,
+        HospitalServiceRepository $hospitalServiceRepository,
     ): Response {
         $form = $this->createForm(DoctorAppointmentFormType::class);
         $form->handleRequest($request);
@@ -100,9 +101,7 @@ class DoctorController extends AbstractController
             ]);
             if (!$schedule) {
                 $this->addFlash('error', 'Nu există program pentru data selectată.');
-                return $this->render('pages/doctor/appointments/new.html.twig', [
-                    'form' => $form->createView()
-                ]);
+                return $this->redirectToRoute('homepage');
             }
 
             $timeslots = $schedule->getTimeSlots()->toArray();
@@ -137,9 +136,7 @@ class DoctorController extends AbstractController
 
             if (count($block) < $requiredSlots) {
                 $this->addFlash('error', 'Nu există suficiente intervale orare consecutive disponibile pentru serviciul selectat.');
-                return $this->render('pages/doctor/appointments/new.html.twig', [
-                    'form' => $form->createView()
-                ]);
+                return $this->redirectToRoute('homepage');
             }
 
             foreach ($block as $slot) {
@@ -255,10 +252,13 @@ class DoctorController extends AbstractController
             ];
         }
 
+        $services = $hospitalServiceRepository->findServicesByDoctor($this->getUser());
+
         return $this->render('pages/doctor/appointments/new.html.twig', [
             'form' => $form->createView(),
             'appointments' => json_encode($appointments),
             'doctorSchedules' => json_encode($doctorSchedules),
+            'services' => $services,
         ]);
     }
 
