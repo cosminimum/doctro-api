@@ -2,6 +2,7 @@
 
 namespace App\Command;
 
+use App\Application\Repository\AppointmentRepositoryInterface;
 use App\Application\Repository\DoctorRepositoryInterface;
 use App\Infrastructure\Entity\Appointment;
 use App\Infrastructure\Entity\Doctor;
@@ -13,6 +14,7 @@ use App\Infrastructure\Entity\TimeSlot;
 use App\Infrastructure\Repository\DoctorScheduleRepository;
 use App\Infrastructure\Repository\HospitalServiceRepository;
 use App\Infrastructure\Repository\MedicalSpecialtyRepository;
+use App\Infrastructure\Repository\TimeSlotRepository;
 use App\Infrastructure\Repository\UserRepository;
 use App\Infrastructure\Service\FhirApiClient;
 use Doctrine\ORM\EntityManagerInterface;
@@ -38,6 +40,8 @@ class SyncFhirResourcesCommand extends Command
     private DoctorRepositoryInterface $doctorRepository;
     private MedicalSpecialtyRepository $medicalSpecialtyRepository;
     private HospitalServiceRepository $hospitalServiceRepository;
+    private AppointmentRepositoryInterface $appointmentRepository;
+    private TimeSlotRepository $timeSlotRepository;
 
     public function __construct(
         EntityManagerInterface $entityManager,
@@ -48,6 +52,8 @@ class SyncFhirResourcesCommand extends Command
         DoctorRepositoryInterface $doctorRepository,
         MedicalSpecialtyRepository $medicalSpecialtyRepository,
         HospitalServiceRepository $hospitalServiceRepository,
+        AppointmentRepositoryInterface $appointmentRepository,
+        TimeSlotRepository $timeSlotRepository,
     ) {
         parent::__construct();
         $this->entityManager = $entityManager;
@@ -57,6 +63,8 @@ class SyncFhirResourcesCommand extends Command
         $this->doctorRepository = $doctorRepository;
         $this->medicalSpecialtyRepository = $medicalSpecialtyRepository;
         $this->hospitalServiceRepository = $hospitalServiceRepository;
+        $this->appointmentRepository = $appointmentRepository;
+        $this->timeSlotRepository = $timeSlotRepository;
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -68,15 +76,15 @@ class SyncFhirResourcesCommand extends Command
         $this->output->writeln('Starting FHIR resources synchronization...');
 
         try {
-            $this->syncPatients();
-            $this->syncPractitioners();
-            $this->syncHealthcareServices();
-            $this->syncPractitionerRoles();
-            $this->syncSchedules();
+//            $this->syncPatients();
+//            $this->syncPractitioners();
+//            $this->syncHealthcareServices();
+//            $this->syncPractitionerRoles();
+//            $this->syncSchedules();
             $this->syncSlots();
-            $this->syncAppointments();
+//            $this->syncAppointments();
 
-            $this->entityManager->flush();
+//            $this->entityManager->flush();
 
             $endTime = microtime(true);
             $executionTime = round($endTime - $startTime, 2);
@@ -698,7 +706,9 @@ class SyncFhirResourcesCommand extends Command
                 continue;
             }
             $this->output->writeln('Fetching slots from FHIR API for ' . $schedule->getIdHis());
-            $response = $this->apiClient->get('/api/HInterop/GetSlots?schedule=' . $schedule->getIdHis());
+//            $response = $this->apiClient->get('/api/HInterop/GetSlots?schedule=' . $schedule->getIdHis());
+            $response = '{"resourceType":"Bundle","type":"collection","entry":[{"fullUrl":"f9418a84-a281-4c65-8dbd-996a9e666cd7","resource":{"resourceType":"Slot","id":"1","identifier":[{"use":"official","type":{"coding":[{"system":"http://snomed.info/sct","code":"MR"}]},"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025__07:00__2__30"}],"serviceCategory":[{"coding":[{"code":"APPSERV"}],"text":"Servicii programari"}],"serviceType":[{"reference":{"type":"HealthcareService","identifier":{"system":"http://snomed.info/sct","value":"79831959-E760-435A-AC9A-775B27F8ACF2"}}}],"appointmentType":[{"coding":[{"code":"CHECKUP"}],"text":"CHECKUP"}],"schedule":{"type":"Schedule","identifier":{"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025"}},"status":"free","start":"2025-03-31T07:00:00+00:00","end":"2025-03-31T07:30:00+00:00"}},{"fullUrl":"1e8f5df8-ef63-47fa-82f0-bf719a9b1594","resource":{"resourceType":"Slot","id":"2","identifier":[{"use":"official","type":{"coding":[{"system":"http://snomed.info/sct","code":"MR"}]},"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025__07:30__2__30"}],"serviceCategory":[{"coding":[{"code":"APPSERV"}],"text":"Servicii programari"}],"serviceType":[{"reference":{"type":"HealthcareService","identifier":{"system":"http://snomed.info/sct","value":"79831959-E760-435A-AC9A-775B27F8ACF2"}}}],"appointmentType":[{"coding":[{"code":"CHECKUP"}],"text":"CHECKUP"}],"schedule":{"type":"Schedule","identifier":{"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025"}},"status":"free","start":"2025-03-31T07:30:00+00:00","end":"2025-03-31T08:00:00+00:00"}},{"fullUrl":"a17f9c59-2743-4f21-9ac7-effa146de148","resource":{"resourceType":"Slot","id":"3","identifier":[{"use":"official","type":{"coding":[{"system":"http://snomed.info/sct","code":"MR"}]},"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025__10:30__2__30"}],"serviceCategory":[{"coding":[{"code":"APPSERV"}],"text":"Servicii programari"}],"serviceType":[{"reference":{"type":"HealthcareService","identifier":{"system":"http://snomed.info/sct","value":"79831959-E760-435A-AC9A-775B27F8ACF2"}}}],"appointmentType":[{"coding":[{"code":"CHECKUP"}],"text":"CHECKUP"}],"schedule":{"type":"Schedule","identifier":{"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025"}},"status":"free","start":"2025-03-31T10:30:00+00:00","end":"2025-03-31T11:00:00+00:00"}},{"fullUrl":"321b082c-754f-43ba-87e3-8c2e6d302353","resource":{"resourceType":"Slot","id":"4","identifier":[{"use":"official","type":{"coding":[{"system":"http://snomed.info/sct","code":"MR"}]},"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025__11:00__2__30"}],"serviceCategory":[{"coding":[{"code":"APPSERV"}],"text":"Servicii programari"}],"serviceType":[{"reference":{"type":"HealthcareService","identifier":{"system":"http://snomed.info/sct","value":"79831959-E760-435A-AC9A-775B27F8ACF2"}}}],"appointmentType":[{"coding":[{"code":"CHECKUP"}],"text":"CHECKUP"}],"schedule":{"type":"Schedule","identifier":{"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025"}},"status":"free","start":"2025-03-31T11:00:00+00:00","end":"2025-03-31T11:30:00+00:00"}},{"fullUrl":"1d19afcb-0a1b-4219-a8db-2a2a9675432f","resource":{"resourceType":"Slot","id":"5","identifier":[{"use":"official","type":{"coding":[{"system":"http://snomed.info/sct","code":"MR"}]},"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025__11:30__2__30"}],"serviceCategory":[{"coding":[{"code":"APPSERV"}],"text":"Servicii programari"}],"serviceType":[{"reference":{"type":"HealthcareService","identifier":{"system":"http://snomed.info/sct","value":"79831959-E760-435A-AC9A-775B27F8ACF2"}}}],"appointmentType":[{"coding":[{"code":"CHECKUP"}],"text":"CHECKUP"}],"schedule":{"type":"Schedule","identifier":{"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025"}},"status":"free","start":"2025-03-31T11:30:00+00:00","end":"2025-03-31T12:00:00+00:00"}},{"fullUrl":"ba4c9a14-0df6-4bbf-8109-2b89fe021181","resource":{"resourceType":"Slot","id":"6","identifier":[{"use":"official","type":{"coding":[{"system":"http://snomed.info/sct","code":"MR"}]},"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025__12:00__2__30"}],"serviceCategory":[{"coding":[{"code":"APPSERV"}],"text":"Servicii programari"}],"serviceType":[{"reference":{"type":"HealthcareService","identifier":{"system":"http://snomed.info/sct","value":"79831959-E760-435A-AC9A-775B27F8ACF2"}}}],"appointmentType":[{"coding":[{"code":"CHECKUP"}],"text":"CHECKUP"}],"schedule":{"type":"Schedule","identifier":{"system":"http://snomed.info/sct","value":"1__422900000000118__31_03_2025"}},"status":"free","start":"2025-03-31T12:00:00+00:00","end":"2025-03-31T12:30:00+00:00"}}]}';
+            $response = json_decode($response, true);
 
             $stats = [
                 'total'   => count($response['entry'] ?? []),
@@ -958,7 +968,7 @@ class SyncFhirResourcesCommand extends Command
                 }
 
                 // Check if we already have this appointment
-                $existingAppointment = $this->entityManager->getRepository(Appointment::class)->findOneBy(['idHis' => $hisId]);
+                $existingAppointment = $this->appointmentRepository->findOneBy(['idHis' => $existingAppointment]);
 
                 // Extract appointment information
                 $status = $appointmentResource['status'] ?? 'pending';
@@ -998,24 +1008,15 @@ class SyncFhirResourcesCommand extends Command
                 }
 
                 // Find entities
-                $patient = $this->entityManager->getRepository(Patient::class)->findOneBy(['idHis' => $patientHisId]);
-                $doctor = $this->entityManager->getRepository(Doctor::class)->findOneBy(['idHis' => $doctorHisId]);
-                $hospitalService = $this->entityManager->getRepository(HospitalService::class)->findOneBy(['idHis' => $serviceHisId]);
+                $patient = $this->userRepository->findOneBy(['idHis' => $patientHisId]);
+                $doctor = $this->userRepository->findOneBy(['idHis' => $doctorHisId]);
+                $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $serviceHisId]);
 
                 // Create patient if not found (simplified version - you may want to expand this)
                 if (!$patient) {
-                    $patient = new Patient();
-                    $patient->setIdHis($patientHisId);
-                    $patient->setEmail('patient_' . $patientHisId . '@example.com');
-                    $patient->setFirstName('Patient');
-                    $patient->setLastName($patientHisId);
-                    $patient->setCnp(str_pad($patientHisId, 13, '0', STR_PAD_LEFT));
-                    $patient->setPhone('0000000000');
-                    $patient->setPassword(password_hash(uniqid('', true), PASSWORD_BCRYPT));
-                    $patient->setRoles([Patient::BASE_ROLE]);
-
-                    $this->entityManager->persist($patient);
-                    $this->entityManager->flush();
+                    $this->output->writeln("Patient doesnt exist. ID: {$patientHisId}");
+                    $stats['skipped']++;
+                    continue;
                 }
 
                 // Skip if doctor or service not found
@@ -1057,54 +1058,13 @@ class SyncFhirResourcesCommand extends Command
                 $timeSlot = null;
                 if ($slotIdentifier) {
                     // Try to find existing slot
-                    $timeSlot = $this->entityManager->getRepository(TimeSlot::class)->findOneBy(['idHis' => $slotIdentifier]);
+                    $timeSlot = $this->timeSlotRepository->findOneBy(['idHis' => $slotIdentifier]);
                 }
 
                 if (!$timeSlot) {
-                    // We need to find or create the schedule and time slot
-                    $date = clone $startDateTime;
-                    $date->setTime(0, 0, 0);
-
-                    // Find or create schedule
-                    $schedule = $this->entityManager->getRepository(DoctorSchedule::class)->findOneBy([
-                        'doctor' => $doctor,
-                        'date' => $date
-                    ]);
-
-                    if (!$schedule) {
-                        $schedule = new DoctorSchedule();
-                        $schedule->setDoctor($doctor);
-                        $schedule->setDate($date);
-                        $schedule->setIdHis('schedule_' . $hisId);
-                        $this->entityManager->persist($schedule);
-                        $this->entityManager->flush();
-                    }
-
-                    // Create new time slot
-                    $startTime = new \DateTime();
-                    $startTime->setTime(
-                        (int)$startDateTime->format('H'),
-                        (int)$startDateTime->format('i'),
-                        (int)$startDateTime->format('s')
-                    );
-
-                    $endTime = new \DateTime();
-                    $endTime->setTime(
-                        (int)$endDateTime->format('H'),
-                        (int)$endDateTime->format('i'),
-                        (int)$endDateTime->format('s')
-                    );
-
-                    $timeSlot = new TimeSlot();
-                    $timeSlot->setSchedule($schedule);
-                    $timeSlot->setStartTime($startTime);
-                    $timeSlot->setEndTime($endTime);
-                    $timeSlot->setIsBooked(true); // Since we have an appointment, the slot is booked
-                    $timeSlot->setHospitalService($hospitalService);
-                    $timeSlot->setIdHis($slotIdentifier ?? 'slot_' . $hisId);
-
-                    $this->entityManager->persist($timeSlot);
-                    $this->entityManager->flush();
+                    $this->output->writeln('Timeslot unavailable');
+                    $stats['skipped']++;
+                    continue;
                 }
 
                 if ($existingAppointment) {
