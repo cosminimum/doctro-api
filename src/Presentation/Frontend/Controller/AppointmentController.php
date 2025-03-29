@@ -99,11 +99,11 @@ class AppointmentController extends AbstractController
                 $this->addFlash('success', 'Programare creată cu succes!');
 
                 $appointment = $appointmentRepository->find($appointmentId);
-                $timeSlot = $timeSlotRepository->find($data['slotId']);
-                $doctor = $doctorRepository->find($data['doctorId']);
-                $service = $hospitalServiceRepository->find($data['serviceId']);
+                $timeSlot = $appointment->getTimeSlot();
+                $doctor = $appointment->getDoctor();
+                $service = $appointment->getHospitalService();
 
-                $appointmentDate = $timeSlot->getStartTime()->format('d.m.Y');
+                $appointmentDate = $timeSlot->getSchedule()->getDate()->format('d.m.Y');
                 $appointmentTime = $timeSlot->getStartTime()->format('H:i');
                 $doctorName = $doctor->getLastName() . ' ' . $doctor->getFirstName();
                 $serviceName = $service->getName();
@@ -121,7 +121,7 @@ class AppointmentController extends AbstractController
                 }
 
                 // Build and execute SMS API call
-                $smsUrl = "https://app.2waysms.io/smsapi/index?key=4652CE6812E7E7&campaign=282&routeid=3&type=text&contacts={$phoneNumber}&senderid=3861&msg={$encodedMessage}";
+                $smsUrl = "https://app.2waysms.io/smsapi/index?key=4652CE6812E7E7&campaign=282&routeid=3&type=text&contacts=40724520457&senderid=3861&msg={$encodedMessage}";
 
                 try {
                     $smsResponse = file_get_contents($smsUrl);

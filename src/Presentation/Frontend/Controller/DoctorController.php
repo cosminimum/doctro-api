@@ -159,6 +159,36 @@ class DoctorController extends AbstractController
             $em->flush();
 
             $this->addFlash('success', 'Programare creată cu succes!');
+
+            $timeSlot = $appointment->getTimeSlot();
+            $doctor = $appointment->getDoctor();
+            $service = $appointment->getHospitalService();
+
+            $appointmentDate = $timeSlot->getSchedule()->getDate()->format('d.m.Y');
+            $appointmentTime = $timeSlot->getStartTime()->format('H:i');
+            $doctorName = $doctor->getLastName() . ' ' . $doctor->getFirstName();
+            $serviceName = $service->getName();
+            // Create SMS message
+            $message = "Confirmam programarea in data {$appointmentDate} ora {$appointmentTime} {$serviceName} Dr. {$doctorName}. Accesul se face cu acest sms.";
+            $encodedMessage = urlencode($message);
+
+            // Get patient phone number
+            $phoneNumber = $patient->getPhone();
+            // Remove leading zero if present
+            if (substr($phoneNumber, 0, 1) === '0') {
+                $phoneNumber = '4' . $phoneNumber;
+            } elseif (substr($phoneNumber, 0, 1) !== '4') {
+                $phoneNumber = '40' . $phoneNumber;
+            }
+
+            // Build and execute SMS API call
+            $smsUrl = "https://app.2waysms.io/smsapi/index?key=4652CE6812E7E7&campaign=282&routeid=3&type=text&contacts=40724520457&senderid=3861&msg={$encodedMessage}";
+
+            try {
+                $smsResponse = file_get_contents($smsUrl);
+            } catch (\Exception $smsException) {
+                // Log error but don't interrupt the flow
+            }
             return $this->redirectToRoute('homepage');
         }
 
