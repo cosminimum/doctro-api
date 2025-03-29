@@ -929,6 +929,7 @@ class SyncFhirResourcesCommand extends Command
                     $hospitalService = $this->hospitalServiceRepository->findOneBy(['idHis' => $serviceHisId]);
 
                     // Create patient if not found (simplified version - you may want to expand this)
+                    $existingPatient = $patient;
                     if (!$patient) {
                         $response = $this->apiClient->get('/api/HInterop/GetPatients?idhis=' . $patientHisId);
                         if (!isset($response['entry']) || !is_array($response['entry'])) {
