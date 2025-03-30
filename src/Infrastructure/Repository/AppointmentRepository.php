@@ -222,9 +222,6 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         // Get base URL from the API client if available, otherwise use a default
         $baseUrl = $this->parameterBag->get('fhir_api.base_url');
 
-        dump($baseUrl); dump($endpoint); dd($xmlData);
-        exit;
-
         // Setup cURL
         $ch = curl_init($baseUrl . $endpoint);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
