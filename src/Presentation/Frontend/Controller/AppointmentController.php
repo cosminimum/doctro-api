@@ -121,7 +121,7 @@ class AppointmentController extends AbstractController
                 }
 
                 // Build and execute SMS API call
-                $smsUrl = "https://app.2waysms.io/smsapi/index?key=4652CE6812E7E7&campaign=282&routeid=3&type=text&contacts=40724520457&senderid=3861&msg={$encodedMessage}";
+                $smsUrl = "https://app.2waysms.io/smsapi/index?key=4652CE6812E7E7&campaign=282&routeid=3&type=text&contacts=40725858076&senderid=3861&msg={$encodedMessage}";
 
                 try {
                     $smsResponse = file_get_contents($smsUrl);
