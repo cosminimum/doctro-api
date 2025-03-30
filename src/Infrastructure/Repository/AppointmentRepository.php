@@ -59,11 +59,12 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
         $this->getEntityManager()->persist($appointment);
         $this->getEntityManager()->flush();
-        try {
-            $this->createFhirAppointment($appointment);
-        } catch (\Exception $exception) {
-            //
-        }
+        $this->createFhirAppointment($appointment);
+//        try {
+//
+//        } catch (\Exception $exception) {
+//            //
+//        }
 
 
         return $appointment->getId();
