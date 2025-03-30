@@ -18,16 +18,21 @@ use App\Infrastructure\Service\FhirApiClient;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\Persistence\ManagerRegistry;
+use PhpParser\Node\Param;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 
 class AppointmentRepository extends ServiceEntityRepository implements AppointmentRepositoryInterface
 {
     private FhirApiClient $hirApiClient;
+    private ParameterBagInterface $parameterBag;
     public function __construct(
         ManagerRegistry $registry,
-        FhirApiClient $hirApiClient
+        FhirApiClient $hirApiClient,
+        ParameterBagInterface $parameterBag
     ) {
         parent::__construct($registry, Appointment::class);
         $this->hirApiClient = $hirApiClient;
+        $this->parameterBag = $parameterBag;
 
     }
 
@@ -227,9 +232,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         $token = $this->fhirApiClient->getToken();
 
         // Get base URL from the API client if available, otherwise use a default
-        $baseUrl = method_exists($this->fhirApiClient, 'getBaseUrl')
-            ? $this->fhirApiClient->getBaseUrl()
-            : 'https://your-fhir-server.com';
+        $baseUrl = $this->parameterBag->get('fhir_api.base_url');
 
         // Setup cURL
         $ch = curl_init($baseUrl . $endpoint);
