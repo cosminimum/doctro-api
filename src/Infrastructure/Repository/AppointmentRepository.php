@@ -173,7 +173,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
         $participant->appendChild($actor);
 
         $reference = $dom->createElement('reference');
-        $doctorId = $appointment->getDoctor()->getIdHis() ?: $appointment->getDoctor()->getId();
+        $doctorId = $appointment->getDoctor()->getIdHis();
         $reference->setAttribute('value', 'Practitioner/' . $doctorId);
         $actor->appendChild($reference);
 
@@ -187,21 +187,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
         $slotReference = $dom->createElement('reference');
 
-        // Generate a slot reference in the exact format from your example
-        // Format: 2__42290000000004231__03__202515:0010__30
-        $doctorIdPrefix = "2";  // This appears to be a prefix
-        $patientIdHis = "42290000000004231";  // System-specific ID
-        $day = $schedule->getDate()->format('d');
-        $month = $schedule->getDate()->format('m');
-        $year = $schedule->getDate()->format('Y');
-        $time = $timeSlot->getStartTime()->format('H:i');
-        $duration = $appointment->getHospitalService() ? $appointment->getHospitalService()->getDuration() : "30";
-        $durationParts = ["10", "30"];  // Adjust these based on your requirements
-
-        $slotValue = "{$doctorIdPrefix}__{$patientIdHis}__{$day}__{$month}__{$year}{$time}{$durationParts[0]}__{$durationParts[1]}";
-
-        // Use existing ID if available, otherwise use the generated format
-        $slotId = $timeSlot->getIdHis() ?: $slotValue;
+        $slotId = $timeSlot->getIdHis();
 
         $slotReference->setAttribute('value', $slotId);
         $slotElem->appendChild($slotReference);
@@ -211,9 +197,10 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
         // For debugging - uncomment these lines if you need to see the XML
 
+        $response = $this->sendFhirXmlRequest('/api/HInterop/CreateAppointment', $xmlString);
         try {
             // Send the XML using the custom method
-            $response = $this->sendFhirXmlRequest('/api/HInterop/CreateAppointment', $xmlString);
+
 
             // Parse the XML response to extract the ID
             if ($response && preg_match('/<id.*?value="([^"]*)"/', $response, $matches)) {
