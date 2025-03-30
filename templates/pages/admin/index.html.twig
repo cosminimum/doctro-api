@@ -67,32 +67,32 @@
                     <div class="scrollable-x-auto">
                         <table class="table table-border" data-datatable-table="true">
                             <thead>
-                                <tr>
-                                    <th class="min-w-[280px]">
+                            <tr>
+                                <th class="min-w-[280px]">
                                         <span class="sort asc">
                                             <span class="sort-label">Medic</span>
                                             <span class="sort-icon"></span>
                                         </span>
-                                    </th>
-                                    <th class="min-w-[135px]">
+                                </th>
+                                <th class="min-w-[135px]">
                                         <span class="sort">
                                             <span class="sort-label">Pacient</span>
                                             <span class="sort-icon"></span>
                                         </span>
-                                    </th>
-                                    <th class="min-w-[135px]">
+                                </th>
+                                <th class="min-w-[135px]">
                                         <span class="sort">
                                             <span class="sort-label">Status</span>
                                             <span class="sort-icon"></span>
                                         </span>
-                                    </th>
-                                    <th class="min-w-[135px]">
+                                </th>
+                                <th class="min-w-[135px]">
                                         <span class="sort">
                                             <span class="sort-label">Dată</span>
                                             <span class="sort-icon"></span>
                                         </span>
-                                    </th>
-                                </tr>
+                                </th>
+                            </tr>
                             </thead>
                             <tbody>
                             {% for appointment in appointments %}
@@ -138,6 +138,14 @@
     {{ parent() }}
     <script>
       document.addEventListener('DOMContentLoaded', function () {
+      //   'chartData' => [
+      //     'appointmentsByDay' => $appointmentsByDay,
+      //     'appointmentsBySpecialty' => $appointmentsBySpecialty,
+      //     'appointmentsByHour' => $appointmentsByHour
+      // ]
+        const appointmentsByDay = {{ chartData.appointmentsByDay|json_encode()|raw }};
+        const appointmentsBySpecialty = {{ chartData.appointmentsBySpecialty|json_encode()|raw }};
+        const appointmentsByHour = {{ chartData.appointmentsByHour|json_encode()|raw }};
         // Chart: Programări în timp (Line Chart)
         var lineAppointmentsOverTimeOptions = {
           chart: {
@@ -147,10 +155,10 @@
           },
           series: [{
             name: 'Appointments',
-            data: [10, 20, 15, 30, 25, 35, 40] // mock data
+            data: appointmentsByDay.data
           }],
           xaxis: {
-            categories: ['Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă', 'Duminică']
+            categories: appointmentsByDay.categories
           }
         };
         new ApexCharts(document.querySelector("#line_appointments_over_time"), lineAppointmentsOverTimeOptions).render();
@@ -164,10 +172,10 @@
           },
           series: [{
             name: 'Appointments',
-            data: [15, 25, 35, 45, 20] // mock data
+            data: appointmentsBySpecialty.data
           }],
           xaxis: {
-            categories: ['Cardiologie', 'Dermatologie', 'Neurologie', 'Oncologie', 'Pediatrie']
+            categories: appointmentsBySpecialty.categories
           }
         };
         new ApexCharts(document.querySelector("#bar_appointments_by_specialty"), barAppointmentsBySpecialtyOptions).render();
@@ -181,10 +189,10 @@
           },
           series: [{
             name: 'Appointments',
-            data: [5, 10, 15, 20, 15, 10, 5, 2, 8, 12] // mock data
+            data: appointmentsByHour.data
           }],
           xaxis: {
-            categories: ['8 AM', '9 AM', '10 AM', '11 AM', '12 PM', '1 PM', '2 PM', '3 PM', '4 PM', '5 PM']
+            categories: appointmentsByHour.categories
           }
         };
         new ApexCharts(document.querySelector("#line_hourly_distribution"), lineHourlyDistributionOptions).render();

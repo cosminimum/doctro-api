@@ -336,7 +336,8 @@ class DoctorController extends AbstractController
         Request $request,
         AppointmentRepository $appointmentRepo,
         EntityManagerInterface $em,
-        DoctorScheduleRepository $doctorScheduleRepository
+        DoctorScheduleRepository $doctorScheduleRepository,
+        HospitalServiceRepository $hospitalServiceRepository
     ): Response {
         $appointment = $appointmentRepo->find($id);
         if (!$appointment) {
@@ -552,11 +553,13 @@ class DoctorController extends AbstractController
             ];
         }
 
+        $services = $hospitalServiceRepository->findServicesByDoctor($this->getUser());
         return $this->render('pages/doctor/appointments/edit.html.twig', [
             'form' => $form->createView(),
             'appointment' => $appointment,
             'appointments' => json_encode($appointments),
             'doctorSchedules' => json_encode($doctorSchedules),
+            'services' => $services
         ]);
     }
 

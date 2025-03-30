@@ -786,6 +786,7 @@ class SyncFhirResourcesCommand extends Command
             new \DateTime(),
             (new \DateTime())->modify('+1 day'),
             (new \DateTime())->modify('+2 day'),
+            (new \DateTime())->modify('+3 day'),
         ];
 
         foreach ($appointmentDates as $appointmentDate) {
