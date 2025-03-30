@@ -217,7 +217,7 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
     private function sendFhirXmlRequest(string $endpoint, string $xmlData): string
     {
         // Get token from your existing API client
-        $token = $this->fhirApiClient->getToken();
+        $token = $this->hirApiClient->getToken();
 
         // Get base URL from the API client if available, otherwise use a default
         $baseUrl = $this->parameterBag->get('fhir_api.base_url');
