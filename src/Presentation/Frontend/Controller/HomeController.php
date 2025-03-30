@@ -32,6 +32,11 @@ class HomeController extends AbstractController
                 'appointments' => $appointmentRepository->findBy(['patient' => $this->getUser()]),
                 'specialties' => $medicalSpecialtyRepository->findAll(),
                 'services' => $hospitalServiceRepository->findAll(),
+                'chartData' => [
+                    'appointmentsByDay' => [],
+                    'appointmentsBySpecialty' => [],
+                    'appointmentsByHour' => []
+                ]
             ]);
         }
 
@@ -92,6 +97,11 @@ class HomeController extends AbstractController
                 'appointments'     => json_encode($appointments),
                 'doctorSchedules'  => json_encode($doctorSchedules),
                 'services' => $services,
+                'chartData' => [
+                    'appointmentsByDay' => [],
+                    'appointmentsBySpecialty' => [],
+                    'appointmentsByHour' => []
+                ]
             ]);
         }
 
