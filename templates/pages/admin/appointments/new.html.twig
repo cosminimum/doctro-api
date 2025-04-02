@@ -1,0 +1,337 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="grid gap-5 lg:gap-7.5">
+        <div class="grid lg:grid-cols-3 gap-5 lg:gap-7.5 items-stretch">
+            <div class="lg:col-span-2">
+                <div class="grid">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+            <div class="lg:col-span-1">
+                <div class="card h-full">
+                    <div class="card-header">
+                        <h3 class="card-title">Adaugă programare</h3>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(form) }}
+                        {{ form_errors(form) }}
+                        
+                        <label class="form-label font-normal text-gray-900">Medic</label>
+                        {{ form_widget(form.doctor, {'attr': {'class': 'select'}}) }}
+                        
+                        <label class="form-label font-normal text-gray-900">Specialitate</label>
+                        {{ form_widget(form.specialty, {'attr': {'class': 'select'}}) }}
+
+                        <label class="form-label font-normal text-gray-900">Serviciu</label>
+                        {{ form_widget(form.service, {'attr': {'class': 'select'}}) }}
+
+                        <label class="form-label font-normal text-gray-900">Data și ora de start a programării</label>
+                        {{ form_widget(form.appointmentStart, {'attr': {'class': 'flatpickr-datetime input'}}) }}
+
+                        <label class="form-label font-normal text-gray-900">Prenume</label>
+                        {{ form_widget(form.firstName, {'attr': {'class': 'input'}}) }}
+
+                        <label class="form-label font-normal text-gray-900">Nume</label>
+                        {{ form_widget(form.lastName, {'attr': {'class': 'input'}}) }}
+
+                        <label class="form-label font-normal text-gray-900">Email</label>
+                        {{ form_widget(form.email, {'attr': {'class': 'input'}}) }}
+
+                        <label class="form-label font-normal text-gray-900">Telefon</label>
+                        {{ form_widget(form.phone, {'attr': {'class': 'input'}}) }}
+
+                        <label class="form-label font-normal text-gray-900">CNP</label>
+                        {{ form_widget(form.cnp, {'attr': {'class': 'input'}}) }}
+
+                        {{ form_widget(form) }}
+                        <button class="btn btn-primary mt-2">Creați</button>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('theme/vendors/fullcalendar/dist/index.global.js') }}"></script>
+    <script src="{{ asset('theme/vendors/datepicker/dist/datepicker.js') }}"></script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // Define select elements that will be used throughout the script
+        const doctorSelect = document.querySelector('.doctor-select');
+        const specialtySelect = document.querySelector('.specialty-select');
+        const serviceSelect = document.querySelector('.service-select');
+        
+        // Clear any existing options in specialty and service dropdowns
+        if (specialtySelect) {
+            while (specialtySelect.options.length > 0) {
+                specialtySelect.remove(0);
+            }
+            const placeholderOption = document.createElement('option');
+            placeholderOption.value = "";
+            placeholderOption.textContent = "Selectează o specialitate";
+            specialtySelect.appendChild(placeholderOption);
+        }
+        
+        if (serviceSelect) {
+            while (serviceSelect.options.length > 0) {
+                serviceSelect.remove(0);
+            }
+            const servicePlaceholder = document.createElement('option');
+            servicePlaceholder.value = "";
+            servicePlaceholder.textContent = "Selectează un serviciu";
+            serviceSelect.appendChild(servicePlaceholder);
+        }
+        var calendarEl = document.getElementById('calendar');
+        const appointments = {{ appointments|default('[]')|raw }};
+        const doctorSchedules = {{ doctorSchedules|default('[]')|raw }};
+        
+        var blockedEvents = [];
+        if (doctorSchedules && doctorSchedules.length > 0) {
+            doctorSchedules.forEach(schedule => {
+                schedule.slots.forEach(slot => {
+                    if (slot.isBooked) {
+                        blockedEvents.push({
+                            start: schedule.date + 'T' + slot.startTime,
+                            end: schedule.date + 'T' + slot.endTime,
+                            display: 'background',
+                            backgroundColor: '#FF0000'
+                        });
+                    }
+                });
+            });
+        }
+        
+        var availableEvents = [];
+        if (doctorSchedules && doctorSchedules.length > 0) {
+            doctorSchedules.forEach(schedule => {
+                schedule.slots.forEach(slot => {
+                    if (!slot.isBooked) {
+                        availableEvents.push({
+                            start: schedule.date + 'T' + slot.startTime,
+                            end: schedule.date + 'T' + slot.endTime,
+                            display: 'background',
+                            backgroundColor: '#3788d8'
+                        });
+                    }
+                });
+            });
+        }
+        
+        var allEvents = [...appointments, ...blockedEvents, ...availableEvents];
+        
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'timeGridWeek',
+            allDaySlot: false,
+            headerToolbar: {left: 'prev,next', center: 'title', right: ''},
+            locale: 'ro',
+            slotDuration: '00:30:00',
+            slotMinTime: '07:00:00',
+            slotMaxTime: '23:59:59',
+            snapDuration: '00:30:00',
+            slotLabelInterval: '00:30',
+            slotLabelFormat: {hour: '2-digit', minute: '2-digit', hour12: false},
+            events: allEvents,
+            eventContent: function (arg) {
+                if (arg.event.display !== 'background') {
+                    return {
+                        html: '<div class="fc-event-title">' + arg.event.title + '</div>'
+                    };
+                }
+                return null;
+            },
+            eventClick: function (info) {
+                if (info.event.display !== "background") {
+                    window.location.href = '/admin/appointments/' + info.event.id + '/edit';
+                }
+            },
+            dateClick: function (info) {
+                const dateStr = info.dateStr;
+                const appointmentStartField = document.querySelector('input.flatpickr-datetime');
+                if (appointmentStartField && appointmentStartField._flatpickr) {
+                    appointmentStartField._flatpickr.setDate(dateStr);
+                }
+            }
+        });
+        calendar.render();
+        
+        // Initialize flatpickr
+        flatpickr('input.flatpickr-datetime', {
+            enableTime: true,
+            dateFormat: "d-m-Y H:i",
+            time_24hr: true,
+            minuteIncrement: 30
+        });
+        
+        // Handle doctor selection to load their schedule, specialties, and services
+        
+        if (doctorSelect) {
+            doctorSelect.addEventListener('change', function() {
+                const doctorId = this.value;
+                if (doctorId) {
+                    // Clear and disable specialty and service selects until data is loaded
+                    specialtySelect.innerHTML = '<option value="">Selectează o specialitate</option>';
+                    serviceSelect.innerHTML = '<option value="">Selectează un serviciu</option>';
+                    
+                    // Fetch doctor's schedule, specialties, and services
+                    fetchDoctorSchedule(doctorId);
+                    fetchDoctorSpecialties(doctorId);
+                }
+            });
+        }
+        
+        // Handle specialty selection to filter services
+        if (specialtySelect) {
+            specialtySelect.addEventListener('change', function() {
+                const specialtyId = this.value;
+                const doctorId = doctorSelect.value;
+                
+                if (specialtyId && doctorId) {
+                    filterServicesBySpecialty(doctorId, specialtyId);
+                }
+            });
+        }
+        
+        // Function to fetch doctor schedule
+        function fetchDoctorSchedule(doctorId) {
+            fetch(`/admin/api/doctor-schedule/${doctorId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Clear previous events
+                    calendar.getEvents().forEach(event => event.remove());
+                    
+                    // Add blocked slots
+                    const blockedSlots = data.blockedSlots || [];
+                    blockedSlots.forEach(slot => {
+                        calendar.addEvent({
+                            start: slot.date + 'T' + slot.startTime,
+                            end: slot.date + 'T' + slot.endTime,
+                            display: 'background',
+                            backgroundColor: '#FF0000'
+                        });
+                    });
+                    
+                    // Add available slots
+                    const availableSlots = data.availableSlots || [];
+                    availableSlots.forEach(slot => {
+                        calendar.addEvent({
+                            start: slot.date + 'T' + slot.startTime,
+                            end: slot.date + 'T' + slot.endTime,
+                            display: 'background',
+                            backgroundColor: '#3788d8'
+                        });
+                    });
+                    
+                    // Add appointments
+                    const appointments = data.appointments || [];
+                    appointments.forEach(appt => {
+                        calendar.addEvent({
+                            id: appt.id,
+                            title: appt.title,
+                            start: appt.start,
+                            end: appt.end
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching doctor schedule:', error));
+        }
+        
+        // Function to fetch doctor specialties
+        function fetchDoctorSpecialties(doctorId) {
+            fetch(`/admin/api/doctor-specialties/${doctorId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Empty all current options from specialty select
+                    while (specialtySelect.options.length > 0) {
+                        specialtySelect.remove(0);
+                    }
+                    
+                    // Add placeholder option
+                    const placeholderOption = document.createElement('option');
+                    placeholderOption.value = "";
+                    placeholderOption.textContent = "Selectează o specialitate";
+                    specialtySelect.appendChild(placeholderOption);
+                    
+                    // Add doctor's specialties
+                    const specialties = data.specialties || [];
+                    specialties.forEach(specialty => {
+                        const option = document.createElement('option');
+                        option.value = specialty.id;
+                        option.textContent = specialty.name;
+                        specialtySelect.appendChild(option);
+                    });
+                    
+                    // Fetch and populate services after specialties are loaded
+                    fetchDoctorServices(doctorId);
+                })
+                .catch(error => console.error('Error fetching doctor specialties:', error));
+        }
+        
+        // Function to fetch doctor services
+        function fetchDoctorServices(doctorId) {
+            fetch(`/admin/api/doctor-services/${doctorId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Store all services for this doctor
+                    window.doctorServices = data.services || [];
+                    
+                    // Empty all current options from service select
+                    while (serviceSelect.options.length > 0) {
+                        serviceSelect.remove(0);
+                    }
+                    
+                    // Add placeholder option
+                    const servicePlaceholder = document.createElement('option');
+                    servicePlaceholder.value = "";
+                    servicePlaceholder.textContent = "Selectează un serviciu";
+                    serviceSelect.appendChild(servicePlaceholder);
+                    
+                    // Add doctor's services
+                    window.doctorServices.forEach(service => {
+                        const option = document.createElement('option');
+                        option.value = service.id;
+                        option.textContent = service.name;
+                        option.dataset.specialtyId = service.specialtyId;
+                        serviceSelect.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching doctor services:', error));
+        }
+        
+        // Function to filter services by specialty
+        function filterServicesBySpecialty(doctorId, specialtyId) {
+            // Empty all current options from service select
+            while (serviceSelect.options.length > 0) {
+                serviceSelect.remove(0);
+            }
+            
+            // Add placeholder option
+            const servicePlaceholder = document.createElement('option');
+            servicePlaceholder.value = "";
+            servicePlaceholder.textContent = "Selectează un serviciu";
+            serviceSelect.appendChild(servicePlaceholder);
+            
+            // If we have the doctor's services stored, filter them by specialty
+            if (window.doctorServices) {
+                const filteredServices = window.doctorServices.filter(
+                    service => service.specialtyId == specialtyId
+                );
+                
+                filteredServices.forEach(service => {
+                    const option = document.createElement('option');
+                    option.value = service.id;
+                    option.textContent = service.name;
+                    option.dataset.specialtyId = service.specialtyId;
+                    serviceSelect.appendChild(option);
+                });
+            } else {
+                // If services aren't loaded yet, fetch them
+                fetchDoctorServices(doctorId);
+            }
+        }
+      });
+    </script>
+{% endblock %}

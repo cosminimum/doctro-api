@@ -1,0 +1,78 @@
+{% extends 'states/admin-dashboard.html.twig' %}
+
+{% block body %}
+    <div class="grid gap-5 lg:gap-7.5">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">Lista Programări</h3>
+                <div class="card-toolbar">
+                    <a href="{{ path('admin_add_appointment') }}" class="btn btn-primary">Adaugă Programare</a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div data-datatable="true" data-datatable-page-size="50" id="doctor_table">
+                    <div class="scrollable-x-auto">
+                        <table class="table table-border" data-datatable-table="true">
+                            <thead>
+                            <tr class="fw-semibold fs-6 text-gray-800 border-bottom border-gray-200">
+                                <th>ID</th>
+                                <th>Pacient</th>
+                                <th>Medic</th>
+                                <th>Specializare</th>
+                                <th>Serviciu</th>
+                                <th>Data</th>
+                                <th>Status</th>
+                                <th>Acțiuni</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for appointment in appointments %}
+                                <tr>
+                                    <td>{{ appointment.id }}</td>
+                                    <td>{{ appointment.patient.lastName }} {{ appointment.patient.firstName }}</td>
+                                    <td>{{ appointment.doctor.lastName }} {{ appointment.doctor.firstName }}</td>
+                                    <td>{{ appointment.medicalSpecialty.name }}</td>
+                                    <td>{{ appointment.hospitalService.name }}</td>
+                                    <td>
+                                        {{ appointment.timeSlot.schedule.date|date('d.m.Y') }}
+                                        {{ appointment.timeSlot.startTime|date('H:i') }}
+                                    </td>
+                                    <td>
+                                        {% if appointment.isActive %}
+                                            <span class="badge badge-xs badge-outline badge-success text-2xs -mr-2.5">Activ</span>
+                                        {% else %}
+                                            <span class="badge badge-xs badge-outline badge-warning text-2xs -mr-2.5">Inactiv</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('admin_edit_appointment', {'id': appointment.id}) }}" class="btn btn-sm btn-icon btn-clear btn-light"><i class="ki-filled ki-notepad-edit"></i></a>
+                                        <form action="{{ path('admin_delete_appointment', {'id': appointment.id}) }}" method="post" style="display: inline;">
+                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ appointment.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-icon btn-clear btn-light" onclick="return confirm('Sunteți sigur că doriți să anulați această programare?')"><i class="ki-filled ki-trash"></i></button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="8" class="text-center">Nicio programare găsită</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="card-footer justify-center md:justify-between flex-col md:flex-row gap-5 text-gray-600 text-2sm font-medium">
+                        <div class="flex items-center gap-2 order-2 md:order-1">
+                            Arată
+                            <select class="select select-sm w-16" data-datatable-size="true" name="perpage"></select>
+                            pe pagină
+                        </div>
+                        <div class="flex items-center gap-4 order-1 md:order-2">
+                            <span data-datatable-info="true"></span>
+                            <div class="pagination" data-datatable-pagination="true"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
