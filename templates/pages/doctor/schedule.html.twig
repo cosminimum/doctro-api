@@ -9,6 +9,9 @@
                     <i class="ki-filled ki-magnifier leading-none text-md text-gray-500 absolute top-1/2 start-0 -translate-y-1/2 ms-3"></i>
                     <input class="input input-md ps-8" data-datatable-search="#schedules_table" placeholder="Caută după dată" type="text"/>
                 </div>
+                <div class="relative">
+                    <a href="#" class="btn btn-light export-excel" data-table-id="schedules_table" data-file-name="program">Descarcă</a>
+                </div>
             </div>
         </div>
         <div class="card-body">
@@ -143,6 +146,72 @@
             }
           }
         });
+        
+        // Handle Excel export functionality
+        const exportButtons = document.querySelectorAll('.export-excel');
+        exportButtons.forEach(button => {
+          button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tableId = this.getAttribute('data-table-id');
+            const fileName = this.getAttribute('data-file-name') || 'export';
+            const tableContainer = document.getElementById(tableId);
+            
+            if (tableContainer) {
+              const table = tableContainer.querySelector('table');
+              if (table) {
+                exportTableToExcel(table, fileName);
+              } else {
+                alert('Tabelul nu a fost găsit');
+              }
+            } else {
+              alert('Tabelul nu a fost găsit');
+            }
+          });
+        });
+        
+        // Export table data to Excel
+        function exportTableToExcel(table, fileName = 'export') {
+          // Create a worksheet
+          let xlsx = '';
+          const headers = [];
+          
+          // Get headers
+          const headerRow = table.querySelector('thead tr');
+          if (headerRow) {
+            headerRow.querySelectorAll('th').forEach(th => {
+              // Get the text content from the sort-label if it exists, otherwise use the th's text
+              const sortLabel = th.querySelector('.sort-label');
+              const headerText = sortLabel ? sortLabel.textContent.trim() : th.textContent.trim();
+              headers.push(headerText);
+            });
+          }
+          
+          // Add headers to Excel data
+          xlsx += headers.join('\t') + '\n';
+          
+          // Get table data
+          const rows = table.querySelectorAll('tbody tr');
+          rows.forEach(row => {
+            const rowData = [];
+            row.querySelectorAll('td').forEach(cell => {
+              // Clean the text to remove HTML and excess whitespace
+              let cellText = cell.textContent.replace(/\s+/g, ' ').trim();
+              // Escape special characters for TSV
+              cellText = cellText.replace(/\t/g, ' ').replace(/\n/g, ' ');
+              rowData.push(cellText);
+            });
+            xlsx += rowData.join('\t') + '\n';
+          });
+          
+          // Create a download link
+          const blob = new Blob([xlsx], { type: 'application/vnd.ms-excel' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `${fileName}.xls`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
       });
     </script>
 {% endblock %}

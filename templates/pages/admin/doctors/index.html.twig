@@ -11,7 +11,7 @@
                         <input autocomplete="off" placeholder="Caută medic" type="text" data-datatable-search="#doctor_table"/>
                     </div>
                     <div>
-                        <a href="#" class="btn btn-sm btn-light">Descarcă</a>
+                        <a href="#" class="btn btn-sm btn-light export-excel" data-table-id="doctor_table" data-file-name="medici">Descarcă</a>
                     </div>
                     <div>
                         <button data-modal-toggle="#add-doctor" class="btn btn-sm btn-primary">Adaugă</button>
@@ -220,6 +220,72 @@
             });
           }, 100);
         });
+        
+        // Handle Excel export functionality
+        const exportButtons = document.querySelectorAll('.export-excel');
+        exportButtons.forEach(button => {
+          button.addEventListener('click', function(e) {
+            e.preventDefault();
+            const tableId = this.getAttribute('data-table-id');
+            const fileName = this.getAttribute('data-file-name') || 'export';
+            const tableContainer = document.getElementById(tableId);
+            
+            if (tableContainer) {
+              const table = tableContainer.querySelector('table');
+              if (table) {
+                exportTableToExcel(table, fileName);
+              } else {
+                alert('Tabelul nu a fost găsit');
+              }
+            } else {
+              alert('Tabelul nu a fost găsit');
+            }
+          });
+        });
+        
+        // Export table data to Excel
+        function exportTableToExcel(table, fileName = 'export') {
+          // Create a worksheet
+          let xlsx = '';
+          const headers = [];
+          
+          // Get headers
+          const headerRow = table.querySelector('thead tr');
+          if (headerRow) {
+            headerRow.querySelectorAll('th').forEach(th => {
+              // Get the text content from the sort-label if it exists, otherwise use the th's text
+              const sortLabel = th.querySelector('.sort-label');
+              const headerText = sortLabel ? sortLabel.textContent.trim() : th.textContent.trim();
+              headers.push(headerText);
+            });
+          }
+          
+          // Add headers to Excel data
+          xlsx += headers.join('\t') + '\n';
+          
+          // Get table data
+          const rows = table.querySelectorAll('tbody tr');
+          rows.forEach(row => {
+            const rowData = [];
+            row.querySelectorAll('td').forEach(cell => {
+              // Clean the text to remove HTML and excess whitespace
+              let cellText = cell.textContent.replace(/\s+/g, ' ').trim();
+              // Escape special characters for TSV
+              cellText = cellText.replace(/\t/g, ' ').replace(/\n/g, ' ');
+              rowData.push(cellText);
+            });
+            xlsx += rowData.join('\t') + '\n';
+          });
+          
+          // Create a download link
+          const blob = new Blob([xlsx], { type: 'application/vnd.ms-excel' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `${fileName}.xls`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+        }
       });
     </script>
 {% endblock %}

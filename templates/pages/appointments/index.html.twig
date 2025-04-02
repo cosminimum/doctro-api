@@ -84,7 +84,7 @@
                         <div class="flex flex-col gap-1.5">
                             <div class="flex items-center flex-wrap gap-2.5">
                                 <a class="text-base font-medium text-gray-900 hover:text-primary-active" href="tel:0247306711">
-                                    Pentru detalii suplimentare puteti contacta numarul de telefon 0247 306 711
+                                    Pentru detalii suplimentare puteti contacta numarul de telefon 0311 302 300
                                 </a>
                             </div>
                         </div>
@@ -189,6 +189,8 @@
           mutations.forEach(mutation => {
             if (mutation.addedNodes.length) {
               bindConfirmButtons();
+              // Bind export buttons after content is loaded
+              bindExportButtons();
             }
           });
         });
@@ -206,6 +208,76 @@
             button.removeEventListener('click', handleConfirmClick);
             button.addEventListener('click', handleConfirmClick);
           });
+        }
+
+        // Function to bind export buttons
+        function bindExportButtons() {
+          const exportButtons = document.querySelectorAll('.export-excel');
+          exportButtons.forEach(button => {
+            button.removeEventListener('click', handleExportClick);
+            button.addEventListener('click', handleExportClick);
+          });
+        }
+
+        // Handle export button click
+        function handleExportClick(e) {
+          e.preventDefault();
+          const tableId = this.getAttribute('data-table-id');
+          const fileName = this.getAttribute('data-file-name') || 'export';
+          const table = document.getElementById(tableId);
+          
+          if (table) {
+            exportTableToExcel(table, fileName);
+          } else {
+            showError('Tabelul nu a fost găsit');
+          }
+        }
+
+        // Export table data to Excel
+        function exportTableToExcel(table, fileName = 'export') {
+          // Get data from DataTable
+          const dataTable = table.closest('[data-datatable="true"]');
+          
+          // Create a worksheet
+          let xlsx = '';
+          const headers = [];
+          
+          // Get headers
+          const headerRow = table.querySelector('thead tr');
+          if (headerRow) {
+            headerRow.querySelectorAll('th').forEach(th => {
+              // Get the text content from the sort-label if it exists, otherwise use the th's text
+              const sortLabel = th.querySelector('.sort-label');
+              const headerText = sortLabel ? sortLabel.textContent.trim() : th.textContent.trim();
+              headers.push(headerText);
+            });
+          }
+          
+          // Add headers to Excel data
+          xlsx += headers.join('\t') + '\\n';
+          
+          // Get table data
+          const rows = table.querySelectorAll('tbody tr');
+          rows.forEach(row => {
+            const rowData = [];
+            row.querySelectorAll('td').forEach(cell => {
+              // Clean the text to remove HTML and excess whitespace
+              let cellText = cell.textContent.replace(/\\s+/g, ' ').trim();
+              // Escape special characters for TSV
+              cellText = cellText.replace(/\\t/g, ' ').replace(/\\n/g, ' ');
+              rowData.push(cellText);
+            });
+            xlsx += rowData.join('\t') + '\\n';
+          });
+          
+          // Create a download link
+          const blob = new Blob([xlsx], { type: 'application/vnd.ms-excel' });
+          const link = document.createElement('a');
+          link.href = URL.createObjectURL(blob);
+          link.download = `${fileName}.xls`;
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
         }
 
         function handleConfirmClick(e) {
@@ -290,6 +362,9 @@
             if (!response.ok) throw new Error('Network response was not ok');
             const html = await response.text();
             content.innerHTML = html;
+            
+            // Bind export buttons after content is loaded
+            bindExportButtons();
           } catch (error) {
             content.innerHTML = '<div class="text-red-500">Error loading available slots. Please try again.</div>';
           }
@@ -371,6 +446,9 @@
             if (slotsContent) slotsContent.innerHTML = '';
           });
         }
+        
+        // Initialize export buttons on page load
+        bindExportButtons();
       });
     </script>
 {% endblock %}
