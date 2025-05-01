@@ -3,6 +3,7 @@ twig:
     globals:
         hospital_name: '%env(HOSPITAL_NAME)%'
         hospital_url: '%env(HOSPITAL_URL)%'
+        hospital_logo: '%env(HOSPITAL_LOGO)%'
 
 when@test:
     twig:
