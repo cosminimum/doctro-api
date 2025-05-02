@@ -14,7 +14,7 @@ class TimeSlot
     private int $id;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private string $idHis;
+    private ?string $idHis = null;
 
     #[ORM\ManyToOne(targetEntity: DoctorSchedule::class, inversedBy: 'timeSlots')]
     #[ORM\JoinColumn(nullable: false)]
@@ -48,12 +48,12 @@ class TimeSlot
         return $this;
     }
 
-    public function getIdHis(): string
+    public function getIdHis(): ?string
     {
         return $this->idHis;
     }
 
-    public function setIdHis(string $idHis): TimeSlot
+    public function setIdHis(?string $idHis): TimeSlot
     {
         $this->idHis = $idHis;
 

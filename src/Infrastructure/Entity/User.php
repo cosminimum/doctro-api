@@ -37,7 +37,7 @@ class User implements
     private int $id;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private string $idHis;
+    private ?string $idHis = null;
 
     #[ORM\Column(type: 'string', length: 180, unique: true)]
     private string $email;
@@ -71,12 +71,12 @@ class User implements
         return $this->id;
     }
 
-    public function getIdHis(): string
+    public function getIdHis(): ?string
     {
         return $this->idHis;
     }
 
-    public function setIdHis(string $idHis): User
+    public function setIdHis(?string $idHis): User
     {
         $this->idHis = $idHis;
 

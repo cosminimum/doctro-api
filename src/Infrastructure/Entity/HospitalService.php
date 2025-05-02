@@ -25,7 +25,7 @@ class HospitalService
     private int $id;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private string $idHis;
+    private ?string $idHis = null;
 
     #[ORM\ManyToMany(targetEntity: Doctor::class, mappedBy: 'hospitalServices')]
     private Collection $doctors;
@@ -74,12 +74,12 @@ class HospitalService
         return $this->id;
     }
 
-    public function getIdHis(): string
+    public function getIdHis(): ?string
     {
         return $this->idHis;
     }
 
-    public function setIdHis(string $idHis): HospitalService
+    public function setIdHis(?string $idHis): HospitalService
     {
         $this->idHis = $idHis;
 

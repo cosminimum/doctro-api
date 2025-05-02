@@ -20,7 +20,7 @@ class Appointment
     private int $id;
 
     #[ORM\Column(type: 'string', nullable: true)]
-    private string $idHis;
+    private ?string $idHis = null;
 
     #[ORM\ManyToOne(targetEntity: Patient::class, inversedBy: 'appointments')]
     #[ORM\JoinColumn(name: 'patient_id', referencedColumnName: 'id', nullable: false)]
@@ -55,12 +55,12 @@ class Appointment
         return $this->id;
     }
 
-    public function getIdHis(): string
+    public function getIdHis(): ?string
     {
         return $this->idHis;
     }
 
-    public function setIdHis(string $idHis): Appointment
+    public function setIdHis(?string $idHis): Appointment
     {
         $this->idHis = $idHis;
 

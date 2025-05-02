@@ -59,13 +59,16 @@ class AppointmentRepository extends ServiceEntityRepository implements Appointme
 
         $this->getEntityManager()->persist($appointment);
         $this->getEntityManager()->flush();
-        $this->createFhirAppointment($appointment);
-//        try {
-//
-//        } catch (\Exception $exception) {
-//            //
-//        }
-
+        
+        // Only send to FHIR if external API integration is enabled
+        if ($this->parameterBag->get('use_external_api')) {
+            try {
+                $this->createFhirAppointment($appointment);
+            } catch (\Exception $exception) {
+                // Log the exception but continue execution
+                error_log('Failed to create appointment in FHIR: ' . $exception->getMessage());
+            }
+        }
 
         return $appointment->getId();
     }
