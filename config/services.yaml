@@ -10,6 +10,7 @@ parameters:
     fhir_api.username: '%env(FHIR_API_USERNAME)%'
     fhir_api.password: '%env(FHIR_API_PASSWORD)%'
     fhir_api.consumer_key: '%env(FHIR_API_CONSUMER_KEY)%'
+    sms_url: '%env(SMS_URL)%'
 
 
 services:
