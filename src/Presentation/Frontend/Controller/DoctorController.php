@@ -179,7 +179,7 @@ class DoctorController extends AbstractController
             }
 
             // Build and execute SMS API call
-            $smsUrl = $this->getParameter('sms_url') . $encodedMessage;
+            $smsUrl = sprintf($this->getParameter('sms_url'), $phoneNumber, $encodedMessage);
 
             try {
                 $smsResponse = file_get_contents($smsUrl);
